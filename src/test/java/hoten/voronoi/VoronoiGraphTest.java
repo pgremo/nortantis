@@ -1,4 +1,4 @@
-package nortantis.test;
+package hoten.voronoi;
 
 import org.junit.Test;
 

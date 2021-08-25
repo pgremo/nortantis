@@ -1,4 +1,4 @@
-package nortantis.test;
+package nortantis.util;
 
 import static org.junit.Assert.assertEquals;
 
