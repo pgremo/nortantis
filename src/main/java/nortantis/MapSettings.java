@@ -1,32 +1,26 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import hoten.geom.Point;
 import nortantis.editor.CenterEdit;
 import nortantis.editor.EdgeEdit;
 import nortantis.editor.MapEdits;
 import nortantis.editor.RegionEdit;
 import nortantis.util.AssetsPath;
-import nortantis.util.Function0;
 import nortantis.util.Helper;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import java.awt.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 /**
  * For parsing and storing map settings.
@@ -378,101 +372,45 @@ public class MapSettings implements Serializable
 			}
 			return parseBoolean(propString);
 		});
-		colorizeOcean = getProperty("colorizeOcean", new Function0<Boolean>()
-		{
-			public Boolean apply()
+		colorizeOcean = getProperty("colorizeOcean", () -> {
+			String propString = props.getProperty("colorizeOcean");
+			if (propString == null)
 			{
-				String propString = props.getProperty("colorizeOcean");
-				if (propString == null)
-				{
-					return true;
-				}
-				return parseBoolean(propString);
+				return true;
 			}
+			return parseBoolean(propString);
 		});
-		colorizeLand = getProperty("colorizeLand", new Function0<Boolean>()
-		{
-			public Boolean apply()
+		colorizeLand = getProperty("colorizeLand", () -> {
+			String propString = props.getProperty("colorizeLand");
+			if (propString == null)
 			{
-				String propString = props.getProperty("colorizeLand");
-				if (propString == null)
-				{
-					return true;
-				}
-				return parseBoolean(propString);
+				return true;
 			}
+			return parseBoolean(propString);
 		});
-		backgroundTextureImage = getProperty("backgroundTextureImage", new Function0<String>()
-		{
-			public String apply()
-			{
-				String result = props.getProperty("backgroundTextureImage");
-				if (result == null)
-					result = Paths.get(AssetsPath.get(), "example textures").toString();
-				return result;
-			}
+		backgroundTextureImage = getProperty("backgroundTextureImage", () -> {
+			String result = props.getProperty("backgroundTextureImage");
+			if (result == null)
+				result = Paths.get(AssetsPath.get(), "example textures").toString();
+			return result;
 		});
-		backgroundRandomSeed = getProperty("backgroundRandomSeed", new Function0<Long>()
-		{
-			public Long apply()
-			{
-				return (long)(Long.parseLong(props.getProperty("backgroundRandomSeed")));
-			}
+		backgroundRandomSeed = getProperty("backgroundRandomSeed", () -> Long.parseLong(props.getProperty("backgroundRandomSeed")));
+		oceanColor = getProperty("oceanColor", () -> parseColor(props.getProperty("oceanColor")));
+		landColor = getProperty("landColor", () -> parseColor(props.getProperty("landColor")));
+		generatedWidth = getProperty("generatedWidth", () -> Integer.parseInt(props.getProperty("generatedWidth")));
+		generatedHeight = getProperty("generatedHeight", () -> Integer.parseInt(props.getProperty("generatedHeight")));
+		fractalPower = getProperty("fractalPower", () -> Float.parseFloat(props.getProperty("fractalPower")));
+		landBackgroundImage = getProperty("landBackgroundImage", () -> {
+			String result = props.getProperty("landBackgroundImage");
+			if (result == null)
+				throw new NullPointerException();
+			return result;
 		});
-		oceanColor = getProperty("oceanColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("oceanColor"));
-			}
-		});
-		landColor = getProperty("landColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("landColor"));
-			}
-		});
-		generatedWidth = getProperty("generatedWidth", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				return (int)(Integer.parseInt(props.getProperty("generatedWidth")));
-			}
-		});
-		generatedHeight = getProperty("generatedHeight", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				return (int)(Integer.parseInt(props.getProperty("generatedHeight")));
-			}
-		});
-		fractalPower = getProperty("fractalPower", new Function0<Float>()
-		{
-			public Float apply()
-			{
-				return Float.parseFloat(props.getProperty("fractalPower"));
-			}
-		});
-		landBackgroundImage = getProperty("landBackgroundImage", new Function0<String>()
-		{
-			public String apply()
-			{
-				String result = props.getProperty("landBackgroundImage");
-				if (result == null)
-					throw new NullPointerException();
-				return result;
-			}
-		});
-		oceanBackgroundImage = getProperty("oceanBackgroundImage", new Function0<String>()
-		{
-			public String apply()
-			{
-				String result = props.getProperty("oceanBackgroundImage");
-				if (result == null)
-					throw new NullPointerException();
-				return result;
-			}
+		oceanBackgroundImage = getProperty("oceanBackgroundImage", () -> {
+			String result = props.getProperty("oceanBackgroundImage");
+			if (result == null)
+				throw new NullPointerException();
+			return result;
 		});
 		
 		drawRegionColors = getProperty("drawRegionColors", () ->
@@ -500,21 +438,13 @@ public class MapSettings implements Serializable
 			String str = props.getProperty("brightnessRange");
 			return str == null ? 25 : Integer.parseInt(str); // default value
 		});
-		drawIcons = getProperty("drawIcons", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				String str = props.getProperty("drawIcons");
-				return str == null ? true : parseBoolean(str);
-			}
+		drawIcons = getProperty("drawIcons", () -> {
+			String str = props.getProperty("drawIcons");
+			return str == null || parseBoolean(str);
 		});
-		drawRoads= getProperty("drawRoads", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				String str = props.getProperty("drawRoads");
-				return str == null ? true : parseBoolean(str);
-			}
+		drawRoads= getProperty("drawRoads", () -> {
+			String str = props.getProperty("drawRoads");
+			return str == null || parseBoolean(str);
 		});
 		
 		cityIconSetName = getProperty("cityIconSetName", () -> 
@@ -544,271 +474,162 @@ public class MapSettings implements Serializable
 			return setName;
 		});
 	
-		drawText = getProperty("drawText", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				return parseBoolean(props.getProperty("drawText"));
-			}
-		});
-		textRandomSeed = getProperty("textRandomSeed", new Function0<Long>()
-		{
-			public Long apply()
-			{
-				return (long)(Long.parseLong(props.getProperty("textRandomSeed")));
-			}
-		});
-		books = new TreeSet<>(getProperty("books", new Function0<List<String>>()
-		{
-			public List<String> apply()
-			{
-				return Arrays.asList(props.getProperty("books").split("\t"));
-			}
-		}));
+		drawText = getProperty("drawText", () -> parseBoolean(props.getProperty("drawText")));
+		textRandomSeed = getProperty("textRandomSeed", () -> Long.parseLong(props.getProperty("textRandomSeed")));
+		books = new TreeSet<>(getProperty("books", () -> Arrays.asList(props.getProperty("books").split("\t"))));
 		
-		titleFont = getProperty("titleFont", new Function0<Font>()
-		{
-			public Font apply()
-			{
-				return parseFont(props.getProperty("titleFont"));
-			}
-		});	
+		titleFont = getProperty("titleFont", () -> parseFont(props.getProperty("titleFont")));
 
-		titleFont = getProperty("titleFont", new Function0<Font>()
-		{
-			public Font apply()
-			{
-				return parseFont(props.getProperty("titleFont"));
-			}
-		});
-		regionFont = getProperty("regionFont", new Function0<Font>()
-		{
-			public Font apply()
-			{
-				return parseFont(props.getProperty("regionFont"));
-			}
-		});	
+		titleFont = getProperty("titleFont", () -> parseFont(props.getProperty("titleFont")));
+		regionFont = getProperty("regionFont", () -> parseFont(props.getProperty("regionFont")));
 
-		mountainRangeFont = getProperty("mountainRangeFont", new Function0<Font>()
-		{
-			public Font apply()
-			{
-				return parseFont(props.getProperty("mountainRangeFont"));
-			}
-		});	
-		otherMountainsFont = getProperty("otherMountainsFont", new Function0<Font>()
-		{
-			public Font apply()
-			{
-				return parseFont(props.getProperty("otherMountainsFont"));
-			}
-		});	
-		riverFont = getProperty("riverFont", new Function0<Font>()
-		{
-			public Font apply()
-			{
-				return parseFont(props.getProperty("riverFont"));
-			}
-		});	
-		boldBackgroundColor = getProperty("boldBackgroundColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("boldBackgroundColor"));
-			}
+		mountainRangeFont = getProperty("mountainRangeFont", () -> parseFont(props.getProperty("mountainRangeFont")));
+		otherMountainsFont = getProperty("otherMountainsFont", () -> parseFont(props.getProperty("otherMountainsFont")));
+		riverFont = getProperty("riverFont", () -> parseFont(props.getProperty("riverFont")));
+		boldBackgroundColor = getProperty("boldBackgroundColor", () -> parseColor(props.getProperty("boldBackgroundColor")));
+		drawBoldBackground = getProperty("drawBoldBackground", () -> {
+			String value = props.getProperty("drawBoldBackground");
+			if (value == null)
+				return true; // default value
+			return  parseBoolean(value);
 		});
-		drawBoldBackground = getProperty("drawBoldBackground", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				String value = props.getProperty("drawBoldBackground");
-				if (value == null)
-					return true; // default value
-				return  parseBoolean(value);
-			}
+		textColor = getProperty("textColor", () -> parseColor(props.getProperty("textColor")));
+		drawBorder = getProperty("drawBorder", () -> {
+			String value = props.getProperty("drawBorder");
+			if (value == null)
+				return false; // default value
+			return  parseBoolean(value);
 		});
-		textColor = getProperty("textColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("textColor"));
-			}
+		borderType = getProperty("borderType", () -> {
+			String result = props.getProperty("borderType");
+			if (result == null)
+				return "";
+			return result;
 		});
-		drawBorder = getProperty("drawBorder", new Function0<Boolean>()
-		{
-			public Boolean apply()
+		borderWidth = getProperty("borderWidth", () -> {
+			String value = props.getProperty("borderWidth");
+			if (value == null)
 			{
-				String value = props.getProperty("drawBorder");
-				if (value == null)
-					return false; // default value
-				return  parseBoolean(value);
+				return 0;
 			}
+			return Integer.parseInt(value);
 		});
-		borderType = getProperty("borderType", new Function0<String>()
-		{
-			public String apply()
+		frayedBorderSize = getProperty("frayedBorderSize", () -> {
+			String value = props.getProperty("frayedBorderSize");
+			if (value == null)
 			{
-				String result = props.getProperty("borderType");
-				if (result == null)
-					return "";
-				return result;
+				return 10000;
 			}
-		});
-		borderWidth = getProperty("borderWidth", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				String value = props.getProperty("borderWidth");
-				if (value == null)
-				{
-					return 0;
-				}
-				return Integer.parseInt(value);
-			}
-		});
-		frayedBorderSize = getProperty("frayedBorderSize", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				String value = props.getProperty("frayedBorderSize");
-				if (value == null)
-				{
-					return 10000;
-				}
-				return Integer.parseInt(value);
-			}
+			return Integer.parseInt(value);
 		});
 		
 		edits = new MapEdits();
 		// hiddenTextIds is a comma delimited list.
 				
-		edits.text = getProperty("editedText", new Function0<CopyOnWriteArrayList<MapText>>()
-		{
-	
-			@Override
-			public CopyOnWriteArrayList<MapText> apply()
-			{
-				String str = props.getProperty("editedText");
-				if (str == null || str.isEmpty())
-					return new CopyOnWriteArrayList<>();
-				JSONArray array = (JSONArray) JSONValue.parse(str);
-				CopyOnWriteArrayList<MapText> result = new CopyOnWriteArrayList<>();
-				for (Object obj : array)
-				{
-					JSONObject jsonObj = (JSONObject) obj;
-					String text = (String) jsonObj.get("text");
-					Point location = new Point((Double)jsonObj.get("locationX"), (Double)jsonObj.get("locationY"));
-					double angle = (Double)jsonObj.get("angle");
-					TextType type = Enum.valueOf(TextType.class, ((String)jsonObj.get("type")).replace(" ", "_"));
-					MapText mp = new MapText(text, location, angle, type);
-					result.add(mp);
-				}
-				
-				return result;
+		edits.text = getProperty("editedText", () -> {
+			String str = props.getProperty("editedText");
+			if (str == null || str.isEmpty())
+				return new CopyOnWriteArrayList<>();
+			JSONArray array = (JSONArray) JSONValue.parse(str);
+			CopyOnWriteArrayList<MapText> result = new CopyOnWriteArrayList<>();
+			for (Object obj : array) {
+				JSONObject jsonObj = (JSONObject) obj;
+				String text = (String) jsonObj.get("text");
+				Point location = new Point((Double) jsonObj.get("locationX"), (Double) jsonObj.get("locationY"));
+				double angle = (Double) jsonObj.get("angle");
+				TextType type = Enum.valueOf(TextType.class, ((String) jsonObj.get("type")).replace(" ", "_"));
+				MapText mp = new MapText(text, location, angle, type);
+				result.add(mp);
 			}
+
+			return result;
 		});
 		
-		edits.centerEdits = getProperty("centerEdits", new Function0<List<CenterEdit>>()
-		{
-			public List<CenterEdit> apply()
+		edits.centerEdits = getProperty("centerEdits", () -> {
+			String str = props.getProperty("centerEdits");
+			if (str == null || str.isEmpty())
+				return new ArrayList<>();
+			JSONArray array = (JSONArray) JSONValue.parse(str);
+			List<CenterEdit> result = new ArrayList<>();
+			int index = 0;
+			for (Object obj : array)
 			{
-				String str = props.getProperty("centerEdits");
-				if (str == null || str.isEmpty())
-					return new ArrayList<>();
-				JSONArray array = (JSONArray) JSONValue.parse(str);
-				List<CenterEdit> result = new ArrayList<>();
-				int index = 0;
-				for (Object obj : array)
+				JSONObject jsonObj = (JSONObject) obj;
+				boolean isWater = (boolean) jsonObj.get("isWater");
+				Integer regionId = jsonObj.get("regionId") == null ? null : ((Long) jsonObj.get("regionId")).intValue();
+
+				CenterIcon icon = null;
 				{
-					JSONObject jsonObj = (JSONObject) obj;
-					boolean isWater = (boolean) jsonObj.get("isWater");
-					Integer regionId = jsonObj.get("regionId") == null ? null : ((Long) jsonObj.get("regionId")).intValue();
-					
-					CenterIcon icon = null;
+					JSONObject iconObj = (JSONObject)jsonObj.get("icon");
+					if (iconObj != null)
 					{
-						JSONObject iconObj = (JSONObject)jsonObj.get("icon");
-						if (iconObj != null)
-						{
-							String iconGroupId = (String)iconObj.get("iconGroupId");
-							int iconIndex = (int)(long)iconObj.get("iconIndex");
-							String iconName = (String)iconObj.get("iconName");
-							CenterIconType iconType = CenterIconType.valueOf((String)iconObj.get("iconType")); 
-							icon = new CenterIcon(iconType, iconGroupId, iconIndex);
-							icon.iconName = iconName;
-						}
+						String iconGroupId = (String)iconObj.get("iconGroupId");
+						int iconIndex = (int)(long)iconObj.get("iconIndex");
+						String iconName = (String)iconObj.get("iconName");
+						CenterIconType iconType = CenterIconType.valueOf((String)iconObj.get("iconType"));
+						icon = new CenterIcon(iconType, iconGroupId, iconIndex);
+						icon.iconName = iconName;
 					}
-					
-					CenterTrees trees = null;
-					{
-						JSONObject treesObj = (JSONObject)jsonObj.get("trees");
-						if (treesObj != null)
-						{
-							String treeType = (String)treesObj.get("treeType");
-							double density = (Double)treesObj.get("density");
-							long randomSeed = (Long)treesObj.get("randomSeed");
-							trees = new CenterTrees(treeType, density, randomSeed);
-						}
-					}
-					
-					result.add(new CenterEdit(index, isWater, regionId, icon, trees));
-					index++;
 				}
-				
-				return result;
+
+				CenterTrees trees = null;
+				{
+					JSONObject treesObj = (JSONObject)jsonObj.get("trees");
+					if (treesObj != null)
+					{
+						String treeType = (String)treesObj.get("treeType");
+						double density = (Double)treesObj.get("density");
+						long randomSeed = (Long)treesObj.get("randomSeed");
+						trees = new CenterTrees(treeType, density, randomSeed);
+					}
+				}
+
+				result.add(new CenterEdit(index, isWater, regionId, icon, trees));
+				index++;
 			}
+
+			return result;
 		});
 
-		edits.regionEdits = getProperty("regionEdits", new Function0<ConcurrentHashMap<Integer, RegionEdit>>()
-		{
-			public ConcurrentHashMap<Integer, RegionEdit> apply()
+		edits.regionEdits = getProperty("regionEdits", () -> {
+			String str = props.getProperty("regionEdits");
+			if (str == null || str.isEmpty())
+				return new ConcurrentHashMap<>();
+			JSONArray array = (JSONArray) JSONValue.parse(str);
+			ConcurrentHashMap<Integer, RegionEdit> result = new ConcurrentHashMap<>();
+			for (Object obj : array)
 			{
-				String str = props.getProperty("regionEdits");
-				if (str == null || str.isEmpty())
-					return new ConcurrentHashMap<>();
-				JSONArray array = (JSONArray) JSONValue.parse(str);
-				ConcurrentHashMap<Integer, RegionEdit> result = new ConcurrentHashMap<>();
-				for (Object obj : array)
-				{
-					JSONObject jsonObj = (JSONObject) obj;
-					Color color = parseColor((String)jsonObj.get("color"));
-					int regionId = (int)(long)jsonObj.get("regionId");
-					result.put(regionId, new RegionEdit(regionId, color));
-				}
-				
-				return result;
+				JSONObject jsonObj = (JSONObject) obj;
+				Color color = parseColor((String)jsonObj.get("color"));
+				int regionId = (int)(long)jsonObj.get("regionId");
+				result.put(regionId, new RegionEdit(regionId, color));
 			}
+
+			return result;
 		});
 		
-		edits.edgeEdits = getProperty("edgeEdits", new Function0<List<EdgeEdit>>()
-		{
-			public List<EdgeEdit> apply()
+		edits.edgeEdits = getProperty("edgeEdits", () -> {
+			String str = props.getProperty("edgeEdits");
+			if (str == null || str.isEmpty())
+				return new ArrayList<>();
+			JSONArray array = (JSONArray) JSONValue.parse(str);
+			List<EdgeEdit> result = new ArrayList<>();
+			for (Object obj : array)
 			{
-				String str = props.getProperty("edgeEdits");
-				if (str == null || str.isEmpty())
-					return new ArrayList<>();
-				JSONArray array = (JSONArray) JSONValue.parse(str);
-				List<EdgeEdit> result = new ArrayList<>();
-				for (Object obj : array)
-				{
-					JSONObject jsonObj = (JSONObject) obj;
-					int riverLevel = (int)(long)jsonObj.get("riverLevel");
-					int index = (int)(long)jsonObj.get("index");
-					result.add(new EdgeEdit(index, riverLevel));
-				}
-				
-				return result;
+				JSONObject jsonObj = (JSONObject) obj;
+				int riverLevel = (int)(long)jsonObj.get("riverLevel");
+				int index = (int)(long)jsonObj.get("index");
+				result.add(new EdgeEdit(index, riverLevel));
 			}
+
+			return result;
 		});
 		
-		edits.hasIconEdits = getProperty("hasIconEdits", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				String value = props.getProperty("hasIconEdits");
-				if (value == null)
-					return false; // default value
-				return  parseBoolean(value);
-			}
+		edits.hasIconEdits = getProperty("hasIconEdits", () -> {
+			String value = props.getProperty("hasIconEdits");
+			if (value == null)
+				return false; // default value
+			return  parseBoolean(value);
 		});
 	}
 	
@@ -837,11 +658,11 @@ public class MapSettings implements Serializable
 		throw new IllegalArgumentException("Unable to parse color from string: " + str);
 	}
 	
-	private static <T> T getProperty(String propName, Function0<T> getter)
+	private static <T> T getProperty(String propName, Supplier<T> getter)
 	{
 		try
 		{
-			return getter.apply();
+			return getter.get();
 		}
 		catch (NullPointerException e)
 		{

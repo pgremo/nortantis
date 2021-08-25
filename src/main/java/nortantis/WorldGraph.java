@@ -897,13 +897,7 @@ public class WorldGraph extends VoronoiGraph
     		{
     			// Choose a center at random.
 	    		// Choose one of it's neighbors not in the same plate.
-	    		List<Center> neighborsNotInSamePlate = Helper.filter(c.neighbors, new nortantis.util.Function<Center, Boolean>()
-	    				{
-							public Boolean apply(Center otherC) 
-							{
-								return c.tectonicPlate != otherC.tectonicPlate;
-							}
-	    				});
+	    		List<Center> neighborsNotInSamePlate = Helper.filter(c.neighbors, otherC -> c.tectonicPlate != otherC.tectonicPlate);
 	    		Center neighbor = neighborsNotInSamePlate.get(rand.nextInt(neighborsNotInSamePlate.size()));
     		
      		

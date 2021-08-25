@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import hoten.geom.Point;
 import hoten.geom.Rectangle;
 
-public final class SiteList implements IDisposable {
+public final class SiteList implements Disposable {
 
     private ArrayList<Site> _sites;
     private int _currentIndex;

@@ -4,7 +4,7 @@ import java.util.Stack;
 
 import hoten.geom.Point;
 
-final class Vertex extends Object implements ICoord {
+final class Vertex extends Object implements Coord {
 
     final public static Vertex VERTEX_AT_INFINITY = new Vertex(Double.NaN, Double.NaN);
     final private static Stack<Vertex> _pool = new Stack<Vertex>();

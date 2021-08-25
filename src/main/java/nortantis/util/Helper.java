@@ -30,12 +30,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class Helper 
 {	
 	public static <I, R> List<R> map(List<I> items, Function<I, R> fun)
 	{
-		List<R> result = new ArrayList<R>();
+		List<R> result = new ArrayList<>();
 		for (I item : items)
 			result.add(fun.apply(item));
 		return result;
@@ -45,7 +47,7 @@ public class Helper
 	/**
 	 * Combines 2 lists of the same length by applying the given function to each pair of items in the 2 lists.
 	 */
-	public static <I, R> List<R> combineLists(List<I> l1, List<I> l2, Function2<I, R> fun)
+	public static <I, R> List<R> combineLists(List<I> l1, List<I> l2, BiFunction<I, I, R> fun)
 	{
 		if (l1.size() != l2.size())
 			throw new IllegalArgumentException("Lists must be the same size. List 1 size: " + l1.size() 
@@ -208,11 +210,7 @@ public class Helper
 				{
 					futures.get(i).get();
 				}
-				catch(ExecutionException e)
-				{
-					throw new RuntimeException(e);
-				}
-				catch(InterruptedException e)
+				catch(ExecutionException | InterruptedException e)
 				{
 					throw new RuntimeException(e);
 				}

@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import nortantis.util.AssetsPath;
 import nortantis.util.Counter;
-import nortantis.util.Function;
 import nortantis.util.Helper;
 import nortantis.util.Pair;
 import nortantis.util.Range;
@@ -287,13 +287,7 @@ public class NameCompiler
 					"forgave",
 					"seen",
 					"set");
-			List<String> after = Helper.map(before, new Function<String, String>()
-					{
-						public String apply(String item)
-						{
-							return compiler.convertVerbToPresentTense(item);
-						}
-					});
+			List<String> after = Helper.map(before, item -> compiler.convertVerbToPresentTense(item));
 			List<String> expected = Arrays.asList(
 					"travelling", // I'm using a British dictionary apparently.
 					"distilling",

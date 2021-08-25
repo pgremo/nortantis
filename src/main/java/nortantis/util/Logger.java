@@ -15,14 +15,7 @@ public class Logger
 		{
 			try
 			{
-				SwingUtilities.invokeAndWait(new Runnable()
-				{
-				    @Override
-				    public void run()
-				    {
-				    	RunSwing.getConsoleOutputTextArea().append("\n");
-				    }
-				});
+				SwingUtilities.invokeAndWait(() -> RunSwing.getConsoleOutputTextArea().append("\n"));
 			} catch (InvocationTargetException | InterruptedException e)
 			{
 				e.printStackTrace();
@@ -42,14 +35,7 @@ public class Logger
 		{
 			try
 			{
-				SwingUtilities.invokeAndWait(new Runnable()
-				{
-				    @Override
-				    public void run()
-				    {
-				    	RunSwing.getConsoleOutputTextArea().append(message + "\n");
-				    }
-				});
+				SwingUtilities.invokeAndWait(() -> RunSwing.getConsoleOutputTextArea().append(message + "\n"));
 			} catch (InvocationTargetException | InterruptedException e)
 			{
 				e.printStackTrace();

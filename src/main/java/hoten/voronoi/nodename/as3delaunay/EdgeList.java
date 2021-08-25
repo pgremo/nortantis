@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import hoten.geom.Point;
 
-public final class EdgeList implements IDisposable {
+public final class EdgeList implements Disposable {
 
     private double _deltax;
     private double _xmin;

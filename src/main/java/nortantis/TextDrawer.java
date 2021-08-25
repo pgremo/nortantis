@@ -23,9 +23,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
@@ -34,7 +34,6 @@ import hoten.voronoi.Center;
 import hoten.voronoi.Corner;
 import hoten.voronoi.Edge;
 import nortantis.util.AssetsPath;
-import nortantis.util.Function0;
 import nortantis.util.Helper;
 import nortantis.util.ImageHelper;
 import nortantis.util.Pair;
@@ -693,35 +692,35 @@ public class TextDrawer
 		
 	public String generatePlaceName(String format, boolean requireUnique)
 	{
-		Function0<String> nameCreator = () -> placeNameGenerator.generateName();
+		Supplier<String> nameCreator = () -> placeNameGenerator.generateName();
 		return innerCreateUniqueName(format, requireUnique, nameCreator);
 	}
 	
 	public String generatePersonName(String format, boolean requireUnique)
 	{
-		Function0<String> nameCreator = () -> personNameGenerator.generateName();
+		Supplier<String> nameCreator = () -> personNameGenerator.generateName();
 		return innerCreateUniqueName(format, requireUnique, nameCreator);
 	}
 
 	
 	private String compileName(String format, boolean requireUnique)
 	{
-		Function0<String> nameCreator = () -> nameCompiler.compileName();
+		Supplier<String> nameCreator = () -> nameCompiler.compileName();
 		return innerCreateUniqueName(format, requireUnique, nameCreator);
 	}
 	
-	private String innerCreateUniqueName(String format, boolean requireUnique, Function0<String> nameCreator)
+	private String innerCreateUniqueName(String format, boolean requireUnique, Supplier<String> nameCreator)
 	{
 		final int maxRetries = 20;
 		
 		if (!requireUnique)
 		{
-			return 	String.format(format, nameCreator.apply());
+			return 	String.format(format, nameCreator.get());
 		}
 		
 		for (@SuppressWarnings("unused") int retry : new Range(maxRetries))
 		{
-			String name = String.format(format, nameCreator.apply());
+			String name = String.format(format, nameCreator.get());
 			if (!namesGenerated.contains(name))
 			{
 				namesGenerated.add(name);

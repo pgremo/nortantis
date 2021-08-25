@@ -1,6 +1,6 @@
 package hoten.voronoi.nodename.as3delaunay;
 
-public interface IDisposable {
+public interface Disposable {
 
     void dispose();
 }

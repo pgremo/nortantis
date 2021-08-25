@@ -1570,9 +1570,7 @@ public class RunSwing
 		});
 	
 		final JMenuItem mntmSave = new JMenuItem("Save");
-		mntmSave.setAccelerator(KeyStroke.getKeyStroke(
-		        java.awt.event.KeyEvent.VK_S, 
-		        java.awt.Event.CTRL_MASK));
+		mntmSave.setAccelerator(KeyStroke.getKeyStroke("control S"));
 		fileMenu.add(mntmSave);
 		mntmSave.addActionListener(new ActionListener()
 		{
@@ -1647,9 +1645,7 @@ public class RunSwing
 		menuBar.add(editorMenu);
 		
 		launchEditorMenuItem = new JMenuItem("Launch Editor");
-		launchEditorMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-		        java.awt.event.KeyEvent.VK_E, 
-		        java.awt.Event.CTRL_MASK));
+		launchEditorMenuItem.setAccelerator(KeyStroke.getKeyStroke("control E"));
 		launchEditorMenuItem.addActionListener(new ActionListener()
 		{
 			@Override

@@ -9,7 +9,7 @@ import java.util.Stack;
 import hoten.geom.Point;
 import hoten.geom.Rectangle;
 
-public final class Site implements ICoord {
+public final class Site implements Coord {
 
     private static Stack<Site> _pool = new Stack<Site>();
 
@@ -330,7 +330,7 @@ public final class Site implements ICoord {
         return _coord.y;
     }
 
-    public double dist(ICoord p) {
+    public double dist(Coord p) {
         return Point.distance(p.get_coord(), this._coord);
     }
 }
