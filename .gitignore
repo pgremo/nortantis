@@ -27,3 +27,5 @@ user preferences
 .recommenders/
 /.metadata
 /user preferences
+.idea
+*.iml

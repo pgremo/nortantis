@@ -2128,7 +2128,7 @@ public class RunSwing
 	
 	/**
 	 * Loads a map settings file into the GUI.
-	 * @param path
+	 * @param settings
 	 */
 	private void loadSettingsIntoGUI(MapSettings settings)
 	{

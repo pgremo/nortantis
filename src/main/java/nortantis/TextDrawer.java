@@ -335,7 +335,6 @@ public class TextDrawer
 	 * Draw text which was added by the user.
 	 * @param map
 	 * @param graph
-	 * @param g
 	 */
 	public synchronized void drawUserModifiedText(BufferedImage map, WorldGraph graph)
 	{

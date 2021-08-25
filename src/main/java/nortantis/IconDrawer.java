@@ -460,7 +460,7 @@ public class IconDrawer
 	
 	/**
 	 * Adds icon draw tasks to draw cities.
-	 * Side effect – if a city is placed where it cannot be drawn, this will un-mark it as a city.
+	 * Side effect if a city is placed where it cannot be drawn, this will un-mark it as a city.
 	 * @return IconDrawTask of each city icon added. Needed to avoid drawing text on top of cities.
 	 */
 	public List<IconDrawTask> addOrUnmarkCities(double sizeMultiplyer, boolean addIconDrawTasks)
@@ -860,7 +860,7 @@ public class IconDrawer
 		double biomeFrequency;
 		
 		/**
-		 * @param biomeProb If this is not 1.0, groups of centers of biome type "biome" will be found
+		 * @param biomeFrequency If this is not 1.0, groups of centers of biome type "biome" will be found
 		 * and each groups will have this type of forest with probability biomeProb.
 		*/
 		public ForestType(TreeType treeType, Biome biome, double density, double biomeFrequency)

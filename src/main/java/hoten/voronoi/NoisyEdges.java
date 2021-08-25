@@ -174,7 +174,6 @@ public class NoisyEdges
 	 * Find the previous point when drawing a curve and the curve segment currently being drawn doesn't contain that point. 
 	 * That point is needed to maintain C1 continuity at corners in the voronoi graph.
 	 * @param edge
-	 * @param firstPointOnCurve
 	 * @param corner This must be either edge.v0 or edge.v1. Whichever is the first point in the curve.
 	 * @return
 	 */

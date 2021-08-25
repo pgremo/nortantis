@@ -33,7 +33,6 @@ import nortantis.util.Helper;
  * @author joseph
  *
  */
-@SuppressWarnings("serial")
 public class MapSettings implements Serializable
 {
 	public static final double defaultPointPrecision = 2.0;
@@ -302,149 +301,49 @@ public class MapSettings implements Serializable
 
 		// Load parameters from the properties file.
 		
-		randomSeed = getProperty("randomSeed", new Function0<Long>()
-		{
-			public Long apply()
+		randomSeed = getProperty("randomSeed", () -> Long.parseLong(props.getProperty("randomSeed")));
+		resolution = getProperty("resolution", () -> Double.parseDouble(props.getProperty("resolution")));
+		landBlur = getProperty("landBlur", () -> Integer.parseInt(props.getProperty("landBlur")));
+		oceanEffectSize = getProperty("oceanEffects", () -> Integer.parseInt(props.getProperty("oceanEffects")));
+		worldSize = getProperty("worldSize", () -> Integer.parseInt(props.getProperty("worldSize")));
+		riverColor = getProperty("riverColor", () -> parseColor(props.getProperty("riverColor")));
+		roadColor = getProperty("roadColor", () -> {
+			String roadColorString = props.getProperty("roadColor");
+			if (roadColorString == null || roadColorString.equals(""))
 			{
-				return (long)(Long.parseLong(props.getProperty("randomSeed")));
+				return Color.black;
 			}
+			return parseColor(roadColorString);
 		});
-		resolution = getProperty("resolution", new Function0<Double>()
-		{
-			public Double apply()
+		landBlurColor = getProperty("landBlurColor", () -> parseColor(props.getProperty("landBlurColor")));
+		oceanEffectsColor = getProperty("oceanEffectsColor", () -> parseColor(props.getProperty("oceanEffectsColor")));
+		coastlineColor = getProperty("coastlineColor", () -> parseColor(props.getProperty("coastlineColor")));
+		oceanEffect = getProperty("addWavesToOcean", () -> {
+			String str = props.getProperty("oceanEffect");
+			if (str == null || str.equals(""))
 			{
-				return Double.parseDouble(props.getProperty("resolution"));
-			}
-		});
-		landBlur = getProperty("landBlur", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				return (int)(Integer.parseInt(props.getProperty("landBlur")));
-			}
-		});
-		oceanEffectSize = getProperty("oceanEffects", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				return (int)(Integer.parseInt(props.getProperty("oceanEffects")));
-			}
-		});
-		worldSize = getProperty("worldSize", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				return (int)Integer.parseInt(props.getProperty("worldSize"));
-			}
-		});
-		riverColor = getProperty("riverColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("riverColor"));
-			}
-		});
-		roadColor = getProperty("roadColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				String roadColorString = props.getProperty("roadColor");
-				if (roadColorString == null || roadColorString.equals(""))
+				// Try the old property name.
+				String str2 = props.getProperty("addWavesToOcean");
+				if (str2 == null || str2.equals(""))
 				{
-					return Color.black;
+					return OceanEffect.Ripples;
 				}
-				return parseColor(roadColorString);
+				return parseBoolean(str2) ? OceanEffect.Ripples : OceanEffect.Ripples;
 			}
+			return OceanEffect.valueOf(str);
 		});
-		landBlurColor = getProperty("landBlurColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("landBlurColor"));
-			}
+		centerLandToWaterProbability = getProperty("centerLandToWaterProbability", () -> Double.parseDouble(props.getProperty("centerLandToWaterProbability")));
+		edgeLandToWaterProbability = getProperty("edgeLandToWaterProbability", () -> Double.parseDouble(props.getProperty("edgeLandToWaterProbability")));
+		frayedBorder = getProperty("frayedBorder", () -> parseBoolean(props.getProperty("frayedBorder")));
+		frayedBorderColor = getProperty("frayedBorderColor", () -> parseColor(props.getProperty("frayedBorderColor")));
+		frayedBorderBlurLevel = getProperty("frayedBorderBlurLevel", () -> (int)(Integer.parseInt(props.getProperty("frayedBorderBlurLevel"))));
+		grungeWidth = getProperty("grungeWidth", () -> {
+			String str = props.getProperty("grungeWidth");
+			return str == null ? 0 : (int)(Integer.parseInt(str));
 		});
-		oceanEffectsColor = getProperty("oceanEffectsColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("oceanEffectsColor"));
-			}
-		});
-		coastlineColor = getProperty("coastlineColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("coastlineColor"));
-			}
-		});
-		oceanEffect = getProperty("addWavesToOcean", new Function0<OceanEffect>()
-		{
-			public OceanEffect apply()
-			{
-				String str = props.getProperty("oceanEffect");
-				if (str == null || str.equals(""))
-				{
-					// Try the old property name.
-					String str2 = props.getProperty("addWavesToOcean");
-					if (str2 == null || str2.equals(""))
-					{
-						return OceanEffect.Ripples;
-					}
-					return parseBoolean(str2) ? OceanEffect.Ripples : OceanEffect.Ripples;
-				}
-				return OceanEffect.valueOf(str);
-			}
-		});		
-		centerLandToWaterProbability = getProperty("centerLandToWaterProbability", new Function0<Double>()
-		{
-			public Double apply()
-			{
-				return Double.parseDouble(props.getProperty("centerLandToWaterProbability"));
-			}
-		});
-		edgeLandToWaterProbability = getProperty("edgeLandToWaterProbability", new Function0<Double>()
-		{
-			public Double apply()
-			{
-				return Double.parseDouble(props.getProperty("edgeLandToWaterProbability"));
-			}
-		});
-		frayedBorder = getProperty("frayedBorder", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				return parseBoolean(props.getProperty("frayedBorder"));
-			}
-		});		
-		frayedBorderColor = getProperty("frayedBorderColor", new Function0<Color>()
-		{
-			public Color apply()
-			{
-				return parseColor(props.getProperty("frayedBorderColor"));
-			}
-		});
-		frayedBorderBlurLevel = getProperty("frayedBorderBlurLevel", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				return (int)(Integer.parseInt(props.getProperty("frayedBorderBlurLevel")));
-			}
-		});
-		grungeWidth = getProperty("grungeWidth", new Function0<Integer>()
-		{
-			public Integer apply()
-			{
-				String str = props.getProperty("grungeWidth");
-				return str == null ? 0 : (int)(Integer.parseInt(str));
-			}
-		});
-		cityProbability = getProperty("cityProbability", new Function0<Double>()
-		{
-			public Double apply()
-			{
-				String str = props.getProperty("cityProbability");
-				return str == null ? 0.0 : (double)(Double.parseDouble(str));
-			}
+		cityProbability = getProperty("cityProbability", () -> {
+			String str = props.getProperty("cityProbability");
+			return str == null ? 0.0 : Double.parseDouble(str);
 		});
 		lineStyle = getProperty("lineStyle", () -> 
 		{
@@ -455,47 +354,29 @@ public class MapSettings implements Serializable
 			}
 			return LineStyle.valueOf(str);
 		});
-		pointPrecision = getProperty("pointPrecision", new Function0<Double>()
-		{
-			public Double apply()
-			{
-				String str = props.getProperty("pointPrecision");
-				return (str == null || str == "") ? 10.0 : (double)(Double.parseDouble(str)); // 10.0 was the value used before I made a setting for it.
-			}
+		pointPrecision = getProperty("pointPrecision", () -> {
+			String str = props.getProperty("pointPrecision");
+			return (str == null || str == "") ? 10.0 : Double.parseDouble(str); // 10.0 was the value used before I made a setting for it.
 		});
 		
 		
 		// Background image stuff.
-		generateBackground = getProperty("generateBackground", new Function0<Boolean>()
-		{
-			public Boolean apply()
+		generateBackground = getProperty("generateBackground", () -> parseBoolean(props.getProperty("generateBackground")));
+		generateBackgroundFromTexture = getProperty("generateBackgroundFromTexture", () -> {
+			String propString = props.getProperty("generateBackgroundFromTexture");
+			if (propString == null)
 			{
-				return parseBoolean(props.getProperty("generateBackground"));
+				return false;
 			}
+			return parseBoolean(propString);
 		});
-		generateBackgroundFromTexture = getProperty("generateBackgroundFromTexture", new Function0<Boolean>()
-		{
-			public Boolean apply()
+		transparentBackground = getProperty("transparentBackground", () -> {
+			String propString = props.getProperty("transparentBackground");
+			if (propString == null)
 			{
-				String propString = props.getProperty("generateBackgroundFromTexture");
-				if (propString == null)
-				{
-					return false;
-				}
-				return parseBoolean(propString);
+				return false;
 			}
-		});
-		transparentBackground = getProperty("transparentBackground", new Function0<Boolean>()
-		{
-			public Boolean apply()
-			{
-				String propString = props.getProperty("transparentBackground");
-				if (propString == null)
-				{
-					return false;
-				}
-				return parseBoolean(propString);
-			}
+			return parseBoolean(propString);
 		});
 		colorizeOcean = getProperty("colorizeOcean", new Function0<Boolean>()
 		{
@@ -937,7 +818,7 @@ public class MapSettings implements Serializable
 			throw new NullPointerException();
 		if (!(str.equals("true") || str.equals("false")))
 			throw new IllegalArgumentException();
-		return (boolean)Boolean.parseBoolean(str);		
+		return Boolean.parseBoolean(str);
 	}
 	
 	private static Color parseColor(String str)
@@ -964,18 +845,18 @@ public class MapSettings implements Serializable
 		}
 		catch (NullPointerException e)
 		{
-			throw new RuntimeException("Property \"" + propName + "\" is missing or cannot be read.", e);			
+			throw new RuntimeException(String.format("Property \"%s\" is missing or cannot be read.", propName), e);
 		}
 		catch(NumberFormatException e)
 		{
 			if (e.getMessage().equals("null"))
-				throw new RuntimeException("Property \"" + propName + "\" is missing.", e);		
+				throw new RuntimeException(String.format("Property \"%s\" is missing.", propName), e);
 			else
-				throw new RuntimeException("Property \"" + propName + "\" is invalid.", e);
+				throw new RuntimeException(String.format("Property \"%s\" is invalid.", propName), e);
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException("Property \"" + propName + "\" is invalid.", e);
+			throw new RuntimeException(String.format("Property \"%s\" is invalid.", propName), e);
 		}
 	}
 
@@ -994,9 +875,11 @@ public class MapSettings implements Serializable
 		{
 			return font;
 		}
-		// They don't have the font in their system. Return a font that looks good in Windows.
-//		Logger.println("Cannot find font: \"" + parts[0] + "\". A default font will be used instead.");
-//		return new Font("Gabriola", Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+		/*
+ 		They don't have the font in their system. Return a font that looks good in Windows.
+		Logger.println("Cannot find font: \"" + parts[0] + "\". A default font will be used instead.");
+		return new Font("Gabriola", Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+		*/
 	}
 	
 	@Override

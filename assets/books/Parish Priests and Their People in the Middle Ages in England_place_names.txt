@@ -2,8 +2,8 @@ Chepyng Wycombe
 Maxstoke
 England
 Northallerton
-St. Jamesâ
-St. Cuthbertâ
+St. James
+St. Cuthbert
 Allington
 Long Preston
 Staffordshire
@@ -62,7 +62,7 @@ St. Agnes
 Leland
 Dereham
 St. Nichl
-Bluntâ
+Bluntï¿½
 Barford
 Normandy
 Kynstock
@@ -85,7 +85,7 @@ Ithanacester
 Nightsang
 Bromholme
 St. Nicholas
-Solomonâ
+Solomonï¿½
 North Burton
 Prudencia
 St. Dunstan
@@ -93,7 +93,7 @@ Kempsey
 Howby
 Burnley
 Greneburg
-Scala CÅ
+Scala Cï¿½
 Wingfield
 Alvetham
 Gateshead
@@ -106,7 +106,7 @@ Clun
 St. Erkenwald
 Haslebury
 Chichester
-St. Stephenâ
+St. Stephenï¿½
 Fossbridge
 St. Osyth
 Sussex
@@ -167,13 +167,13 @@ Leicester
 Swynford
 Waltham Abbey
 Tunlay
-St. Anneâ
-Wilfridâ
+St. Anneï¿½
+Wilfridï¿½
 Ribble
 Rheims
 Grafton Flyford
 Our Lady
-St. Johnâ
+St. Johnï¿½
 Sherborne Church
 Northampton
 Westminster
@@ -189,7 +189,7 @@ Cransford
 West Dereham
 Little Waltham
 Dean of York
-St. Paulâ
+St. Paulï¿½
 Gaynford
 Wye Richard Walker Vicar
 Augsburg
@@ -197,7 +197,7 @@ Herefordshire
 Scamelsby
 Whitsuntide
 St. Katharine
-St. Maryâ
+St. Maryï¿½
 Ober Ammergau
 Bradwaie
 Gloucestershire
@@ -289,8 +289,8 @@ St. Katherine
 Pontefract Castle
 Arundel
 Bradford-on-Avon
-Miltonâ
-St. Gilesâ
+Miltonï¿½
+St. Gilesï¿½
 Burton-on-Trent
 Woodstock
 Waltham
@@ -317,7 +317,7 @@ Darlington
 Childewick
 Stokesay
 Bethlem
-Englandâ
+Englandï¿½
 Hindishal
 Ramsey
 Knt.
@@ -332,7 +332,7 @@ St. Richard
 Kermerdenin
 Earconwald
 Welsh Newton
-Alfredâ
+Alfredï¿½
 Spurnhead
 Ordell
 Pendle
@@ -355,13 +355,13 @@ Slayneton
 Church of York
 Hymulton
 Clovesho
-St. Williamâ
+St. Williamï¿½
 Knaresburgh
 Thames
 St. Werburg
 Granby
 St. George , York
-St. Michaelâ
+St. Michaelï¿½
 Carlton
 Wyche
 Quarrindon
@@ -371,10 +371,10 @@ Prittlewell
 Hedingham
 Bedrichsworth
 Lewes
-St. Martinâ
+St. Martinï¿½
 Devon
 Hatherton
-Sawcendineâ
+Sawcendineï¿½
 Dorset
 St. Modwenne
 St. Thomas
@@ -388,7 +388,7 @@ Stafford Castles
 Ipswich
 Lorde
 Emberton
-Flyxboroâ
+Flyxboroï¿½
 Saxon
 Wulfstan
 Clerkenwell
@@ -400,8 +400,8 @@ Warwickshire
 Mackworth
 Bodiam
 Chichester Diocese
-St. Omerâ
-Peckhamâ
+St. Omerï¿½
+Peckhamï¿½
 IPSUM BONUM
 Swyneshead
 Rossendale
@@ -427,9 +427,9 @@ Derby
 Eresby
 St. Ellen
 Bexley
-Loveâ
+Loveï¿½
 Wykeham
-Servantsâ
+Servantsï¿½
 Colebrook
 Manchester
 Glasney
@@ -439,17 +439,17 @@ St. Brice
 Lady of Mercia
 Whitefield
 Notts
-Lordâ
-Chaucerâ
+Lordï¿½
+Chaucerï¿½
 Abingdon
 Eccleshall
-St. Katharineâ
+St. Katharineï¿½
 Wapentake
 Monkgate
 Oxford St. Frideswide
 St. Pancras
 Vatican
-Godâ
+Godï¿½
 Rutland
 Brancaster
 South Kirkby
@@ -469,7 +469,7 @@ Belvoir
 Hampole
 Burgh
 Okeburn
-St. Edmundâ
+St. Edmundï¿½
 Fermo
 Sherifhoton
 Exeter
@@ -505,7 +505,7 @@ Withyford
 Flyxburgh
 Totton
 Rouen
-Hampoleâ
+Hampoleï¿½
 Essex
 Pater
 Drontheim
@@ -521,7 +521,7 @@ Weston Turville
 Whalley
 Nottingham
 Ingatestone
-Hellâ
+Hellï¿½
 Tutthill
 East Gate
 St. Peter
@@ -585,7 +585,7 @@ St. Mary le Port
 Great Dunmow
 Bridgenorth Castle
 Kentish
-Turnerâ
+Turnerï¿½
 Aldgate
 Edmonton
 Holies
@@ -642,7 +642,7 @@ Knolls
 Hertford
 Whorleton
 Kildewick Parish
-St. Gregoryâ
+St. Gregoryï¿½
 Chertsey
 Tetbury
 Britain
@@ -660,24 +660,24 @@ Matthew Paris
 Tevelby
 Blackheath
 Reigate
-St. Leonardâ
+St. Leonardï¿½
 Shrewsbury
 Ruthwell
 Leighton
 Knesale
-Daundyâ
+Daundyï¿½
 West Dean
 Balderstone
 Bardney
 Langedon
 Norton
-St. Peterâ
+St. Peterï¿½
 Steventon
 St. Andrew
 Merton Priory
 Australia
 Mekesburgh
-Williamâ
+Williamï¿½
 Penuria
 Elvet
 Selsey
@@ -779,7 +779,7 @@ Deuteronomy xxiii.
 Niflheim
 Nostell
 Tikhill
-Brancastâ
+Brancastï¿½
 Doneham
 Helperthorpe
 Leominster
@@ -793,10 +793,10 @@ Sempringham
 Wearmouth
 Omne Bonum
 Kurdford
-St. Hughâ
+St. Hughï¿½
 Basle
 Pattingham
-Lydgateâ
+Lydgateï¿½
 Byshampton
 Ightham Mote
 Lincoln Cathedral

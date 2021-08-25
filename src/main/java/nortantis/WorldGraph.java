@@ -942,9 +942,9 @@ public class WorldGraph extends VoronoiGraph
     
     /**
      * Returns the amount c1 and c2 are converging. This is between -1 and 1.
-     * @param c1 A center along a tectonic plate border.
-     * @param c1Velocity The velocity of the plate c1 is on.
-     * @param c2 A center along a tectonic plate border: not the same tectonic plate as c1
+     * @param p1 A center along a tectonic plate border.
+     * @param p1Velocity The velocity of the plate c1 is on.
+     * @param p2 A center along a tectonic plate border: not the same tectonic plate as c1
      * @param c2Velocity The velocity of the plate c2 is on.
      */
     private double calcLevelOfConvergence(Point p1, PolarCoordinate p1Velocity, Point p2,
@@ -1166,7 +1166,6 @@ public class WorldGraph extends VoronoiGraph
 	/**
 	 * Create path using back pointers in search does for Voronoi edges.
 	 * @param end The end of the search
-	 * @param edgeType The type of edge to return
 	 * @return A path
 	 */
 	private Set<Edge> createPathFromBackPointers(CornerSearchNode end)
@@ -1291,7 +1290,6 @@ public class WorldGraph extends VoronoiGraph
 	/**
 	 * Create path using back pointers in search does for Voronoi edges.
 	 * @param end The end of the search
-	 * @param edgeType The type of edge to return
 	 * @return A path
 	 */
 	private List<Edge> createPathFromBackPointers(CenterSearchNode end)
