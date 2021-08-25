@@ -104,21 +104,15 @@ public class NameGenerator
 	
 	private String capitalizeAllFirstLetters(String str)
 	{
-		char[] chars = str.toCharArray();
-		for (int i : new Range(0, chars.length))
-		{
-			if ((i == 0 || chars[i - 1] == ' ') && Character.isLowerCase(chars[i]))
-			{
-				chars[i] = Character.toUpperCase(str.charAt(i));
-			}
-		}
-		return  String.valueOf(chars);
+		return Arrays.stream(str.split(" "))
+				.map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1))
+				.collect(Collectors.joining(" "));
 	}
 	
 	private String capitalizeRomanNumerals(String str)
 	{
-		String[] pieces = str.split(" ");
-		List<String> piecesList =  Arrays.stream(pieces).map((s) -> romanNumerals.contains(s.toUpperCase()) ? s.toUpperCase() : s).collect(Collectors.toList());
-		return String.join(" ", piecesList);
+		return Arrays.stream(str.split(" "))
+				.map(s -> romanNumerals.contains(s.toUpperCase()) ? s.toUpperCase() : s)
+				.collect(Collectors.joining(" "));
 	}
 }

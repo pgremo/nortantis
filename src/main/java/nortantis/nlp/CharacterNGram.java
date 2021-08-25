@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import nortantis.NotEnoughNamesException;
 import nortantis.util.ComparableList;
@@ -29,7 +30,7 @@ public class CharacterNGram
 	
 	/**
 	 * 
-	 * @param r
+	 * @param r The randomizer
 	 * @param n The size of the n-grams. For bi-grams n=2, for tri-grams n=3, etc.
 	 */
 	public CharacterNGram(Random r, int n)
@@ -45,7 +46,7 @@ public class CharacterNGram
 		{
 			for (int i : new Range(phrase.length()))
 			{
-				List<Character> lastChars = new ComparableList<Character>(n-1);
+				List<Character> lastChars = new ComparableList<>(n - 1);
 				for (int j = i - n + 1; j < i; j++)
 				{
 					if (j < 0)
@@ -57,7 +58,7 @@ public class CharacterNGram
 				lcMap.increamentCount(lastChars, phrase.charAt(i));
 			}
 			// Add the end token.
-			List<Character> lastChars = new ComparableList<Character>(n-1);
+			List<Character> lastChars = new ComparableList<>(n - 1);
 			for (int j = phrase.length() - n + 1; j < phrase.length(); j++)
 			{
 				if (j < 0)
@@ -101,7 +102,7 @@ public class CharacterNGram
 			lastChars.add(startToken);
 		}
 		
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		char next;
 		do
 		{
@@ -109,11 +110,11 @@ public class CharacterNGram
 			lastChars.remove(0);
 			lastChars.add(next);
 			if (next != endToken)
-				result += next;
+				result.append(next);
 		}
 		while(next != endToken);
 
-		return result;
+		return result.toString();
 	}
 	
 	public static void main(String[] args)
@@ -121,7 +122,8 @@ public class CharacterNGram
 		List<String> strs = Arrays.asList("yellow", "bannana", "yellowish", "corn", "corn and rice", "corn without rice", "yellow corn");
 		CharacterNGram generator = new CharacterNGram(new Random(), 3);
 		generator.addData(strs);
-		for (@SuppressWarnings("unused") int i : new Range(10))
-			System.out.println(generator.generateName());
+		IntStream.range(1, 10)
+				.mapToObj(x -> generator.generateName())
+				.forEach(System.out::println);
 	}
 }

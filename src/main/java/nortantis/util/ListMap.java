@@ -24,7 +24,7 @@ public class ListMap <K, V> implements Serializable
 	
 	public ListMap()
 	{
-		map = new TreeMap<K, List<V>>();
+		map = new TreeMap<>();
 	}
 
 	public ListMap(Comparator<K> comparator)
@@ -34,24 +34,12 @@ public class ListMap <K, V> implements Serializable
 	
 	public void add(K key, V value)
 	{
-		List<V> valueList = map.get(key);
-		if (valueList == null)
-		{
-			valueList = new ArrayList<>();
-			map.put(key, valueList);
-		}
-		valueList.add(value);
+		map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
 	}
 	
 	public void addAll(K key, Collection<V> values)
 	{
-		List<V> valueList = map.get(key);
-		if (valueList == null)
-		{
-			valueList = new ArrayList<>();
-			map.put(key, valueList);
-		}
-		valueList.addAll(values);
+		map.computeIfAbsent(key, k -> new ArrayList<>()).addAll(values);
 	}
 	
 	public void put(K key, List<V> values)
