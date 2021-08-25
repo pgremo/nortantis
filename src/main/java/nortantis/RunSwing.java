@@ -217,18 +217,14 @@ public class RunSwing
 			e.printStackTrace();
 		}
 		
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
+		EventQueue.invokeLater(() -> {
+			try
 			{
-				try
-				{
-					RunSwing window = new RunSwing();
-					window.frame.setVisible(true);
-				} catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+				RunSwing window = new RunSwing();
+				window.frame.setVisible(true);
+			} catch (Exception e)
+			{
+				e.printStackTrace();
 			}
 		});
 	}
