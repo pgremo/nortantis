@@ -34,6 +34,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -79,6 +80,8 @@ import nortantis.util.ImageHelper;
 import nortantis.util.JFontChooser;
 import nortantis.util.Logger;
 import nortantis.util.Range;
+
+import static java.util.stream.Collectors.toList;
 
 public class RunSwing
 {
@@ -334,7 +337,7 @@ public class RunSwing
             	}
             }
         });
-		frame.setIconImage(ImageHelper.read("assets/internal/taskbar icon.png"));
+		frame.setIconImage(ImageHelper.read(AssetsPath.get().resolve(Path.of("internal", "taskbar icon.png"))));
 		frame.getContentPane().setLayout(new BorderLayout());
 		
 		
@@ -1857,7 +1860,7 @@ public class RunSwing
 			BufferedImage texture;
 			try
 			{
-				texture = ImageHelper.read(textureImageFilename.getText());
+				texture = ImageHelper.read(Path.of(textureImageFilename.getText()));
 				
 				if (colorizeOceanCheckbox.isSelected())
 				{
@@ -2250,21 +2253,18 @@ public class RunSwing
 	
 	public static List<String> getAllBooks()
 	{
-		String[] filenames = new File(Paths.get(AssetsPath.get(), "books").toString()).list(new FilenameFilter()
-		{
-			public boolean accept(File arg0, String name)
-			{
-				return name.endsWith("_place_names.txt");
-			}
-		});
-	
-		List<String> result = new ArrayList<>();
-		for (String filename : filenames)
-		{
-			result.add(filename.replace("_place_names.txt", ""));
+		try {
+			return Files.list(AssetsPath.get().resolve("books"))
+					.map(Path::getFileName)
+					.map(Path::toString)
+					.filter(x -> x.endsWith("_place_names.txt"))
+					.map(x -> x.replace("_place_names.txt", ""))
+					.sorted()
+					.collect(toList());
+		} catch (IOException e) {
+			Logger.println(e.getMessage());
+			return List.of();
 		}
-		Collections.sort(result);
-		return result;
 	}
 	
 	private MapSettings getSettingsFromGUI()

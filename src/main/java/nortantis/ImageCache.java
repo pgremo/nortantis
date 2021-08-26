@@ -57,7 +57,7 @@ public class ImageCache
 	
 	public BufferedImage getImageFromFile(Path path)
 	{
-		return fileCache.getOrCreate(path.toString(), () -> ImageHelper.read(path.toString()));
+		return fileCache.getOrCreate(path.toString(), () -> ImageHelper.read(path));
 	}
 	
 	public boolean containsImageFile(Path path)

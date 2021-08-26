@@ -8,6 +8,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -461,7 +462,7 @@ public class IconDrawer
 	 */
 	public List<IconDrawTask> addOrUnmarkCities(double sizeMultiplyer, boolean addIconDrawTasks)
 	{
-		Map<String, Tuple3<BufferedImage, BufferedImage, Integer>> cityIcons = loadIconsWithWidths(citiesName);
+		var cityIcons = loadIconsWithWidths(citiesName);
 		if (cityIcons.isEmpty())
 		{
 			Logger.println("Cities will not be drawn because there are no city icons.");
@@ -949,29 +950,31 @@ public class IconDrawer
 	 */
 	private Map<String, Tuple3<BufferedImage, BufferedImage, Integer>> loadIconsWithWidths(final String iconType)
 	{
-		Map<String, Tuple3<BufferedImage, BufferedImage, Integer>> imagesAndMasks = new HashMap<>();
-		String[] fileNames = getIconGroupFileNames(iconType, null, getIconSetName(iconType));
+		var imagesAndMasks = new HashMap<String, Tuple3<BufferedImage, BufferedImage, Integer>>();
+		var fileNames = getIconGroupFileNames(iconType, null, getIconSetName(iconType));
 		if (fileNames.length == 0)
 		{
 			return imagesAndMasks;
 		}
 		
-		for (String fileName : fileNames)
+		for (var fileName : fileNames)
 		{
-			String[] parts = FilenameUtils.getBaseName(fileName).split("width=");
+			String s = fileName.getFileName().toString();
+			String baseName = s.substring(0, s.lastIndexOf("."));
+			var parts = baseName.split("width=");
 			if (parts.length < 2)
 			{
 				throw new RuntimeException("The icon " + fileName + " of type " + iconType + " must have its default width stored at the end of the file name in the format width=<number>. Example: myCityIcon width=64.png.");
 			}
 			
-			String fileNameBaseWithoutWidth = getFileNameBaseWithoutWidth(fileName);
+			String fileNameBaseWithoutWidth = getFileNameBaseWithoutWidth(fileName.toString());
 			if (imagesAndMasks.containsKey(fileNameBaseWithoutWidth))
 			{
 				throw new RuntimeException("There are multiple icons for " + iconType + " named '" + fileNameBaseWithoutWidth + "' whose file names only differ by the width."
 						+ " Rename one of them");
 			}
 
-			Path path = Paths.get(getIconGroupPath(iconType, null, getIconSetName(iconType)), fileName);
+			var path = getIconGroupPath(iconType, null, getIconSetName(iconType)).resolve(fileName);
 			if (!ImageCache.getInstance().containsImageFile(path))
 			{
 				Logger.println("Loading icon: " + path);
@@ -980,7 +983,7 @@ public class IconDrawer
 			BufferedImage mask;
 			
 			icon = ImageCache.getInstance().getImageFromFile(path);
-			mask = ImageCache.getInstance().getOrCreateImage("mask " + path.toString(), () -> createMask(icon));
+			mask = ImageCache.getInstance().getOrCreateImage("mask " + path, () -> createMask(icon));
 			
 			
 			int width;
@@ -1010,16 +1013,16 @@ public class IconDrawer
 		String[] groupNames = getIconGroupNames(iconType);
 		for (String groupName : groupNames)
 		{
-			String[] fileNames = getIconGroupFileNames(iconType, groupName, getIconSetName(iconType));
-			String groupPath = getIconGroupPath(iconType, groupName, getIconSetName(iconType));
+			Path[] fileNames = getIconGroupFileNames(iconType, groupName, getIconSetName(iconType));
+			Path groupPath = getIconGroupPath(iconType, groupName, getIconSetName(iconType));
 			if (fileNames.length == 0)
 			{
 				continue;
 			}
 	
-			for (String fileName : fileNames)
+			for (var fileName : fileNames)
 			{
-				Path path = Paths.get(groupPath, fileName);
+				Path path = groupPath.resolve(fileName);
 				if (!ImageCache.getInstance().containsImageFile(path))
 				{
 					Logger.println("Loading icon: " + path);
@@ -1052,7 +1055,7 @@ public class IconDrawer
 			throw new RuntimeException("Type '" + iconType + "' does not use sets.");
 		}
 		
-		String path = Paths.get(AssetsPath.get(), "icons", iconType).toString();
+		String path = AssetsPath.get().resolve("icons/" + iconType).toString();
 		String[] folderNames = new File(path).list(new FilenameFilter()
 		{
 			@Override
@@ -1070,11 +1073,11 @@ public class IconDrawer
 	
 	public static Set<String> getIconGroupFileNamesWithoutWidthOrExtension(String iconType, String groupName, String cityIconSetName)
 	{
-		String[] folderNames = getIconGroupFileNames(iconType, groupName, cityIconSetName);
+		var folderNames = getIconGroupFileNames(iconType, groupName, cityIconSetName);
 		Set<String> result = new HashSet<String>();
 		for (int i : new Range(folderNames.length))
 		{
-			result.add(getFileNameBaseWithoutWidth(folderNames[i]));
+			result.add(getFileNameBaseWithoutWidth(folderNames[i].toString()));
 		}
 		return result;
 	}
@@ -1093,37 +1096,31 @@ public class IconDrawer
 	 */
 	public static String[] getIconGroupNames(String iconType, String setName)
 	{
-		String path;
+		Path path;
 		if (doesUseSets(iconType))
 		{
 			if (setName == null || setName.isEmpty())
 			{
 				return new String[] {};
 			}
-			path = Paths.get(AssetsPath.get(), "icons", iconType, setName).toString();
+			path = AssetsPath.get().resolve(Path.of("icons", iconType, setName));
 		}
 		else
 		{
-			path = Paths.get(AssetsPath.get(), "icons", iconType).toString();
+			path = AssetsPath.get().resolve(Path.of("icons", iconType));
 		}
-		
-		String[] folderNames = new File(path).list(new FilenameFilter()
-		{
-			@Override
-			public boolean accept(File dir, String name)
-			{
-				File file = new File(dir, name);
-				return file.isDirectory();
-			}
-		});
-		
-		if (folderNames == null)
-		{
-			return new String[] {};
+
+		try {
+			return Files.list(path)
+					.filter(x -> x.toFile().isDirectory())
+					.map(Path::toString)
+					.distinct()
+					.sorted()
+					.toArray(String[]::new);
+		} catch (IOException e) {
+			Logger.println(e.getMessage());
+			return new String[0];
 		}
-		
-		Arrays.sort(folderNames);
-		return folderNames;
 	}
 	
 	public String[] getIconGroupNames(String iconType)
@@ -1132,35 +1129,28 @@ public class IconDrawer
 		return getIconGroupNames(iconType, setName);
 	}
 	
-	public static String[] getIconGroupFileNames(String iconType, String groupName, String setName)
+	public static Path[] getIconGroupFileNames(String iconType, String groupName, String setName)
 	{
-		String path = getIconGroupPath(iconType, groupName, setName);
-		
-		String[] fileNames = new File(path).list(new FilenameFilter()
-		{
-			@Override
-			public boolean accept(File dir, String name)
-			{
-				File file = new File(dir, name);
-				return !file.isDirectory();
-			}
-		});
-		
-		if (fileNames == null)
-		{
-			return new String[] {};
+		var path = getIconGroupPath(iconType, groupName, setName);
+
+		try {
+			return Files.list(path)
+					.filter(x -> !Files.isDirectory(x))
+					.distinct()
+					.sorted()
+					.toArray(Path[]::new);
+		} catch (IOException e) {
+			Logger.println(e.getMessage());
+			return new Path[0];
 		}
-		
-		Arrays.sort(fileNames);
-		return fileNames;
 	}
 	
-	public static String getIconGroupPath(String iconType, String groupName, String setName)
+	public static Path getIconGroupPath(String iconType, String groupName, String setName)
 	{
-		String path;
+		Path path;
 		if (iconType.equals(citiesName))
 		{
-			path = Paths.get(AssetsPath.get(), "icons", iconType, setName).toString();
+			path = AssetsPath.get().resolve(Path.of("icons", iconType, setName));
 		}
 		else
 		{
@@ -1172,11 +1162,11 @@ public class IconDrawer
 				{
 					throw new IllegalArgumentException("The icon type " + iconType + " uses sets, but no set name was given.");
 				}
-				path = Paths.get(AssetsPath.get(), "icons", iconType, groupName, setName).toString(); 
+				path = AssetsPath.get().resolve(Path.of("icons", iconType, groupName, setName));
 			}
 			else
 			{
-				path = Paths.get(AssetsPath.get(), "icons", iconType, groupName).toString();
+				path = AssetsPath.get().resolve(Path.of("icons", iconType, groupName));
 			}
 		}
 		return path;

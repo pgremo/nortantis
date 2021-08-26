@@ -7,11 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -164,7 +160,7 @@ public class TextDrawer
 	private List<String> readNameList(String filename)
 	{
 		List<String> result = new ArrayList<>();
-		try(BufferedReader br = new BufferedReader(new FileReader(new File(filename)))) 
+		try(BufferedReader br = new BufferedReader(new FileReader(filename)))
 		{
 		    for(String line; (line = br.readLine()) != null; )
 		    {

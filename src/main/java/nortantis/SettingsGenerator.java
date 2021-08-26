@@ -25,7 +25,7 @@ import nortantis.util.Range;
  */
 public class SettingsGenerator
 {
-	private static String defaultSettingsFile = Paths.get(AssetsPath.get(), "internal/old_paper.properties").toString();
+	private static String defaultSettingsFile = AssetsPath.get().resolve(Path.of("internal", "old_paper.properties")).toString();
 	public static int minWorldSize = 2000;
 	public static int maxWorldSize = 30000;
 	public static int worldSizePrecision = 1000;
@@ -147,7 +147,7 @@ public class SettingsGenerator
 			settings.generateBackground = false;
 			settings.generateBackgroundFromTexture = true;
 			
-			Path exampleTexturesPath = Paths.get(AssetsPath.get(), "example textures");
+			Path exampleTexturesPath = AssetsPath.get().resolve("example textures");
 			List<Path> textureFiles;
 			try
 			{
