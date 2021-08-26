@@ -92,7 +92,7 @@ public abstract class EditorTool
 	private BufferedImage createPlaceholderImage()
 	{
 		String message = "Drawing the map. Some details like borders and grunge are not shown in edit mode.";
-		Font font = MapSettings.parseFont("URW Chancery L\t0\t25");
+		Font font = MapSettings.parseFont("URW Chancery L 0 25");
 		Point textBounds = TextDrawer.getTextBounds(message, font);
 		BufferedImage placeHolder = new BufferedImage(textBounds.x + 10, textBounds.y + 20, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = placeHolder.createGraphics();

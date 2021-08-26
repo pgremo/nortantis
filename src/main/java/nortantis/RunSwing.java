@@ -1,13 +1,6 @@
 package nortantis;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -82,6 +75,7 @@ import nortantis.util.JFontChooser;
 import nortantis.util.Logger;
 import nortantis.util.Range;
 
+import static java.awt.Font.*;
 import static java.util.stream.Collectors.toList;
 
 public class RunSwing
@@ -214,13 +208,14 @@ public class RunSwing
 	{
 		try
 		{
+			Font font = createFont(TRUETYPE_FONT, AssetsPath.get().resolve(Path.of("fonts", "Herculanum-Regular.ttf")).toFile());
+			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException
-				| IllegalAccessException | UnsupportedLookAndFeelException e)
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | IOException | FontFormatException e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		EventQueue.invokeLater(() -> {
 			try
 			{

@@ -16,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -682,24 +681,7 @@ public class MapSettings implements Serializable
 
 	public static Font parseFont(String str)
 	{
-		String[] parts = str.split("\t");
-		if (parts.length != 3)
-			throw new IllegalArgumentException("Unable to parse the value of the font: \"" + str + "\"");
-		Font font = new Font(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-		if (parts[0].startsWith("URW Chancery") && font.getFamily().equals("Dialog"))
-		{
-			// Windows doesn't have URW Chancery, so change it to another font.
-			return new Font("Gabriola", Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-		}
-		else
-		{
-			return font;
-		}
-		/*
- 		They don't have the font in their system. Return a font that looks good in Windows.
-		Logger.println("Cannot find font: \"" + parts[0] + "\". A default font will be used instead.");
-		return new Font("Gabriola", Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-		*/
+		return Font.decode(str);
 	}
 	
 	@Override
