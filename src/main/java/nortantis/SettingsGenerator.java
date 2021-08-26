@@ -25,7 +25,7 @@ import nortantis.util.Range;
  */
 public class SettingsGenerator
 {
-	private static String defaultSettingsFile = Paths.get(AssetsPath.get(), "internal/old_paper.properties").toString();
+	private static final Path defaultSettingsFile = AssetsPath.get().resolve(Path.of("internal", "old_paper.properties"));
 	public static int minWorldSize = 2000;
 	public static int maxWorldSize = 30000;
 	public static int worldSizePrecision = 1000;
@@ -33,7 +33,7 @@ public class SettingsGenerator
 
 	public static MapSettings generate()
 	{
-		if (!Files.exists(Paths.get(defaultSettingsFile)))
+		if (!Files.exists(defaultSettingsFile))
 		{
 			throw new IllegalArgumentException("The default settings files " + defaultSettingsFile + " does not exist");
 		}
@@ -146,8 +146,8 @@ public class SettingsGenerator
 		{
 			settings.generateBackground = false;
 			settings.generateBackgroundFromTexture = true;
-			
-			Path exampleTexturesPath = Paths.get(AssetsPath.get(), "example textures");
+
+			var exampleTexturesPath = AssetsPath.get().resolve("example textures");
 			List<Path> textureFiles;
 			try
 			{
@@ -160,7 +160,7 @@ public class SettingsGenerator
 			
 			if (textureFiles.size() > 0)
 			{
-				settings.backgroundTextureImage = ProbabilityHelper.sampleUniform(rand, textureFiles).toString();
+				settings.backgroundTextureImage = ProbabilityHelper.sampleUniform(rand, textureFiles);
 			}
 		}
 		

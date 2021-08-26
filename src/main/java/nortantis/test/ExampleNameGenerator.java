@@ -1,5 +1,6 @@
 package nortantis.test;
 
+import java.nio.file.Path;
 import java.util.Random;
 
 import nortantis.MapSettings;
@@ -15,7 +16,7 @@ public class ExampleNameGenerator
 			System.out.println("Expected exactly one argument");
 			return;
 		}
-		MapSettings settings = new MapSettings(args[0]);
+		MapSettings settings = new MapSettings(Path.of(args[0]));
 		settings.textRandomSeed = new Random().nextLong();
 		TextDrawer textDrawer = new TextDrawer(settings, 1.0);
 		

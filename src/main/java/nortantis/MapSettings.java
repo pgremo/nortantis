@@ -15,6 +15,7 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
@@ -60,7 +61,7 @@ public class MapSettings implements Serializable
 	public boolean transparentBackground; 
 	public boolean colorizeOcean; // For backgrounds generated from a texture.
 	public boolean colorizeLand; // For backgrounds generated from a texture.
-	public String backgroundTextureImage;
+	public Path backgroundTextureImage;
 	public long backgroundRandomSeed;
 	public Color oceanColor;
 	public Color landColor;
@@ -132,7 +133,7 @@ public class MapSettings implements Serializable
 		// Background image settings.
 		result.setProperty("backgroundRandomSeed", backgroundRandomSeed + "");
 		result.setProperty("generateBackground", generateBackground + "");
-		result.setProperty("backgroundTextureImage", backgroundTextureImage);
+		result.setProperty("backgroundTextureImage", backgroundTextureImage.toString());
 		result.setProperty("generateBackgroundFromTexture", generateBackgroundFromTexture + "");
 		result.setProperty("transparentBackground", transparentBackground + "");
 		result.setProperty("colorizeOcean", colorizeOcean + "");
@@ -282,12 +283,12 @@ public class MapSettings implements Serializable
 		return font.getFontName() + "\t" + font.getStyle() + "\t" + font.getSize();
 	}
 		
-	public MapSettings(String propertiesFilename)
+	public MapSettings(Path propertiesFilename)
 	{
 		final Properties props = new Properties();
 		try
 		{
-			props.load(new FileInputStream(propertiesFilename));
+			props.load(new FileInputStream(propertiesFilename.toFile()));
 		} catch (IOException e)
 		{
 			throw new RuntimeException(e);
@@ -389,10 +390,8 @@ public class MapSettings implements Serializable
 			return parseBoolean(propString);
 		});
 		backgroundTextureImage = getProperty("backgroundTextureImage", () -> {
-			String result = props.getProperty("backgroundTextureImage");
-			if (result == null)
-				result = Paths.get(AssetsPath.get(), "example textures").toString();
-			return result;
+			var result = props.getProperty("backgroundTextureImage");
+			return result == null ? AssetsPath.get().resolve("example textures") : Path.of(result);
 		});
 		backgroundRandomSeed = getProperty("backgroundRandomSeed", () -> Long.parseLong(props.getProperty("backgroundRandomSeed")));
 		oceanColor = getProperty("oceanColor", () -> parseColor(props.getProperty("oceanColor")));

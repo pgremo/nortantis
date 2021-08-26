@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,14 +40,14 @@ public class NameCompiler
 	}
 	private Set<String> dict;
 
-	public NameCompiler(Random r, List<Pair<String>> nounAdjectivePairs, 
+	public NameCompiler(Random r, List<Pair<String>> nounAdjectivePairs,
 			List<Pair<String>> nounVerbPairs)
-	{		
+	{
 		// Load the word dictionary.
 		List<String> lines;
 		try
 		{
-			lines = Files.readAllLines(Paths.get(AssetsPath.get(), "internal/en_GB.dic"), Charset.defaultCharset());
+			lines = Files.readAllLines(AssetsPath.get().resolve(Path.of("internal","en_GB.dic")), Charset.defaultCharset());
 		} catch (IOException e)
 		{
 			throw new RuntimeException("Unable to read word dictionary file.", e);
@@ -69,16 +70,16 @@ public class NameCompiler
 		this.nounAdjectivePairs = capitalizeFirstLetters(nounAdjectivePairs);
 		this.nounVerbPairs = capitalizeFirstLetters(this.nounVerbPairs);
 		nounAdjectivePairs = null;
-		
-				
+
+
 		this.r = r;
 		counter = new Counter<>();
 		counter.addCount("adjectives", this.nounAdjectivePairs.size());
 		counter.addCount("verbs", this.nounVerbPairs.size());
-				
-		
+
+
 	}
-	
+
 	private List<Pair<String>> convertToPresentTense(List<Pair<String>> verbPairs)
 	{
 		// Convert verbs to present tense.
@@ -91,7 +92,7 @@ public class NameCompiler
 		}
 		return result;
 	}
-	
+
 	private List<Pair<String>> capitalizeFirstLetters(List<Pair<String>> pairs)
 	{
 		List<Pair<String>> result = new ArrayList<>();
@@ -103,7 +104,7 @@ public class NameCompiler
 		}
 		return result;
 	}
-	
+
 	private String capitalizeAllFirstLetter(String str)
 	{
 		char[] chars = str.toCharArray();
@@ -116,7 +117,7 @@ public class NameCompiler
 		}
 		return  String.valueOf(chars);
 	}
-	
+
 	public String compileName()
 	{
 		if (counter.sample(r).equals("adjectives"))
@@ -154,7 +155,7 @@ public class NameCompiler
 			Pair<String> pair = nounVerbPairs.get(r.nextInt(nounVerbPairs.size()));
 			double d = r.nextDouble();
 			String result;
-			if (d < 0.5) 
+			if (d < 0.5)
 			{
 				// Just return the noun.
 				result = pair.getFirst();
@@ -163,12 +164,12 @@ public class NameCompiler
 			{
 				// Return both.
 				result = pair.getSecond() + " " + pair.getFirst();
-			}			
-			
+			}
+
 			return result;
 		}
 	}
-	
+
 	/**
 	 * Use rules from http://www.oxforddictionaries.com/us/words/verb-tenses-adding-ed-and-ing
 	 * and some rules I made to convert a verb to present tense.
@@ -178,27 +179,27 @@ public class NameCompiler
 	private String convertVerbToPresentTense(String verb)
 	{
 		List<Character> vowels = Arrays.asList('a', 'e', 'i', 'o', 'u');
-		
+
 		if (verb.endsWith("ing"))
 			return verb;
-		
+
 		if (verb.endsWith("ee") || verb.endsWith("ye") || verb.endsWith("oe"))
 		{
 			// Keep silent e.
 			return verb + "ing";
 		}
-		
+
 		if (verb.endsWith("ed"))
 		{
 			return verb.substring(0, verb.length() - 2) + "ing";
 		}
-		
-		
+
+
 		if (verb.endsWith("aid"))
 		{
 			return verb.substring(0, verb.length() - 2) + "ying";
 		}
-		
+
 		if (verb.endsWith("ood"))
 		{
 			return verb.substring(0, verb.length() - 3) + "anding";
@@ -218,7 +219,7 @@ public class NameCompiler
 		{
 			return verb.substring(0, verb.length() - 1) + "ing";
 		}
-		
+
 		if (verb.endsWith("ought"))
 		{
 			if (dict.contains(verb + "ing"))
@@ -229,19 +230,19 @@ public class NameCompiler
 			return verb;
 		}
 
-		if (verb.length() >= 3 && 
+		if (verb.length() >= 3 &&
 				!vowels.contains(verb.charAt(verb.length() - 1)) && vowels.contains(verb.charAt(verb.length() - 2))
 				&& vowels.contains(verb.charAt(verb.length() - 3)))
 		{
 			// 2 vowels vowels by a consonant.
 			return verb + "ing";
 		}
-		
+
 		if (verb.endsWith("c"))
 		{
 			return verb + "king";
 		}
-		
+
 		if (verb.length() >= 2 &&
 				!vowels.contains(verb.charAt(verb.length() - 1)) && vowels.contains(verb.charAt(verb.length() - 2)))
 		{
@@ -254,18 +255,18 @@ public class NameCompiler
 			// Give up.
 			return verb;
 		}
-		
+
 		if (verb.endsWith("ept"))
 		{
 			return verb.substring(0, verb.length() - 2) + "eping";
 		}
-						
+
 		if (dict.contains(verb + "ing"))
 			return verb + "ing";
 		// Give up.
 		return verb;
 	}
-	
+
 	public static void test()
 	{
 		final NameCompiler compiler = new NameCompiler(new Random(), new ArrayList<Pair<String>>(),
@@ -308,7 +309,7 @@ public class NameCompiler
 				assertEquals(expected.get(i), after.get(i));
 			}
 		}
-		
+
 		// Examples from text.
 		{
 			List<String> before = Arrays.asList(
@@ -332,7 +333,7 @@ public class NameCompiler
 						public String apply(String item)
 						{
 							return compiler.convertVerbToPresentTense(item);
-						}			
+						}
 					});
 			List<String> expected = Arrays.asList(
 					"redeeming",

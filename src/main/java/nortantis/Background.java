@@ -1,14 +1,12 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.Random;
-
 import nortantis.util.ImageHelper;
 import nortantis.util.ImageHelper.ColorifyAlgorithm;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Random;
 
 /**
  * An assortment of things needed to draw the background.
@@ -83,7 +81,7 @@ public class Background
 				BufferedImage texture;
 				try
 				{
-					texture = ImageCache.getInstance().getImageFromFile(Paths.get(settings.backgroundTextureImage));
+					texture = ImageCache.getInstance().getImageFromFile(settings.backgroundTextureImage);
 				}
 				catch (RuntimeException e)
 				{

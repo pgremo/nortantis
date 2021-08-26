@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
 
@@ -72,7 +73,7 @@ public class GraphCreator
         heightMap = ImageHelper.blur(heightMap, (int)IconDrawer.findMeanPolygonWidth(graph) / 2);
        
         // Use a texture generated from mountain elevation to carve mountain shapes into the areas with high elevation.
-        BufferedImage mountains = ImageHelper.read(Paths.get(AssetsPath.get(), "internal/mountain texture.png").toString());
+        BufferedImage mountains = ImageHelper.read(AssetsPath.get().resolve(Path.of("internal", "mountain texture.png")));
         if (mountains.getType() != BufferedImage.TYPE_USHORT_GRAY)
         {
         	mountains = ImageHelper.convertImageToType(mountains, BufferedImage.TYPE_USHORT_GRAY);

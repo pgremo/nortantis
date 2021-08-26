@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +42,8 @@ import nortantis.util.Pair;
 import nortantis.util.ProbabilityHelper;
 import nortantis.util.Range;
 import nortantis.util.Tuple2;
+
+import static java.util.function.Predicate.not;
 
 public class TextDrawer
 {
@@ -102,10 +106,10 @@ public class TextDrawer
 		List<Pair<String>> nounVerbPairs = new ArrayList<>();
 		for (String book : settings.books)
 		{
-			placeNames.addAll(readNameList(AssetsPath.get() + "/books/" + book + "_place_names.txt"));
-			personNames.addAll(readNameList(AssetsPath.get() + "/books/" + book + "_person_names.txt"));
-			nounAdjectivePairs.addAll(readStringPairs(AssetsPath.get() + "/books/" + book + "_noun_adjective_pairs.txt"));
-			nounVerbPairs.addAll(readStringPairs(AssetsPath.get() + "/books/" + book + "_noun_verb_pairs.txt"));
+			placeNames.addAll(readNameList(AssetsPath.get().resolve(Path.of("books", book +"_place_names.txt"))));
+			personNames.addAll(readNameList(AssetsPath.get().resolve(Path.of("books", book +"_person_names.txt"))));
+			nounAdjectivePairs.addAll(readStringPairs(AssetsPath.get().resolve(Path.of("books", book + "_noun_adjective_pairs.txt"))));
+			nounVerbPairs.addAll(readStringPairs(AssetsPath.get().resolve(Path.of("books", book + "_noun_verb_pairs.txt"))));
 		}
 				
 		placeNameGenerator = new NameGenerator(r, placeNames, maxWordLengthComparedToAverage, probabilityOfKeepingNameLength1, probabilityOfKeepingNameLength2, probabilityOfKeepingNameLength3);
@@ -126,10 +130,10 @@ public class TextDrawer
 
 	}
 	
-	private List<Pair<String>> readStringPairs(String filename)
+	private List<Pair<String>> readStringPairs(Path filename)
 	{
 		List<Pair<String>> result = new ArrayList<>();
-		try(BufferedReader br = new BufferedReader(new FileReader(new File(filename)))) 
+		try(BufferedReader br = new BufferedReader(new FileReader(filename.toFile())))
 		{
 			int lineNum = 0;
 		    for(String line; (line = br.readLine()) != null; ) 
@@ -148,39 +152,24 @@ public class TextDrawer
 		        	result.add(new Pair<>(parts[0], parts[1]));
 		        }
 		    }
-		} 
-		catch (FileNotFoundException e)
+		} catch (IOException e)
 		{
 			throw new RuntimeException(e);
-		} 
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}	
-		
+		}
+
 		return result;
 	}
 	
-	private List<String> readNameList(String filename)
+	private List<String> readNameList(Path filename)
 	{
-		List<String> result = new ArrayList<>();
-		try(BufferedReader br = new BufferedReader(new FileReader(new File(filename)))) 
-		{
-		    for(String line; (line = br.readLine()) != null; )
-		    {
-		    	// Remove white space lines.
-		        if (!line.trim().isEmpty())
-		        {
-		        	result.add(line);
-		        }
-		    }
-		} 
-		catch (IOException e)
-		{
+		try {
+			return Files.readAllLines(filename)
+					.stream()
+					.filter(not(String::isBlank))
+					.collect(Collectors.toList());
+		} catch (IOException e) {
 			throw new RuntimeException("Unable to read names from the file " + filename, e);
 		}
-		
-		return result;
 	}
 	
 	public void drawText(WorldGraph graph, BufferedImage map, BufferedImage landAndOceanBackground,

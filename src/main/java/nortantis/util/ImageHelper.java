@@ -12,6 +12,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -1348,11 +1349,11 @@ public class ImageHelper
 		}
 	}
 	
-	public static BufferedImage read(String fileName)
+	public static BufferedImage read(Path fileName)
 	{
 		try
 		{
-			return ImageIO.read(new File(fileName));
+			return ImageIO.read(fileName.toFile());
 		} 
 		catch (IOException e)
 		{
