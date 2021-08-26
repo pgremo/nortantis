@@ -76,6 +76,7 @@ import nortantis.util.Logger;
 import nortantis.util.Range;
 
 import static java.awt.Font.*;
+import static java.nio.file.Files.newInputStream;
 import static java.util.stream.Collectors.toList;
 
 public class RunSwing
@@ -208,7 +209,8 @@ public class RunSwing
 	{
 		try
 		{
-			Font font = createFont(TRUETYPE_FONT, AssetsPath.get().resolve(Path.of("fonts", "Herculanum-Regular.ttf")).toFile());
+			Path path = AssetsPath.get("fonts", "Herculanum-Regular.ttf");
+			Font font = createFont(TRUETYPE_FONT, newInputStream(path.resolve(path)));
 			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | IOException | FontFormatException e)
@@ -333,7 +335,7 @@ public class RunSwing
             	}
             }
         });
-		frame.setIconImage(ImageHelper.read(AssetsPath.get().resolve(Path.of("internal", "taskbar icon.png"))));
+		frame.setIconImage(ImageHelper.read(AssetsPath.get("internal", "taskbar icon.png")));
 		frame.getContentPane().setLayout(new BorderLayout());
 		
 		
@@ -2250,7 +2252,7 @@ public class RunSwing
 	public static List<String> getAllBooks()
 	{
 		try {
-			return Files.list(AssetsPath.get().resolve("books"))
+			return Files.list(AssetsPath.get("books"))
 					.map(Path::getFileName)
 					.map(Path::toString)
 					.filter(name -> name.endsWith("_place_names.txt"))

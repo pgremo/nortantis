@@ -15,12 +15,15 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+
+import static java.nio.file.Files.newInputStream;
 
 /**
  * For parsing and storing map settings.
@@ -287,7 +290,7 @@ public class MapSettings implements Serializable
 		final Properties props = new Properties();
 		try
 		{
-			props.load(new FileInputStream(propertiesFilename.toFile()));
+			props.load(newInputStream(propertiesFilename));
 		} catch (IOException e)
 		{
 			throw new RuntimeException(e);
@@ -390,7 +393,7 @@ public class MapSettings implements Serializable
 		});
 		backgroundTextureImage = getProperty("backgroundTextureImage", () -> {
 			var result = props.getProperty("backgroundTextureImage");
-			return result == null ? AssetsPath.get().resolve("example textures") : Path.of(result);
+			return result == null ? AssetsPath.get("example textures") : Path.of(result);
 		});
 		backgroundRandomSeed = getProperty("backgroundRandomSeed", () -> Long.parseLong(props.getProperty("backgroundRandomSeed")));
 		oceanColor = getProperty("oceanColor", () -> parseColor(props.getProperty("oceanColor")));

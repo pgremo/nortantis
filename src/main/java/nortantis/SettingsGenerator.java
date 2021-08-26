@@ -25,7 +25,7 @@ import nortantis.util.Range;
  */
 public class SettingsGenerator
 {
-	private static final Path defaultSettingsFile = AssetsPath.get().resolve(Path.of("internal", "old_paper.properties"));
+	private static final Path defaultSettingsFile = AssetsPath.get("internal", "old_paper.properties");
 	public static int minWorldSize = 2000;
 	public static int maxWorldSize = 30000;
 	public static int worldSizePrecision = 1000;

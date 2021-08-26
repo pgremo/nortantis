@@ -687,7 +687,7 @@ public class MapCreator
 		background.borderBackground.getGraphics().drawImage(map, borderWidthScaled, borderWidthScaled, null);
 		map = background.borderBackground;
 
-		var allBordersPath = AssetsPath.get().resolve("borders");
+		var allBordersPath = AssetsPath.get("borders");
 		var borderPath = allBordersPath.resolve(settings.borderType);
 		if (!Files.exists(borderPath))
 		{
@@ -1120,7 +1120,7 @@ public class MapCreator
 	public static Set<String> getAvailableBorderTypes()
 	{
 		try {
-			return Files.list(AssetsPath.get().resolve("borders"))
+			return Files.list(AssetsPath.get("borders"))
 					.filter(Files::isDirectory)
 					.map(Path::getFileName)
 					.map(Path::toString)

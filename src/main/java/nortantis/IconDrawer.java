@@ -1054,7 +1054,7 @@ public class IconDrawer
 			throw new RuntimeException("Type '" + iconType + "' does not use sets.");
 		}
 
-		var path = AssetsPath.get().resolve(Path.of("icons", iconType));
+		var path = AssetsPath.get("icons", iconType);
 		try {
 			return Files.list(path)
 					.filter(Files::isDirectory)
@@ -1099,11 +1099,11 @@ public class IconDrawer
 			{
 				return new String[] {};
 			}
-			path = AssetsPath.get().resolve(Path.of( "icons", iconType, setName));
+			path = AssetsPath.get( "icons", iconType, setName);
 		}
 		else
 		{
-			path = AssetsPath.get().resolve(Path.of( "icons", iconType));
+			path = AssetsPath.get( "icons", iconType);
 		}
 
 		try {
@@ -1147,7 +1147,7 @@ public class IconDrawer
 		Path path;
 		if (iconType.equals(citiesName))
 		{
-			path = AssetsPath.get().resolve(Path.of("icons", iconType, setName));
+			path = AssetsPath.get("icons", iconType, setName);
 		}
 		else
 		{
@@ -1159,11 +1159,11 @@ public class IconDrawer
 				{
 					throw new IllegalArgumentException("The icon type " + iconType + " uses sets, but no set name was given.");
 				}
-				path = AssetsPath.get().resolve(Path.of("icons", iconType, groupName, setName));
+				path = AssetsPath.get("icons", iconType, groupName, setName);
 			}
 			else
 			{
-				path = AssetsPath.get().resolve(Path.of( "icons", iconType, groupName));
+				path = AssetsPath.get( "icons", iconType, groupName);
 			}
 		}
 		return path;

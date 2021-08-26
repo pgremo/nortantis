@@ -1,32 +1,18 @@
 package hoten.voronoi;
 
-import static org.junit.Assert.assertEquals;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.function.Function;
-
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-
 import hoten.geom.Point;
 import hoten.geom.Rectangle;
 import hoten.voronoi.nodename.as3delaunay.LineSegment;
 import hoten.voronoi.nodename.as3delaunay.Voronoi;
 import nortantis.Biome;
 import nortantis.util.Range;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * VoronoiGraph.java
@@ -68,8 +54,28 @@ public abstract class VoronoiGraph {
         dipWidth = r.nextDouble() * .5 + .2;
         this.pointPrecision = pointPrecision;
    }
-    
-    public void initVoronoiGraph(Voronoi v, int numLloydRelaxations, boolean createElevationRiversAndBiomes)
+
+	static Vector3D findHighestZ(Vector3D v1, Vector3D v2, Vector3D v3)
+	{
+		if (v1.getZ() > v2.getZ())
+		{
+			if (v1.getZ() > v3.getZ())
+			{
+				return v1;
+			}
+			return v3;
+		}
+		else
+		{
+			if (v2.getZ() > v3.getZ())
+			{
+				return v2;
+			}
+			return v3;
+		}
+	}
+
+	public void initVoronoiGraph(Voronoi v, int numLloydRelaxations, boolean createElevationRiversAndBiomes)
     {
         bounds = v.get_plotBounds();
          for (int i = 0; i < numLloydRelaxations; i++) {
@@ -162,7 +168,7 @@ public abstract class VoronoiGraph {
         g.fillPolygon(x, y, 3);
     }
     
-    private static void drawTriangleElevation(Graphics2D g, Corner c1, Corner c2, Center center) 
+    static void drawTriangleElevation(Graphics2D g, Corner c1, Corner c2, Center center)
     {
     	Vector3D v1 = new Vector3D(c1.loc.x, c1.loc.y, c1.elevation);
     	Vector3D v2 = new Vector3D(c2.loc.x, c2.loc.y, c2.elevation);
@@ -211,123 +217,9 @@ public abstract class VoronoiGraph {
     	double yChange = gradient.getY() * (-point.getZ()) / (gradient.getX() * gradient.getX() + gradient.getY() * gradient.getY());
     	return new Vector3D(point.getX() + xChange, point.getY() + yChange, 0.0);
     }
-    
-    private static Vector3D findHighestZ(Vector3D v1, Vector3D v2, Vector3D v3)
-    {
-    	if (v1.getZ() > v2.getZ())
-    	{
-    		if (v1.getZ() > v3.getZ())
-    		{
-    			return v1;
-    		}
-    		return v3;
-    	}
-    	else
-    	{
-    		if (v2.getZ() > v3.getZ())
-    		{
-    			return v2;
-    		}
-    		return v3;
-    	}
-    }
-    
-    public static void runPrivateUnitTests()
-    {
-    	findHighestZTest();
-    	drawTriangleElevationZeroXGradientTest(); 
-    	drawTriangleElevationZeroYGradientTest();
-    	drawTriangleElevationWithXAndYGradientTest();
-    }
-  
-    private static void drawTriangleElevationWithXAndYGradientTest()
-    {
-    	BufferedImage image = new BufferedImage(101,101, BufferedImage.TYPE_INT_RGB);
-    	Corner corner1 = new Corner();
-    	corner1.loc = new Point(0, 0);
-    	corner1.elevation = 0.0;
-    	Corner corner2 = new Corner();
-    	corner2.elevation = 0.5;
-    	corner2.loc = new Point(100, 0);
-    	Center center = new Center(new Point(100, 100));
-    	center.elevation = 1.0;
-    	Graphics2D g = image.createGraphics();
-    	drawTriangleElevation(g, corner1, corner2, center);
-        assertEquals(
-    			0, 
-    			new Color(image.getRGB((int)corner1.loc.x, (int)corner1.loc.y)).getBlue());
-    	assertEquals(
-    			125,
-    			new Color(image.getRGB((int)corner2.loc.x - 1, (int)corner2.loc.y)).getBlue());
-    	assertEquals(
-    			251,
-    			new Color(image.getRGB((int)center.loc.x - 1, (int)center.loc.y - 2)).getBlue());
-    }
 
-    private static void drawTriangleElevationZeroXGradientTest()
-    {
-    	BufferedImage image = new BufferedImage(101,101, BufferedImage.TYPE_INT_RGB);
-    	Corner corner1 = new Corner();
-    	corner1.loc = new Point(0, 0);
-    	corner1.elevation = 0.5;
-    	Corner corner2 = new Corner();
-    	corner2.elevation = 0.5;
-    	corner2.loc = new Point(50, 0);
-    	Center center = new Center(new Point(50, 100));
-    	center.elevation = 1.0;
-    	Graphics2D g = image.createGraphics();
-    	drawTriangleElevation(g, corner1, corner2, center);
-    	assertEquals(
-    			(int)(corner1.elevation * 255),
-    			new Color(image.getRGB((int)corner1.loc.x, (int)corner1.loc.y)).getBlue());
-    	assertEquals(
-    			(int)(corner2.elevation * 255),
-    			new Color(image.getRGB((int)corner2.loc.x - 1, (int)corner2.loc.y)).getBlue());
-    	assertEquals((int)(center.elevation * 253),
-    			new Color(image.getRGB((int)center.loc.x - 1, (int)center.loc.y - 2)).getBlue());
-    }
 
-    private static void drawTriangleElevationZeroYGradientTest()
-    {
-    	BufferedImage image = new BufferedImage(101,101, BufferedImage.TYPE_INT_RGB);
-    	Corner corner1 = new Corner();
-    	corner1.loc = new Point(0, 0);
-    	corner1.elevation = 0.0;
-    	Corner corner2 = new Corner();
-    	corner2.elevation = 0.0;
-    	corner2.loc = new Point(0, 100);
-    	Center center = new Center(new Point(50, 100));
-    	center.elevation = 1.0;
-    	Graphics2D g = image.createGraphics();
-    	drawTriangleElevation(g, corner1, corner2, center);
-    	assertEquals(
-    			(int)(corner1.elevation * 255), 
-    			new Color(image.getRGB((int)corner1.loc.x, (int)corner1.loc.y)).getBlue());
-    	assertEquals(
-    			(int)(corner2.elevation * 255),
-    			new Color(image.getRGB((int)corner2.loc.x, (int)corner2.loc.y)).getBlue());
-    	assertEquals((int)(center.elevation * 249),
-    			new Color(image.getRGB((int)center.loc.x - 1, (int)center.loc.y-1)).getBlue());
-    }
-
-        
-    /**
-     * Unit test for findHighestZ.
-     */
-	private static void findHighestZTest() 
-	{		
-		Vector3D v1 = new Vector3D(0, 0, -3);
-		Vector3D v2 = new Vector3D(0, 0, 1);
-		Vector3D v3 = new Vector3D(0, 0, 2);
-		
-		List<Vector3D> list = Arrays.asList(v1, v2, v3);
-		
-		Collections.shuffle(list);
-		
-		assertEquals(v3, findHighestZ(list.get(0), list.get(1), list.get(2)));
-	}
-
-    private boolean closeEnough(double d1, double d2, double diff) {
+	private boolean closeEnough(double d1, double d2, double diff) {
         return Math.abs(d1 - d2) <= diff * scaleMultiplyer;
     }
 

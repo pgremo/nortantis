@@ -1,47 +1,26 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import org.apache.commons.math3.exception.NoDataException;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
-
 import hoten.geom.Point;
 import hoten.voronoi.Center;
 import hoten.voronoi.Corner;
 import hoten.voronoi.Edge;
-import nortantis.util.AssetsPath;
-import nortantis.util.Helper;
-import nortantis.util.ImageHelper;
-import nortantis.util.Pair;
-import nortantis.util.ProbabilityHelper;
-import nortantis.util.Range;
-import nortantis.util.Tuple2;
+import nortantis.util.*;
+import org.apache.commons.math3.exception.NoDataException;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
@@ -106,10 +85,10 @@ public class TextDrawer
 		List<Pair<String>> nounVerbPairs = new ArrayList<>();
 		for (String book : settings.books)
 		{
-			placeNames.addAll(readNameList(AssetsPath.get().resolve(Path.of("books", book +"_place_names.txt"))));
-			personNames.addAll(readNameList(AssetsPath.get().resolve(Path.of("books", book +"_person_names.txt"))));
-			nounAdjectivePairs.addAll(readStringPairs(AssetsPath.get().resolve(Path.of("books", book + "_noun_adjective_pairs.txt"))));
-			nounVerbPairs.addAll(readStringPairs(AssetsPath.get().resolve(Path.of("books", book + "_noun_verb_pairs.txt"))));
+			placeNames.addAll(readNameList(AssetsPath.get("books", book +"_place_names.txt")));
+			personNames.addAll(readNameList(AssetsPath.get("books", book +"_person_names.txt")));
+			nounAdjectivePairs.addAll(readStringPairs(AssetsPath.get("books", book + "_noun_adjective_pairs.txt")));
+			nounVerbPairs.addAll(readStringPairs(AssetsPath.get("books", book + "_noun_verb_pairs.txt")));
 		}
 				
 		placeNameGenerator = new NameGenerator(r, placeNames, maxWordLengthComparedToAverage, probabilityOfKeepingNameLength1, probabilityOfKeepingNameLength2, probabilityOfKeepingNameLength3);
@@ -133,7 +112,7 @@ public class TextDrawer
 	private List<Pair<String>> readStringPairs(Path filename)
 	{
 		List<Pair<String>> result = new ArrayList<>();
-		try(BufferedReader br = new BufferedReader(new FileReader(filename.toFile())))
+		try(BufferedReader br = Files.newBufferedReader(filename))
 		{
 			int lineNum = 0;
 		    for(String line; (line = br.readLine()) != null; ) 

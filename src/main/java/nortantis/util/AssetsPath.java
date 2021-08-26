@@ -39,4 +39,8 @@ public class AssetsPath {
     public static Path get() {
         return assetsPath;
     }
+
+    public static Path get(String first, String... rest){
+        return get().resolve(get().getFileSystem().getPath(first, rest));
+    }
 }

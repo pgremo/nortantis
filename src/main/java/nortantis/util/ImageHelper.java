@@ -12,6 +12,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Random;
 
@@ -29,6 +30,8 @@ import nortantis.ComplexArray;
 import nortantis.DimensionDouble;
 import nortantis.IconDrawer;
 import pl.edu.icm.jlargearrays.ConcurrencyUtils;
+
+import static java.nio.file.Files.newInputStream;
 
 public class ImageHelper
 {
@@ -1353,7 +1356,7 @@ public class ImageHelper
 	{
 		try
 		{
-			return ImageIO.read(fileName.toFile());
+			return ImageIO.read(newInputStream(fileName));
 		} 
 		catch (IOException e)
 		{
