@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public class NameCompiler
 		List<String> lines;
 		try
 		{
-			lines = Files.readAllLines(AssetsPath.get().resolve(Path.of( "internal", "en_GB.dic")), Charset.defaultCharset());
+			lines = Files.readAllLines(Paths.get(AssetsPath.get(), "internal/en_GB.dic"), Charset.defaultCharset());
 		} catch (IOException e)
 		{
 			throw new RuntimeException("Unable to read word dictionary file.", e);

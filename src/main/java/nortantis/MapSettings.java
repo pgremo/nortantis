@@ -391,7 +391,7 @@ public class MapSettings implements Serializable
 		backgroundTextureImage = getProperty("backgroundTextureImage", () -> {
 			String result = props.getProperty("backgroundTextureImage");
 			if (result == null)
-				result = AssetsPath.get().resolve("example textures").toString();
+				result = Paths.get(AssetsPath.get(), "example textures").toString();
 			return result;
 		});
 		backgroundRandomSeed = getProperty("backgroundRandomSeed", () -> Long.parseLong(props.getProperty("backgroundRandomSeed")));

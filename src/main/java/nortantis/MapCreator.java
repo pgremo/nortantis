@@ -685,7 +685,7 @@ public class MapCreator
 		background.borderBackground.getGraphics().drawImage(map, borderWidthScaled, borderWidthScaled, null);
 		map = background.borderBackground;
 		
-		Path allBordersPath = AssetsPath.get().resolve("borders");
+		Path allBordersPath = Paths.get(AssetsPath.get(), "borders");
 		Path borderPath = Paths.get(allBordersPath.toString(), settings.borderType);
 		if (!Files.exists(borderPath))
 		{
@@ -995,27 +995,20 @@ public class MapCreator
 	
 	private BufferedImage loadImageWithStringInFileName(Path path, String inFileName, boolean throwExceptionIfMissing)
 	{
-		try {
-			var cornerArray = Files.list(path)
-					.filter(file -> file.getFileName().toString().contains(inFileName))
-					.toArray(Path[]::new);
-			if (cornerArray.length == 0)
-			{
-				if (throwExceptionIfMissing)
-					throw new RuntimeException("Unable to find a file containing \"" + inFileName + "\" in the directory " + path.toAbsolutePath());
-				else
-					return null;
-			}
-			if (cornerArray.length > 1)
-			{
-				throw new RuntimeException("More than one file contains \"" + inFileName + "\" in the directory " + path.toAbsolutePath());
-			}
-
-			return ImageHelper.read(cornerArray[0]);
-		} catch (IOException e) {
-			Logger.println(e.getMessage());
-			throw new RuntimeException(e);
+		File[] cornerArray = new File(path.toString()).listFiles(file -> file.getName().contains(inFileName));
+		if (cornerArray.length == 0)
+		{
+			if (throwExceptionIfMissing)
+				throw new RuntimeException("Unable to find a file containing \"" + inFileName + "\" in the directory " + path.toAbsolutePath());
+			else
+				return null;
 		}
+		if (cornerArray.length > 1)
+		{
+			throw new RuntimeException("More than one file contains \"" + inFileName + "\" in the directory " + path.toAbsolutePath());			
+		}
+		
+		return ImageHelper.read(cornerArray[0].getPath());
 	}
 		
 	/**
@@ -1117,16 +1110,8 @@ public class MapCreator
 	
 	public static Set<String> getAvailableBorderTypes()
 	{
-		try {
-			return Files.list(AssetsPath.get().resolve("borders"))
-					.filter(Files::isDirectory)
-					.map(Path::getFileName)
-					.map(Path::toString)
-					.collect(Collectors.toCollection(TreeSet::new));
-		} catch (IOException e) {
-			Logger.println(e.getMessage());
-			return new TreeSet<>();
-		}
+		File[] directories = new File(Paths.get(AssetsPath.get(), "borders").toString()).listFiles(File::isDirectory);
+		return new TreeSet<String>(Arrays.stream(directories).map(file -> file.getName()).collect(Collectors.toList()));
 	}
 	
 	public BufferedImage createHeightMap(MapSettings settings)
