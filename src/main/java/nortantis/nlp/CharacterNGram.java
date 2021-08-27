@@ -14,13 +14,13 @@ import java.util.stream.IntStream;
  */
 public class CharacterNGram
 {
-	int n;
-	Random r;
-	ListCounterMap<Character> lcMap;
-	Set<String> namesFromCorpora;
+	private final int n;
+	private final Random r;
+	private final ListCounterMap<Character> lcMap;
+	private Set<String> namesFromCorpora;
 	
-	final char startToken = 0;
-	final char endToken = 4; 
+	private final char startToken = 0;
+	private final char endToken = 4;
 	
 	/**
 	 * 
@@ -36,29 +36,23 @@ public class CharacterNGram
 	
 	public void addData(Collection<String> phrases)
 	{
-		for (String phrase : phrases)
+		for (var phrase : phrases)
 		{
-			for (int i : new Range(phrase.length()))
+			for (var i : new Range(phrase.length()))
 			{
-				List<Character> lastChars = new ArrayList<>(n - 1);
+				var lastChars = new ArrayList<Character>(n - 1);
 				for (int j = i - n + 1; j < i; j++)
 				{
-					if (j < 0)
-						lastChars.add(startToken);
-					else
-						lastChars.add(phrase.charAt(j));
+					lastChars.add(j < 0 ? startToken : phrase.charAt(j));
 				}
 				
 				lcMap.incrementCount(lastChars, phrase.charAt(i));
 			}
 			// Add the end token.
-			List<Character> lastChars = new ArrayList<>(n - 1);
-			for (int j = phrase.length() - n + 1; j < phrase.length(); j++)
+			var lastChars = new ArrayList<Character>(n - 1);
+			for (var j = phrase.length() - n + 1; j < phrase.length(); j++)
 			{
-				if (j < 0)
-					lastChars.add(startToken);
-				else
-					lastChars.add(phrase.charAt(j));
+				lastChars.add(j < 0 ? startToken : phrase.charAt(j));
 			}
 			lcMap.incrementCount(lastChars, endToken);
 		}
@@ -90,13 +84,13 @@ public class CharacterNGram
 	{
 		if (lcMap.size() == 0)
 			throw new IllegalStateException("At least one book must be selected to generate text.");
-		List<Character> lastChars = new ArrayList<>();
-		for (@SuppressWarnings("unused") int i : new Range(n - 1))
+		var lastChars = new ArrayList<Character>();
+		for (@SuppressWarnings("unused") var i : new Range(n - 1))
 		{
 			lastChars.add(startToken);
 		}
 		
-		StringBuilder result = new StringBuilder();
+		var result = new StringBuilder();
 		char next;
 		do
 		{

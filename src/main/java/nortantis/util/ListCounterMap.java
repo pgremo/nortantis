@@ -36,21 +36,13 @@ public class ListCounterMap <T extends Comparable<T>> implements Serializable
 	
 	public void incrementCount(List<T> key, T value)
 	{
-		Counter<T> counter = map.get(key);
-		if (counter == null)
-		{
-			counter = new Counter<T>();
-			map.put(key, counter);
-		}
-		counter.increment(value);
+		map.computeIfAbsent(key, x -> new Counter<>()).add(value);
 	}
 	
 	public double getCount(List<T> key, T value)
 	{
 		Counter<T> counter = map.get(key);
-		if (counter == null)
-			return 0.0;
-		return counter.get(value);
+		return counter == null ? 0.0 : counter.getCount(value);
 	}
 	
 	/**
