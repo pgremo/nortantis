@@ -83,7 +83,7 @@ abbot	represents
 abbot	spend
 abbot	supplied
 abbot	vested
-abbot	�
+abbot
 abbots	behave
 abbots	called
 abbots	founded
@@ -173,7 +173,7 @@ altar	walk
 altar	worshipped
 altar-lamp	left
 altars	erected
-altar�	going
+altar	going
 alterations	disguised
 ambition	encouraged
 amice	wears
@@ -188,11 +188,11 @@ angels	wait
 angles	attached
 angles	crossing
 anio	allows
-anio	�
+anio
 anniversary	ministering
 annueller	suffer
-another�	drank
-another�	played
+another	drank
+another	played
 answers	show
 antecedents	qualified
 antecessor	built
@@ -231,7 +231,7 @@ archbishopric	belonging
 archbishops	built
 archbishops	disappointed
 archbishops	raise
-archbishop�	residing
+archbishop	residing
 archdeacons	excused
 archdeacons	help
 archdeacons	performed
@@ -330,7 +330,7 @@ behalf	distribute
 behalf	held
 belief	examined
 bell	ring
-bell	�
+bell
 bells	rung
 bells	spit
 bells	tolling
@@ -366,7 +366,7 @@ benefices	occupy
 benefices	prohibited
 benefices	remunerated
 benefices	running
-benefices	�
+benefices
 benefit	conferred
 benefit	conferring
 benefits	assure
@@ -385,7 +385,7 @@ bible	leaves
 bible	read
 bible	translate
 bible	wrote
-bible	�
+bible
 bill	proposed
 birthplace	reflected
 bishop	administer
@@ -439,20 +439,20 @@ bishops	received
 bishops	refuse
 bishops	seek
 bishops	wore
-bishops�	appointed
-bishops�	complained
-bishops�	contain
-bishops�	issued
-bishops�	sequestrated
-bishop�	celebrate
-bishop�	celebrated
-bishop�	eat
-bishop�	erected
-bishop�	join
-bishop�	listen
-bishop�	turn
+bishops	appointed
+bishops	complained
+bishops	contain
+bishops	issued
+bishops	sequestrated
+bishop	celebrate
+bishop	celebrated
+bishop	eat
+bishop	erected
+bishop	join
+bishop	listen
+bishop	turn
 bisshope	pleyned
-blackburn.�	teach
+blackburn.	teach
 board	seen
 boc-land	has
 bodies	buried
@@ -481,7 +481,7 @@ boys	instructed
 boys	look
 boys	maintained
 branches	divided
-braun�	�
+braun
 breast	reaches
 breast	symbolizing
 breastplate	wore
@@ -528,7 +528,7 @@ burial-place	provided
 business	seems
 businesse	drawen
 calendar	refers
-calling.�	forgetting
+calling.	forgetting
 candle	carrying
 candle	find
 candle	holding
@@ -567,7 +567,7 @@ cardinal	called
 cardinal	postponed
 career	opened
 career	support
-carpenter	�
+carpenter
 case	asked
 case	comes
 case	denies
@@ -704,7 +704,7 @@ chantries	provided
 chantries	put
 chantries	refers
 chantries	supply
-chantries	�
+chantries
 chantry	buried
 chantry	endow
 chantry	endowed
@@ -779,8 +779,8 @@ chaplain	seems
 chaplain	selected
 chaplain	supplied
 chaplain	teach
-chaplain	�
-chaplaincy	�
+chaplain
+chaplaincy
 chaplains	agree
 chaplains	conducted
 chaplains	differ
@@ -843,7 +843,7 @@ chastity	keep
 chastity	live
 chasuble	defined
 chasuble	seen
-chaucer	�
+chaucer
 check	interposed
 chekens	returns
 chest	put
@@ -858,7 +858,7 @@ child	inquire
 child	profit
 child	talk
 child	train
-child	�
+child
 children	baptized
 children	baptizing
 children	belong
@@ -949,7 +949,7 @@ churchyard	preaching
 churchyard	taken
 churchyard	took
 churchyards	found
-church�	received
+church	received
 circ	executed
 circumstance	cast
 circumstance	remembered
@@ -1095,7 +1095,7 @@ commission	entrusted
 commission	issued
 commissioners	arranged
 commissioners	put
-commonwealth	�
+commonwealth
 communi	pretio
 communicants	communicated
 communion	come
@@ -1120,7 +1120,7 @@ conclusion	following
 conclusion	forced
 conclusion	leads
 conclusion	point
-conclusion	�
+conclusion
 concubines	conniving
 condition	left
 condition	modified
@@ -1184,7 +1184,7 @@ converse	make
 conviction	produce
 cook	goes
 cook	sprinkle
-coomenwelthe.�	weded
+coomenwelthe.	weded
 copes	face
 copes	overlook
 copes	vested
@@ -1262,14 +1262,14 @@ cross	died
 cross	purchase
 cross	stand
 crosses	see
-crosses	�
+crosses
 crown	appealed
 crown	expected
 crown	found
 crown	inflicted
 crown	provided
 crown	received
-crown�	limit
+crown	limit
 crusaders	brought
 crusaders	returning
 crusaders	spread
@@ -1397,13 +1397,13 @@ device	implies
 device	raised
 devices	painted
 devil	sent
-devil	�
+devil
 devils	making
 devotion	maintained
 devotion	relieved
 devotions	puts
 diagrams	representing
-dico	�
+dico
 die	unbaptized
 differences	arbitrate
 difficulties	advise
@@ -1434,7 +1434,7 @@ dioceses	differed
 dioceses	existing
 dioceses	subdivide
 dioceses	visit
-dipl.	�
+dipl.
 directions	gave
 directions	gives
 dirge	sing
@@ -1452,7 +1452,7 @@ dispensation	obtain
 dispensation	sanctioned
 dispensation	use
 dispensations	gave
-dispensations	priests�
+dispensations	priests
 disposition	inquiring
 distance	grew
 district	belongs
@@ -1461,11 +1461,11 @@ district	whipped
 districts	assigned
 districts	divided
 dmon	sing
-dmon	�
+dmon
 documents	giving
 documents	recognized
 dog	manage
-dogs	�
+dogs
 doinges	called
 domesday	appears
 domesday	held
@@ -1504,7 +1504,7 @@ duty	desert
 duty	engage
 dykes	defended
 dylington	appointed
-d�	engraved
+d	engraved
 e.	_
 ealdorman	find
 ealdorman	flee
@@ -1517,7 +1517,7 @@ earth	stablished
 east	brought
 ecclesiastics	put
 ecclesiastics	seem
-ecclesiasticus	�
+ecclesiasticus
 edict	added
 education	complete
 education	completed
@@ -1597,7 +1597,7 @@ evening	healed
 evensong	consisted
 evensong	heard
 event	showed
-even�	chasing
+even	chasing
 evidence	found
 evidence	leads
 evil	alleviate
@@ -1621,7 +1621,7 @@ example	set
 example	supplies
 example	taken
 example	treat
-example	�
+example
 examples	cull
 examples	select
 examples	supported
@@ -1642,12 +1642,12 @@ extracts	giving
 extracts	illustrated
 eye	traced
 eyes	consecrate
-e�	built
-e�	cast
-e�	dwelled
-e�	hoped
-e�	hurled
-e�	possessed
+e	built
+e	cast
+e	dwelled
+e	hoped
+e	hurled
+e	possessed
 fact	accounted
 fact	afforded
 fact	arose
@@ -1703,17 +1703,17 @@ father	praye
 father	proceeding
 father	says
 father	tilled
-father	�
+father
 fathers	held
 fathers	read
 fathers	succeeding
-fathers�	succeed
-father�	entertained
-father�	succeed
+fathers	succeed
+father	entertained
+father	succeed
 fault	deprived
 fault	mutilated
 fault	recorded
-fault	�
+fault
 favour	met
 feast	held
 feature	added
@@ -1739,7 +1739,7 @@ fer	inhabit
 ferby	dismissed
 ferry	flooded
 festival	preceding
-festivalis.�	wrote
+festivalis.	wrote
 festivals	asperse
 festivals	attend
 festivals	come
@@ -1786,7 +1786,7 @@ form	grew
 form	run
 fortunes	rise
 fortuneth	reserves
-fortuneth	�
+fortuneth
 foundation	added
 foundation	specified
 founder	founded
@@ -1842,7 +1842,7 @@ friends	assure
 friends	entered
 friends	find
 friends	pray
-froissart�	speaks
+froissart	speaks
 fruite	fallen
 ft.	remains
 function	organizing
@@ -1907,7 +1907,7 @@ godparents	teach
 gods	consumed
 gods	worshipped
 godson	leaves
-god�	be
+god	be
 goods	cheapening
 gospel	preaching
 gospel	read
@@ -1940,7 +1940,7 @@ grievance	lasted
 groining	overshadowing
 gronethe	dedicated
 grostete	instituted
-grostete�	round
+grostete	round
 ground	entrusted
 ground	spit
 ground	stood
@@ -1961,7 +1961,7 @@ hall	called
 hall	constructed
 hall	containing
 hall	has
-hall	�
+hall
 halls	built
 hamlets	ministering
 hamlets	scattered
@@ -1993,7 +1993,7 @@ hands	putting
 hands	rescued
 hangings	furnished
 harness	find
-hast	�
+hast
 hawk	detained
 head	passed
 head	placed
@@ -2092,7 +2092,7 @@ houses	existing
 houses	grew
 houses	held
 houses	living
-houses	observed.�
+houses	observed.
 houses	reduced
 houses	reoccupied
 houses	spread
@@ -2227,9 +2227,9 @@ king	read
 king	seized
 king	sent
 king	strengthened
-king	tenths.�
+king	tenths.
 king	took
-king	�
+king
 kingdom	coalesced
 kingdom	limit
 kingdom	settle
@@ -2253,17 +2253,17 @@ kings	took
 kings	used
 kingston-on-thames	farmed
 kingston-on-thames	seem
-king�	allow
-king�	asked
-king�	contrasted
-king�	forfeit
-king�	going
-king�	make
-king�	oppose
-king�	played
-king�	read
-king�	recommended
-king�	work
+king	allow
+king	asked
+king	contrasted
+king	forfeit
+king	going
+king	make
+king	oppose
+king	played
+king	read
+king	recommended
+king	work
 kinsmen	carved
 kinsmen	conquered
 kinsmen	give
@@ -2287,7 +2287,7 @@ knowledge	come
 knowledge	examine
 knowledge	has
 knowledge	realize
-knyves	�
+knyves
 kyng	serven
 labour	bound
 labour	defined
@@ -2434,7 +2434,7 @@ living	resigned
 living	surrendering
 livings	hold
 lofts	containing
-lollards	�
+lollards
 lord	adopted
 lord	built
 lord	confessing
@@ -2448,8 +2448,8 @@ lord	take
 lords	reduced
 lords	supported
 lordship	found
-lord�	explaining
-lord�	teach
+lord	explaining
+lord	teach
 losses	established
 love-feast	cut
 lyndwode	says
@@ -2551,9 +2551,9 @@ mantil	give
 manual	adopted
 manumission	promoting
 manuscripts	illuminated
-man�	exclude
-man�	sends
-man�	�
+man	exclude
+man	sends
+man
 marcs	leaves
 mark	give
 mark	pay
@@ -2580,12 +2580,12 @@ mass	singing
 mass-book	taken
 mass-book	translated
 mass-book	written
-mass-book	�
+mass-book
 mass-books	granted
 mass-books	written
 mass-priests	keep
 mass.	rede
-mass.	�
+mass.
 masses	sing
 masses	supply
 master	founded
@@ -2620,9 +2620,9 @@ meat	hear
 meat	read
 medeshamsted	concurred
 medieties	held
-medi�	entered
-medi�	retain
-medi�	studying
+medi	entered
+medi	retain
+medi	studying
 meetings	existed
 member	helped
 members	bound
@@ -2668,7 +2668,7 @@ method	using
 methods	adopted
 metropolitans	obliged
 michaelmas	forbidding
-mien	�
+mien
 might	stablished
 miles	covering
 mill	gave
@@ -2762,7 +2762,7 @@ monks	submit
 monks	told
 monks	welcome
 monks	wrote
-monk�	cope
+monk	cope
 montford	seems
 month	dismiss
 months	correct
@@ -2772,7 +2772,7 @@ morning	consisted
 morning	setting
 morrow	heard
 mother	milked
-mother�	obey
+mother	obey
 mountains	seated
 movables	protect
 movement	lent
@@ -2785,7 +2785,7 @@ municipalities	rising
 municipalities	seeing
 museum	found
 museum	given
-museum	�
+museum
 myrc	says
 myrc	set
 mysteries	celebrated
@@ -2822,9 +2822,9 @@ neighbourhood	welcome
 neighbours	draw
 neighbours	entertained
 neighbours	relate
-neighbours	school�
-neighbours	�
-neighbour�	covet
+neighbours	school
+neighbours
+neighbour	covet
 nephew	leaves
 nests	destroyed
 niches	surrounded
@@ -2899,7 +2899,7 @@ occasions	worn
 occupations	adapted
 occupations	engaged
 occupations	unbecoming
-octo	�
+octo
 offence	shared
 offences	dealt
 offender	thought
@@ -2910,7 +2910,7 @@ offerings	making
 office	discharge
 office	exercise
 office	intended
-office	�
+office
 officers	borne
 officers	distinguished
 officers	elected
@@ -3002,11 +3002,11 @@ others	repent
 others	revived
 others	ruin
 others	trained
-others	�
+others
 oversight	maintained
 owners	distinguished
 ox	covet
-o�	stood
+o	stood
 pace	held
 pageants	exhibiting
 pages	adorned
@@ -3065,16 +3065,16 @@ parlour	containing
 parson	maintain
 parson	provide
 parson	says
-parson	�
+parson
 parsons	percyved
 parsons	shryve
-parson�	comes
-parson�	married
-parson�	signifies
+parson	comes
+parson	married
+parson	signifies
 part	played
 part	requires
 part	supposed
-particle	�
+particle
 particulars	confirmed
 particulars	following
 particulars	taken
@@ -3084,7 +3084,7 @@ partner	having
 partners	leave
 partners	retain
 parts	divided
-pasch�	�
+pasch
 passers-by	soliciting
 pastor	permitted
 pastor	seek
@@ -3093,13 +3093,13 @@ paternoster	desire
 paternoster	learn
 paternoster	teach
 paternosters	taking
-patience.�	tax
+patience.	tax
 patron	agreed
 patron	pay
 patronage	attached
 patronage	founded
 patrons	assigned
-patron�	refuse
+patron	refuse
 payment	assigned
 payment	required
 payment	tend
@@ -3125,7 +3125,7 @@ penance	redeemed
 penance	taper
 penances	enjoins
 penitents	receiving
-penny	�
+penny
 pension	give
 pension	pay
 pension	paying
@@ -3186,7 +3186,7 @@ people	turn
 people	turns
 people	varied
 people	watches
-people	�
+people
 period	began
 period	disregarded
 period	founded
@@ -3218,7 +3218,7 @@ petitions	arranged
 photograph	comes
 photograph	fails
 phrase	meet
-phrase	�
+phrase
 picture	presents
 pictures	adorned
 pictures	appeared
@@ -3245,7 +3245,7 @@ place	held
 place	obtained
 place	seen
 place	taken
-place	�
+place
 places	celebrating
 places	consecrated
 places	defined
@@ -3255,7 +3255,7 @@ places	find
 places	following
 places	held
 places	screened
-places	�
+places
 plan	carried
 plan	dividing
 plan	see
@@ -3274,15 +3274,15 @@ poems	attributed
 poems	sing
 poet	puts
 poet	says
-poetry	�
-poet�	endowed
-poet�	fashioned
-poet�	gave
-poet�	moulded
-poet�	reigned
-poet�	reposed
-poet�	take
-poet�	work
+poetry
+poet	endowed
+poet	fashioned
+poet	gave
+poet	moulded
+poet	reigned
+poet	reposed
+poet	take
+poet	work
 point	meet
 point	shaped
 poll-tax	levied
@@ -3301,15 +3301,15 @@ pope	relieved
 pope	send
 pope	sent
 pope	writes
-pope	�
+pope
 popes	assumed
 popes	ceding
 popes	reconciled
 popes	took
-pope�	asks
-pope�	build
-pope�	gather
-pope�	whereupon
+pope	asks
+pope	build
+pope	gather
+pope	whereupon
 population	gathered
 population	grown
 population	increased
@@ -3363,7 +3363,7 @@ precincts	accorded
 precincts	selling
 precincts	sought
 predecessors	accustomed
-predecessor�	disputed
+predecessor	disputed
 preface	stated
 preferment	fit
 prelates	enjoining
@@ -3412,7 +3412,7 @@ priest	throw
 priest	wants
 priest	wishes
 priest	wore
-priest	�
+priest
 priesthood	established
 priests	appointed
 priests	assigned
@@ -3447,7 +3447,7 @@ priests	scattered
 priests	see
 priests	warn
 priests	wore
-priest�	gave
+priest	gave
 prince	submitted
 princes	put
 princes	sought
@@ -3486,7 +3486,7 @@ profits	pay
 profits	took
 progress	attended
 projections	enclose
-promotion	tenths.�
+promotion	tenths.
 proof	need
 properties	endowed
 property	let
@@ -3552,7 +3552,7 @@ races	ran
 raid	making
 rank	furnished
 rank	held
-rank	�
+rank
 reader	feel
 reader	find
 reader	has
@@ -3566,7 +3566,7 @@ readers	provided
 readers	remember
 reason	concludes
 reason	creep
-reason	�
+reason
 reasons	gave
 receipts	|
 recluses	enclosed
@@ -3759,8 +3759,8 @@ s	spread
 s	thane
 s	use
 s	wyfe
-s	�
-s-minds	month�
+s
+s-minds	month
 sacrament	administering
 sacrament	giving
 sacraments	committed
@@ -3791,13 +3791,13 @@ scholars	proceed
 scholars	putting
 scholars	returned
 scholars	supported
-scholar�	forged
+scholar	forged
 school	maintain
 school	set
 schoolmaster	add
 schoolmaster	being
 schoolmaster	formed
-schoolmaster�	provided
+schoolmaster	provided
 schools	attend
 schools	established
 schools	look
@@ -3827,7 +3827,7 @@ sense	disallows
 sentence	enforced
 sentence	resisted
 sentiment	based
-sequestration	�
+sequestration
 serf	gave
 serf	ordained
 serf	send
@@ -3871,7 +3871,7 @@ services	popularize
 services	provided
 services	stipulated
 services	supply
-settl	�
+settl
 settlement	making
 settlers	wants
 sexton	appointed
@@ -3882,7 +3882,7 @@ share	received
 shepherd	see
 sheriff	carried
 sheriff	meeting
-shilling	�
+shilling
 shode	lay
 shoemakers	maintained
 shoes	habited
@@ -3899,7 +3899,7 @@ shrifts	hear
 shrine	occupy
 shrines	refurnish
 shutters	closed
-sick	body�
+sick	body
 side	buttress
 side	fell
 sides	round
@@ -3909,7 +3909,7 @@ sight-seers	lounging
 signs	hung
 silver	included
 similitude	moulded
-simond�	take
+simond	take
 sin	bring
 sin	caused
 sin	confirmed
@@ -3953,7 +3953,7 @@ soil	bound
 solas	visited
 soldiers	obtained
 soldiers	placed
-soldiers.�	setting
+soldiers.	setting
 solidarity	given
 solution	found
 solution	proceed
@@ -3970,7 +3970,7 @@ songs	abstain
 sons	dividing
 sons	gave
 sons	present
-sons	priests�
+sons	priests
 sons	serve
 soul	celebrate
 soul	indicate
@@ -4009,7 +4009,7 @@ spirit	revived
 spirits	get
 spirits	grew
 spiritualities	consisted
-spiritualities	�
+spiritualities
 sponsor	stood
 sports	indulging
 sports	prohibited
@@ -4038,7 +4038,7 @@ standing	insist
 stanzas	lies
 stanzas	mount
 stars	consumed
-stars	e�
+stars	e
 state	believed
 state	chosen
 state	threaten
@@ -4071,12 +4071,12 @@ story	complete
 story	finished
 story	intended
 story	told
-strain	�
+strain
 strait	helped
 stranger	confess
 stranger	entertain
 stranger	live
-strangers	�
+strangers
 streams	utilized
 street	built
 streets	clad
@@ -4179,7 +4179,7 @@ syllable	existed
 syllable	indicate
 symbol	celebrate
 symbolism	varied
-symond�	take
+symond	take
 synod	assembled
 synod	bound
 synod	fetches
@@ -4247,7 +4247,7 @@ tenements	left
 tent	pitched
 tenths	gave
 term	appeared
-tern�	immolated
+tern	immolated
 testator	gives
 testators	left
 tester	canopied
@@ -4552,7 +4552,7 @@ vicars	proceed
 vicars	remaining
 vicars	serve
 vicars	served
-vicar�	served
+vicar	served
 victims	offered
 view	making
 views	adopted
@@ -4637,7 +4637,7 @@ white	make
 whitgils	built
 whitgils	left
 whole	see
-wich-elms	�
+wich-elms
 widow	lodging
 widows	being
 wife	behave
@@ -4651,7 +4651,7 @@ wife	learn
 wife	married
 wife	sever
 will	bound
-will	�
+will
 wills	acted
 wills	attached
 wills	given
@@ -4663,7 +4663,7 @@ windows	closed
 windows	has
 winter	get
 witan	showed
-witan	�
+witan
 witenagemot	sought
 wives	_
 wives	attacked
@@ -4776,10 +4776,10 @@ youth	gave
 |	belonged
 |	divided
 |	|
-�	�
-�	amounted
-�	giving
-�	leaving
-�	received
-�	spent
-�	ps�
+
+	amounted
+	giving
+	leaving
+	received
+	spent
+	ps

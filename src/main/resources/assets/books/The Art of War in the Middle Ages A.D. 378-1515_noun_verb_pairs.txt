@@ -280,7 +280,7 @@ bow	provided
 bow	used
 bow-strings	possess
 bowman	boast
-bowman	�
+bowman
 bowmen	mounted
 bowmen	supported
 bravery	fell
@@ -292,14 +292,14 @@ brook	lined
 brook	protected
 brook	ran
 brook	recoiled
-bruce�	turn
+bruce	turn
 bucklers	gained
 bucklers	laid
 building	round
 bullet	advancing
 burst	dashed
-butchery	�
-byrnie�	�
+butchery
+byrnie
 byzantinism	accepted
 camp	coming
 camp	kept
@@ -362,7 +362,7 @@ cavalry	sent
 cavalry	strengthen
 cavalry	supported
 cavalry	turned
-cavalry	�
+cavalry
 centre	advanced
 centre	begun
 centre	broke
@@ -372,7 +372,7 @@ centre	drew
 centre	lay
 centre	making
 centre	refused
-centre	�
+centre
 centres	faced
 centuries	repeated
 century	adding
@@ -394,7 +394,7 @@ century	serving
 century	show
 century	succeeding
 century	written
-century	�
+century
 challenges	accepted
 chance	preserved
 change	accomplished
@@ -514,8 +514,8 @@ commanders	possess
 commanders	practised
 commanders	threw
 commanders	troubled
-commanders	�
-commander�	threw
+commanders
+commander	threw
 commines	called
 commissariat	existed
 commissariat	organized
@@ -561,7 +561,7 @@ confederates	thrust
 confederates	tried
 confederates	waving
 confederates	worked
-confederates	�
+confederates
 confidence	placed
 conflict	began
 conflict	defer
@@ -749,7 +749,7 @@ emperor	took
 empire	observed
 empire	save
 empire	shaking
-employment	�
+employment
 end	being
 end	contributed
 end	put
@@ -761,11 +761,11 @@ enemies	devoted
 enemies	distinguished
 enemies	exceed
 enemies	fight
-enemies�	brought
-enemies�	concentrated
-enemies�	force
-enemies�	gauged
-enemies�	thought
+enemies	brought
+enemies	concentrated
+enemies	force
+enemies	gauged
+enemies	thought
 enemy	approached
 enemy	beat
 enemy	come
@@ -797,19 +797,19 @@ enemy	succeeded
 enemy	turned
 enemy	used
 enemy	won
-enemy�	ascertain
-enemy�	brought
-enemy�	defeat
-enemy�	get
-enemy�	hang
-enemy�	has
-enemy�	led
-enemy�	meet
-enemy�	receive
-enemy�	receiving
-enemy�	says
-enemy�	spare
-enemy�	turn
+enemy	ascertain
+enemy	brought
+enemy	defeat
+enemy	get
+enemy	hang
+enemy	has
+enemy	led
+enemy	meet
+enemy	receive
+enemy	receiving
+enemy	says
+enemy	spare
+enemy	turn
 energy	preserved
 engagement	copied
 engagement	opened
@@ -1005,11 +1005,11 @@ fortresses	blockaded
 fortresses	isolated
 foundations	shaking
 four-fifths	destroyed
-francis�	employed
+francis	employed
 frank	bore
 frank	face
 frank	pictured
-frank	�
+frank
 fray	begin
 fray	plunge
 fray	throw
@@ -1038,7 +1038,7 @@ generalship	displayed
 genius	condescend
 genius	showed
 gesiths	wore
-girdle	�
+girdle
 glance	cast
 glarus	drew
 goal	reach
@@ -1068,14 +1068,14 @@ halberd	planted
 halberd	proved
 halberdiers	drawn
 halberds	working
-halberds	�
+halberds
 half	fought
 half-banda	consists
 half-banda	posted
 half-bandon	attached
 half-bandon	called
 halves	divided
-hammers	�
+hammers
 hand	commenced
 hand	deal
 hand	engaged
@@ -1090,7 +1090,7 @@ havoc	worked
 head	brought
 hedges	crossed
 hedges	protected
-height	�
+height
 herules	removed
 hierarchy	established
 hill	descend
@@ -1213,9 +1213,9 @@ island	subjected
 janissaries	took
 javelin	armed
 javelins	armed
-javelins.�	provided
+javelins.	provided
 jealousies	remembered
-justinian�	defeats
+justinian	defeats
 key	served
 king	aimed
 king	contracted
@@ -1339,13 +1339,13 @@ line	stationed
 line	take
 line	thundered
 line	try
-line	�
+line
 lines	appeared
 lines	drag
 lines	drawn
 lines	placed
 lines	reorganized
-lives	�
+lives
 long-bow	begins
 long-bow	employed
 long-bow	find
@@ -1371,9 +1371,9 @@ man	sit
 man	turned
 manner	act
 manuscript	illuminated
-man�	meant
-man�	repeated
-man�	succeed
+man	meant
+man	repeated
+man	succeed
 march	arrest
 march	executed
 march	pronounce
@@ -1406,7 +1406,7 @@ masses	threw
 masses	turned
 masters	dispute
 masters	recognize
-masters�	meddle
+masters	meddle
 match	proved
 match	resembled
 material	considered
@@ -1416,8 +1416,8 @@ maxim	pursued
 meal	halting
 means	keep
 measures	keep
-medi�	dealing
-medi�	designed
+medi	dealing
+medi	designed
 men	assumed
 men	avoided
 men	bound
@@ -1461,7 +1461,7 @@ men	strove
 men	succeeded
 men	teaches
 men	won
-men	�
+men
 men-at-arms	advanced
 men-at-arms	appeared
 men-at-arms	caught
@@ -1626,7 +1626,7 @@ opponents	found
 opponents	got
 opponents	prevent
 opponents	satisfied
-opponents�	meet
+opponents	meet
 opportunity	gave
 opportunity	give
 opportunity	saw
@@ -1639,8 +1639,8 @@ others	began
 others	bound
 others	directed
 others	exterminated
-others�	rely
-other�	thrust
+others	rely
+other	thrust
 ottomans	enabled
 ottomans	fell
 oversight	favoured
@@ -1744,7 +1744,7 @@ plunderers	stand
 point	ended
 point	found
 point	strike
-point	�
+point
 points	beat
 points	bristling
 points	placed
@@ -1790,7 +1790,7 @@ precautions	directing
 precautions	neglecting
 precautions	selecting
 predecessors	employed
-predecessors	�
+predecessors
 preparations	win
 preponderance	asserted
 presence	pointing
@@ -1870,7 +1870,7 @@ rear	sent
 rear	surging
 rear	wheeled
 reasons	ascribing
-rebels	�
+rebels
 reforms	mention
 reinforcements	spread
 reins	turned
@@ -1904,7 +1904,7 @@ retreat	execute
 retreat	harassed
 retreats	degenerate
 revenge	took
-re�	�
+re
 right	assailed
 right	flanked
 rise	bring
@@ -2090,14 +2090,14 @@ supremacy	aimed
 supremacy	asserted
 supremacy	retained
 surcoat	wore
-surgeons	�
+surgeons
 survivors	sent
 sword	established
 sword	suited
 swords	rushed
 swordsman	met
-swordsman�	added
-swordsman�	obtains
+swordsman	added
+swordsman	obtains
 system	appears
 system	assumed
 system	borrowed
@@ -2192,7 +2192,7 @@ troopers	shout
 troops	accustomed
 troops	act
 troops	acting
-troops	anything.�
+troops	anything.
 troops	attacked
 troops	attempted
 troops	bore
@@ -2280,7 +2280,7 @@ victory	secure
 victory	secured
 victory	won
 vigour	threw
-vincas	�
+vincas
 volunteer	raised
 waggoners	disengage
 waggoners	drilled
@@ -2292,7 +2292,7 @@ waists	hung
 walls	showed
 war	grow
 war	revealed
-war-board	�
+war-board
 war-waggons	placed
 warfare	recall
 warrior	bring
@@ -2300,7 +2300,7 @@ warrior	provided
 warrior	worked
 warriors	experienced
 warriors	march
-warrior�	found
+warrior	found
 wars	followed
 wars	utilised
 way	blocked
@@ -2383,5 +2383,5 @@ years	found
 years	last
 years	preserved
 years	rode
-�	consisted
-�	wore
+	consisted
+	wore
