@@ -1,11 +1,9 @@
 package nortantis.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 public class ProbabilityHelper
 {
@@ -18,20 +16,20 @@ public class ProbabilityHelper
 		{
 			throw new IllegalArgumentException("The distribution must have at least one value");
 		}
-		
+
 		if (distribution.size() == 1)
 		{
 			return distribution.get(0).getSecond();
 		}
-		
-		double totalWeight = distribution.stream().map(tuple -> tuple.getFirst()).mapToDouble(d -> d).sum();
+
+		double totalWeight = distribution.stream().mapToDouble(Tuple2::getFirst).sum();
 		if (totalWeight == 0)
 		{
 			throw new IllegalArgumentException("Total weight cannot be 0.");
 		}
 		double sample = rand.nextDouble() * totalWeight;
 		double curWeight = 0;
-		for (Tuple2<Double, T> tuple : distribution)
+		for (var tuple : distribution)
 		{
 			curWeight += tuple.getFirst();
 			if (curWeight >= sample)
@@ -39,73 +37,43 @@ public class ProbabilityHelper
 				return tuple.getSecond();
 			}
 		}
-		
+
 		// This shouldn't actually happen.
 		assert false;
 		return distribution.get(distribution.size() - 1).getSecond();
 	}
-	
+
 	/**
 	 * Samples a uniform distribution over the given items
 	 */
 	public static <T> T sampleUniform(Random rand, List<T> items)
 	{
-		if (items.size() == 0)
+		if (items.isEmpty())
 		{
 			throw new IllegalArgumentException("The distribution must have at least one value");
 		}
-		
-		if (items.size() == 1)
-		{
-			return items.get(0);
-		}
-		
-		double sample = rand.nextDouble();
-		double itemWeight = 1.0 / items.size();
-		double curWeight = 0;
-		for (T item : items)
-		{
-			curWeight += itemWeight;
-			if (curWeight >= sample)
-			{
-				return item;
-			}
-		}
-		
-		// This shouldn't actually happen.
-		assert false;
-		return items.get(0);
+
+		return items.get(rand.nextInt(items.size()));
 	}
-	
+
 	public static <T extends Enum<T>> T sampleEnumUniform(Random rand, Class<T> enumType)
 	{
-		List<T> items = new ArrayList<>();
-		for (T c : enumType.getEnumConstants()) 
-		{
-			items.add(c);
-		}
-		return sampleUniform(rand, items);
+		return sampleUniform(rand, asList(enumType.getEnumConstants()));
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public static List<Tuple2<Double, Enum>> createUniformDistributionOverEnumValues(Enum[] values)
 	{
-		List<Tuple2<Double, Enum>> distribution = new ArrayList<>(values.length);
-		for (Enum value : values)
-		{
-			distribution.add(new Tuple2<>(1.0, value));
-		}
-		
-		return distribution;
+		return Arrays.stream(values).map(value -> new Tuple2<>(1.0, value)).collect(toList());
 	}
-	
+
 	public static void main(String[] args)
 	{
 		Map<String, Integer> counts = new HashMap<>();
 		for (@SuppressWarnings("unused") int i : new Range(10000))
 		{
-			String value = sampleCategorical(new Random(), Arrays.asList(
-					 new Tuple2<>(0.1, "first"), 
+			String value = sampleCategorical(new Random(), asList(
+					 new Tuple2<>(0.1, "first"),
 					 new Tuple2<>(0.5, "second"),
 					 new Tuple2<>(0.4, "third")));
 			if (!counts.containsKey(value))

@@ -191,7 +191,6 @@ burghs	new
 burst	war-cry
 butchery	mere
 byrnie	war-sark
-byrnie
 camp	intrenched
 campaign	whole
 campaigns	few
@@ -342,8 +341,6 @@ commander	byzantine
 commands	subordinate
 commonwealth	european
 companies	free
-companies
-company
 composition	diverse
 comrade	best
 comrades	former
@@ -396,7 +393,6 @@ courage	steadiest
 courtiers	mere
 creature-comforts	small
 crest	small
-crevant
 crime	tactical
 crossbowmen	genoese
 crowd	panic-stricken
@@ -485,7 +481,6 @@ enemies	english
 enemies	old
 enemies	swiss
 enemies	their
-enemies
 enemy	boldest
 enemy	formidable
 enemy	helpless
@@ -676,7 +671,6 @@ historians	modern
 historians	unfortunate
 history	military
 history	simple
-home
 homes	new
 hook	strong
 hordes	chaotic
@@ -765,7 +759,6 @@ kingdom	western
 kingdoms	various
 kinsmen	alpine
 kinsmen	inferior
-knife
 knight	good
 knight	mail-clad
 knight	western
@@ -787,7 +780,6 @@ lands	northern
 landsknechts	stronger
 landsknechts	victorious
 latin	greek
-laws
 leaders	able
 leaders	confederate
 leaders	german
@@ -813,7 +805,6 @@ line	narrowest
 line	second
 line	turkish
 line	uncovered
-line
 lines	first
 lines	opposing
 lines	same
@@ -1016,7 +1007,6 @@ patriotism	intense
 pattern	single
 pattern	stereotyped
 peasants	mere
-peditum
 peoples	most
 peoples	various
 period	characteristic
@@ -1179,7 +1169,6 @@ s	inexcusable
 s	rear
 s	straight
 sabre	curved
-sabre
 scale	small
 scale	smaller
 scale	social
@@ -1367,7 +1356,6 @@ town	liable
 towns	open
 towns	strong
 towns	walled
-train
 tribe	german
 tribes	akin
 tribes	german
@@ -1434,7 +1422,6 @@ war	further
 war	great
 war	noticeable
 war	val
-war
 war-board	defensive
 war-board
 war-waggons	impregnable

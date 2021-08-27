@@ -12,66 +12,54 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.lang.String.format;
+import static java.util.Collections.*;
+import static java.util.Comparator.comparingDouble;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 public class TextDrawer
 {
 	private MapSettings settings;
-	private final int mountainRangeMinSize = 50;
-	// y offset added to names of mountain groups smaller than a range.
-	private final double mountainGroupYOffset = 67;
-	private final int backGroundBlendKernelBaseSize = 10;
 	// How big a river must be , in terms of edge.river, to be considered for labeling.
 	private final int riverMinWidth = 3;
-	// Rivers shorter than this will not be named. This must be at least 3.
-	private final int riverMinLength = 3;
-	private final int largeRiverWidth = 4;
-	// This is how far away from a river it's name will be drawn.
-	private final double riverNameRiseHeight = -32;
-	private final double cityYNameOffset = 18;
-	private final double maxWordLengthComparedToAverage = 2.0;
-	private final double probabilityOfKeepingNameLength1 = 0.0;
-	private final double probabilityOfKeepingNameLength2 = 0.0;
-	private final double probabilityOfKeepingNameLength3 = 0.3;
-	private final double thresholdForPuttingTitleOnLand = 0.3;
-	
+
 	private BufferedImage landAndOceanBackground;
 	private CopyOnWriteArrayList<MapText> mapTexts;
 	private List<Area> cityAreas;
 	Random r;
 	long originalSeed;
-	private NameGenerator placeNameGenerator;
-	private NameGenerator personNameGenerator;
-	private NameCompiler nameCompiler;
+	private final NameGenerator placeNameGenerator;
+	private final NameGenerator personNameGenerator;
+	private final NameCompiler nameCompiler;
 	Area graphBounds;
-	private double sizeMultiplyer;
-	private Font titleFontScaled;
-	private Font regionFontScaled;
-	private Font mountainRangeFontScaled;
-	private Font citiesAndOtherMountainsFontScaled;
-	private Font riverFontScaled;
+	private final Font titleFontScaled;
+	private final Font regionFontScaled;
+	private final Font mountainRangeFontScaled;
+	private final Font citiesAndOtherMountainsFontScaled;
+	private final Font riverFontScaled;
 	Set<String> namesGenerated;
 	
 	/**
 	 * 
 	 * @param settings The map settings to use. Some of these settings are for text drawing.
-	 * @param sizeMultiplyer The font size of text drawn will be multiplied by this value.
+	 * @param sizeMultiplier The font size of text drawn will be multiplied by this value.
 	 *  This allows the map to be scaled larger or smaller.
 	 */
-	public TextDrawer(MapSettings settings, double sizeMultiplyer)
+	public TextDrawer(MapSettings settings, double sizeMultiplier)
 	{
 		this.settings = settings;
-		this.sizeMultiplyer = sizeMultiplyer;
 		mapTexts = new CopyOnWriteArrayList<>();
 		// I create a new Random instead of passing one in so that small differences in the way 
 		// the random number generator is used previous to the TextDrawer do not change the text.
@@ -79,10 +67,10 @@ public class TextDrawer
 		this.originalSeed = settings.textRandomSeed;
 		this.namesGenerated = new HashSet<>();
 				
-		List<String> placeNames = new ArrayList<>();
-		List<String> personNames = new ArrayList<>();
-		List<Pair<String>> nounAdjectivePairs = new ArrayList<>();
-		List<Pair<String>> nounVerbPairs = new ArrayList<>();
+		var placeNames = new ArrayList<String>();
+		var personNames = new ArrayList<String>();
+		var nounAdjectivePairs = new ArrayList<Pair<String>>();
+		var nounVerbPairs = new ArrayList<Pair<String>>();
 		for (String book : settings.books)
 		{
 			placeNames.addAll(readNameList(AssetsPath.get("books", book +"_place_names.txt")));
@@ -90,53 +78,48 @@ public class TextDrawer
 			nounAdjectivePairs.addAll(readStringPairs(AssetsPath.get("books", book + "_noun_adjective_pairs.txt")));
 			nounVerbPairs.addAll(readStringPairs(AssetsPath.get("books", book + "_noun_verb_pairs.txt")));
 		}
-				
+
+		double maxWordLengthComparedToAverage = 2.0;
+		double probabilityOfKeepingNameLength1 = 0.0;
+		double probabilityOfKeepingNameLength2 = 0.0;
+		double probabilityOfKeepingNameLength3 = 0.3;
 		placeNameGenerator = new NameGenerator(r, placeNames, maxWordLengthComparedToAverage, probabilityOfKeepingNameLength1, probabilityOfKeepingNameLength2, probabilityOfKeepingNameLength3);
 		personNameGenerator = new NameGenerator(r, personNames, maxWordLengthComparedToAverage, probabilityOfKeepingNameLength1, probabilityOfKeepingNameLength2, probabilityOfKeepingNameLength3);
 	
 		nameCompiler = new NameCompiler(r, nounAdjectivePairs, nounVerbPairs);
 		
 		titleFontScaled = settings.titleFont.deriveFont(settings.titleFont.getStyle(),
-				(int)(settings.titleFont.getSize() * sizeMultiplyer));
+				(int)(settings.titleFont.getSize() * sizeMultiplier));
 		regionFontScaled = settings.regionFont.deriveFont(settings.regionFont.getStyle(),
-				(int)(settings.regionFont.getSize() * sizeMultiplyer));
+				(int)(settings.regionFont.getSize() * sizeMultiplier));
 		mountainRangeFontScaled = settings.mountainRangeFont.deriveFont(settings.mountainRangeFont.getStyle(),
-				(int)(settings.mountainRangeFont.getSize() * sizeMultiplyer));
+				(int)(settings.mountainRangeFont.getSize() * sizeMultiplier));
 		citiesAndOtherMountainsFontScaled = settings.otherMountainsFont.deriveFont(settings.otherMountainsFont.getStyle(),
-				(int)(settings.otherMountainsFont.getSize() * sizeMultiplyer));
+				(int)(settings.otherMountainsFont.getSize() * sizeMultiplier));
 		riverFontScaled = settings.riverFont.deriveFont(settings.riverFont.getStyle(),
-				(int)(settings.riverFont.getSize() * sizeMultiplyer));
+				(int)(settings.riverFont.getSize() * sizeMultiplier));
 
 	}
 	
 	private List<Pair<String>> readStringPairs(Path filename)
 	{
-		List<Pair<String>> result = new ArrayList<>();
-		try(BufferedReader br = Files.newBufferedReader(filename))
-		{
-			int lineNum = 0;
-		    for(String line; (line = br.readLine()) != null; ) 
-		    {
-		    	lineNum++;
-		    	
-		    	// Remove white space lines.
-		        if (!line.trim().isEmpty())
-		        {
-		        	String[] parts = line.split("\t");
-		        	if (parts.length != 2)
-		        	{
-		        		System.out.println("Warning: No string pair found in " + filename + " at line " + lineNum + ".");
-		        		continue;
-		        	}
-		        	result.add(new Pair<>(parts[0], parts[1]));
-		        }
-		    }
-		} catch (IOException e)
-		{
-			throw new RuntimeException(e);
+		try {
+			var counter = new AtomicInteger();
+			return Files.readAllLines(filename)
+					.stream()
+					.peek(x -> counter.getAndIncrement())
+					.filter(not(String::isBlank))
+					.map(x -> x.split("\t"))
+					.peek(x -> {
+						if (x.length != 2)
+							System.out.printf("Warning: No string pair found in %s at line %d.%n", filename, counter.get());
+					})
+					.filter(x -> x.length == 2)
+					.map(x -> new Pair<>(x[0], x[1]))
+					.collect(toList());
+		} catch (IOException e) {
+			throw new RuntimeException(format("Unable to read names from the file %s", filename), e);
 		}
-
-		return result;
 	}
 	
 	private List<String> readNameList(Path filename)
@@ -145,7 +128,7 @@ public class TextDrawer
 			return Files.readAllLines(filename)
 					.stream()
 					.filter(not(String::isBlank))
-					.collect(Collectors.toList());
+					.collect(toList());
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to read names from the file " + filename, e);
 		}
@@ -155,7 +138,7 @@ public class TextDrawer
 			List<Set<Center>> mountainRanges, List<IconDrawTask> cityDrawTasks)
 	{				
 		this.landAndOceanBackground = landAndOceanBackground;
-		cityAreas = cityDrawTasks.stream().map(drawTask -> drawTask.createArea()).collect(Collectors.toList());;
+		cityAreas = cityDrawTasks.stream().map(IconDrawTask::createArea).collect(toList());
 
 		if (settings.edits.text.size() > 0)
 		{
@@ -194,7 +177,8 @@ public class TextDrawer
 			Set<Point> cityLoc = new HashSet<>(1);
 			cityLoc.add(city.centerLoc);
 			String cityName = generateNameOfType(TextType.City, findCityTypeFromCityFileName(city.fileName), true);
-			drawNameRotated(map, g, cityName, cityLoc, city.scaledHeight/2 + (cityYNameOffset + cityMountainFontHeight/2.0) * settings.resolution, true, TextType.City);
+			double cityYNameOffset = 18;
+			drawNameRotated(map, g, cityName, cityLoc, city.scaledHeight/2.0 + (cityYNameOffset + cityMountainFontHeight/2.0) * settings.resolution, true, TextType.City);
 		}
 		
 		g.setFont(regionFontScaled);
@@ -211,11 +195,12 @@ public class TextDrawer
 				throw new RuntimeException(ex.getMessage());
 			}
 			drawNameHorizontal(map, g, name, locations, graph, settings.drawBoldBackground,
-					true, TextType.Region);
+					TextType.Region);
 		}
 				
 		for (Set<Center> mountainRange : mountainRanges)
 		{
+			int mountainRangeMinSize = 50;
 			if (mountainRange.size() >= mountainRangeMinSize)
 			{
 				g.setFont(mountainRangeFontScaled);
@@ -225,6 +210,8 @@ public class TextDrawer
 			else
 			{
 				g.setFont(citiesAndOtherMountainsFontScaled);
+				// y offset added to name of mountain groups smaller than a range.
+				double mountainGroupYOffset = 67;
 				if (mountainRange.size() >= 2)
 				{
 					if (mountainRange.size() == 2)
@@ -259,11 +246,16 @@ public class TextDrawer
 		List<River> rivers = findRivers(graph);
 		for (River river : rivers)
 		{
+			// Rivers shorter than this will not be named. This must be at least 3.
+			int riverMinLength = 3;
 			if (river.size() >= riverMinLength)
 			{
+				int largeRiverWidth = 4;
 				RiverType riverType = river.getWidth() >= largeRiverWidth ? RiverType.Large : RiverType.Small;
 				
 				Set<Point> locations = extractLocationsFromCorners(river.getCorners());
+				// This is how far away from a river it's name will be drawn.
+				double riverNameRiseHeight = -32;
 				drawNameRotated(map, g, generateNameOfType(TextType.River, riverType, true), locations,
 						riverNameRiseHeight * settings.resolution, true, TextType.River);										
 			}
@@ -276,7 +268,7 @@ public class TextDrawer
 	private CityType findCityTypeFromCityFileName(String cityFileNameNoExtension)
 	{
 		String name = cityFileNameNoExtension.toLowerCase();
-		if (name.contains("fort") || name.contains("castle") || name.contains("keep") || name.contains("citadel"))
+		if (Stream.of("fort", "castle", "keep", "citadel").anyMatch(name::contains))
 		{
 			return CityType.Fortification;
 		}
@@ -284,11 +276,11 @@ public class TextDrawer
 		{
 			return CityType.City;
 		}
-		else if (name.contains("town") || name.contains("village") || name.contains("houses"))
+		else if (Stream.of("town", "village", "houses").anyMatch(name::contains))
 		{
 			return CityType.Town;
 		}
-		else if (name.contains("farm") || name.contains("homestead") || name.contains("building") || name.contains("house"))
+		else if (Stream.of("farm", "homestead", "building", "house").anyMatch(name::contains))
 		{
 			return CityType.Homestead;
 		}
@@ -300,8 +292,8 @@ public class TextDrawer
 	
 	/**
 	 * Draw text which was added by the user.
-	 * @param map
-	 * @param graph
+	 * @param map world image
+	 * @param graph world graph
 	 */
 	public synchronized void drawUserModifiedText(BufferedImage map, WorldGraph graph)
 	{
@@ -318,49 +310,39 @@ public class TextDrawer
 			}
 			
 			Point textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
-			
-			if (text.type == TextType.Title)
-			{
-				g.setFont(titleFontScaled);
-				TectonicPlate plate = graph.getTectonicPlateAt(textLocation.x, textLocation.y);
-				drawNameHorizontal(map, g, extractLocationsFromCenters(plate.centers), 
-						graph, settings.drawBoldBackground, false, text);
-			}
-			else if (text.type == TextType.City)
-			{
-				g.setFont(citiesAndOtherMountainsFontScaled);
-				drawNameRotated(map, g, 0, false, text);	
-			}
-			else if (text.type == TextType.Region)
-			{
-				g.setFont(regionFontScaled);
-				Center center = graph.findClosestCenter(textLocation.x, textLocation.y);
-				Set<Center> plateCenters;
-				if (center.isWater)
-				{
-					plateCenters = findPlateCentersWaterOnly(graph, center.tectonicPlate);
-				}
-				else
-				{
-					plateCenters = center.region.getCenters();
-				}
-				Set<Point> locations = extractLocationsFromCenters(plateCenters);
-				drawNameHorizontal(map, g, locations, graph, settings.drawBoldBackground, false, text);
-			}
-			else if (text.type == TextType.Mountain_range)
-			{
-				g.setFont(mountainRangeFontScaled);
-				drawNameRotated(map, g, 0, false, text);
-			}
-			else if (text.type == TextType.Other_mountains)
-			{
-				g.setFont(citiesAndOtherMountainsFontScaled);
-				drawNameRotated(map, g, 0, false, text);				
-			}
-			else if (text.type == TextType.River)
-			{
-				g.setFont(riverFontScaled);
-				drawNameRotated(map, g, 0, false, text);				
+
+			switch (text.type) {
+				case Title:
+					g.setFont(titleFontScaled);
+					TectonicPlate plate = graph.getTectonicPlateAt(textLocation.x, textLocation.y);
+					drawNameHorizontal(map, g, extractLocationsFromCenters(plate.centers),
+							graph, settings.drawBoldBackground, false, text);
+					break;
+				case City:
+				case Other_mountains:
+					g.setFont(citiesAndOtherMountainsFontScaled);
+					drawNameRotated(map, g, 0, false, text);
+					break;
+				case Region:
+					g.setFont(regionFontScaled);
+					Center center = graph.findClosestCenter(textLocation.x, textLocation.y);
+					Set<Center> plateCenters;
+					if (center.isWater) {
+						plateCenters = findPlateCentersWaterOnly(center.tectonicPlate);
+					} else {
+						plateCenters = center.region.getCenters();
+					}
+					Set<Point> locations = extractLocationsFromCenters(plateCenters);
+					drawNameHorizontal(map, g, locations, graph, settings.drawBoldBackground, false, text);
+					break;
+				case Mountain_range:
+					g.setFont(mountainRangeFontScaled);
+					drawNameRotated(map, g, 0, false, text);
+					break;
+				case River:
+					g.setFont(riverFontScaled);
+					drawNameRotated(map, g, 0, false, text);
+					break;
 			}
 		}
 
@@ -374,33 +356,30 @@ public class TextDrawer
 	 */
 	public String generateNameOfTypeForTextEditor(TextType type)
 	{
-		if (type.equals(TextType.Mountain_range) || type.equals(TextType.Other_mountains) 
-				|| type.equals(TextType.River))
+		if (List.of(TextType.Mountain_range, TextType.Other_mountains, TextType.River).contains(type))
 		{
 			nameCompiler.setSeed(System.currentTimeMillis());
 		}
 		
 		Object subType = null;
-		
-		if (type.equals(TextType.Title))
-		{
-			subType = ProbabilityHelper.sampleCategorical(r, 
-					ProbabilityHelper.createUniformDistributionOverEnumValues(TitleType.values()));
-		}
-		else if (type.equals(TextType.Other_mountains))
-		{
-			subType = ProbabilityHelper.sampleCategorical(r, 
-					ProbabilityHelper.createUniformDistributionOverEnumValues(OtherMountainsType.values()));			
-		}
-		else if (type.equals(TextType.River))
-		{
-			subType = ProbabilityHelper.sampleCategorical(r, 
-					ProbabilityHelper.createUniformDistributionOverEnumValues(RiverType.values()));			
-		}
-		else if (type.equals(TextType.City))
-		{
-			// In the editor you add city icons in a different tool than city text, so we have no way of knowing what icon, if any, this city name is for.
-			subType = ProbabilityHelper.sampleEnumUniform(r, CityType.class);
+
+		switch (type) {
+			case Title:
+				subType = ProbabilityHelper.sampleCategorical(r,
+						ProbabilityHelper.createUniformDistributionOverEnumValues(TitleType.values()));
+				break;
+			case Other_mountains:
+				subType = ProbabilityHelper.sampleCategorical(r,
+						ProbabilityHelper.createUniformDistributionOverEnumValues(OtherMountainsType.values()));
+				break;
+			case River:
+				subType = ProbabilityHelper.sampleCategorical(r,
+						ProbabilityHelper.createUniformDistributionOverEnumValues(RiverType.values()));
+				break;
+			case City:
+				// In the editor you add city icons in a different tool than city text, so we have no way of knowing what icon, if any, this city name is for.
+				subType = ProbabilityHelper.sampleEnumUniform(r, CityType.class);
+				break;
 		}
 		
 		try
@@ -423,171 +402,135 @@ public class TextDrawer
 	 */
 	private String generateNameOfType(TextType type, Object subType, boolean requireUnique)
 	{
-		if (type.equals(TextType.Title))
-		{
-			TitleType titleType = subType == null ? TitleType.Decorated : (TitleType)subType;
-			
-			double probabilityOfPersonName = 0.3;
-			switch (titleType)
-			{
-				case Decorated:
-					if (r.nextDouble() < probabilityOfPersonName)
-					{
-						return generatePersonName("The Land of %s", requireUnique);	
+		switch (type) {
+			case Title: {
+				TitleType titleType = subType == null ? TitleType.Decorated : (TitleType) subType;
+
+				double probabilityOfPersonName = 0.3;
+				switch (titleType) {
+					case Decorated:
+						if (r.nextDouble() < probabilityOfPersonName) {
+							return generatePersonName("The Land of %s", requireUnique);
+						} else {
+							return generatePlaceName("The Land of %s", requireUnique);
+						}
+					case NameOnly:
+						return generatePlaceName("%s", requireUnique);
+					default:
+						throw new IllegalArgumentException("Unknown title type: " + titleType);
+				}
+			}
+			case Region: {
+				double probabilityOfPersonName = 0.2;
+				if (r.nextDouble() < probabilityOfPersonName) {
+					String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+							new Tuple2<>(0.2, "Kingdom of %s"),
+							new Tuple2<>(0.04, "Empire of %s")));
+					return generatePersonName(format, requireUnique);
+				} else {
+					String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+							new Tuple2<>(0.1, "Kingdom of %s"),
+							new Tuple2<>(0.02, "Empire of %s"),
+							new Tuple2<>(0.85, "%s")));
+					return generatePlaceName(format, requireUnique);
+				}
+			}
+			case Mountain_range: {
+				double probabilityOfCompiledName = 0.7;
+				if (r.nextDouble() < probabilityOfCompiledName) {
+					return compileName("%s Range", requireUnique);
+				} else {
+					return generatePlaceName("%s Range", requireUnique);
+				}
+			}
+			case Other_mountains: {
+				OtherMountainsType mountainType = subType == null ? OtherMountainsType.Mountains : (OtherMountainsType) subType;
+				String format = getOtherMountainNameFormat(mountainType);
+				double probabilityOfCompiledName = 0.5;
+				if (r.nextDouble() < probabilityOfCompiledName) {
+					return compileName(format, requireUnique);
+				} else {
+					double probabilityOfPersonName = 0.4;
+					if (r.nextDouble() < probabilityOfPersonName) {
+						// Person name
+						// Make the name possessive.
+						format = format.replace("%s", "%s's");
+						return generatePersonName(format, requireUnique);
+					} else {
+						return generatePlaceName(format, requireUnique);
 					}
-					else
-					{
-						return generatePlaceName("The Land of %s", requireUnique);	
-					}
-				case NameOnly:
-					return generatePlaceName("%s", requireUnique);	
-				default:
-					throw new IllegalArgumentException("Unknown title type: " + titleType);				
+				}
 			}
-		}
-		if (type.equals(TextType.Region))
-		{
-			double probabilityOfPersonName = 0.2;
-			if (r.nextDouble() < probabilityOfPersonName)
-			{
-				String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						new Tuple2<>(0.2, "Kingdom of %s"),
-						new Tuple2<>(0.04, "Empire of %s")));
-				return generatePersonName(format, requireUnique);
+			case City: {
+				CityType cityType = (CityType) subType;
+				String structureName;
+				switch (cityType) {
+					case Fortification:
+						structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+								new Tuple2<>(0.2, "Castle"),
+								new Tuple2<>(0.2, "Fort"),
+								new Tuple2<>(0.2, "Fortress"),
+								new Tuple2<>(0.2, "Keep"),
+								new Tuple2<>(0.2, "Citadel")));
+						break;
+					case City:
+						structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+								new Tuple2<>(0.75, "City"),
+								new Tuple2<>(0.25, "Town")));
+						break;
+					case Town:
+						structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+								new Tuple2<>(0.2, "City"),
+								new Tuple2<>(0.4, "Village"),
+								new Tuple2<>(0.4, "Town")));
+						break;
+					case Homestead:
+						structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+								new Tuple2<>(0.5, "Farm"),
+								new Tuple2<>(0.5, "Village")));
+						break;
+					default:
+						throw new RuntimeException("Unknown city type: " + cityType);
+				}
+
+				double probabilityOfPersonName = 0.5;
+				if (r.nextDouble() < probabilityOfPersonName) {
+					String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+							new Tuple2<>(0.1, structureName + " of %s"),
+							new Tuple2<>(0.04, "%s's " + structureName),
+							new Tuple2<>(0.04, structureName + " of %s"),
+							new Tuple2<>(0.04, structureName + " of %s"),
+							new Tuple2<>(0.04, "%s's " + structureName),
+							new Tuple2<>(0.04, "%s's " + structureName)));
+					return generatePersonName(format, requireUnique);
+				} else {
+					String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+							new Tuple2<>(0.2, structureName + " of %s"),
+							new Tuple2<>(0.2, "%s " + structureName),
+							new Tuple2<>(0.02, "%s " + structureName),
+							new Tuple2<>(0.3, "%s")));
+					return generatePlaceName(format, requireUnique);
+				}
 			}
-			else
-			{
-				String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						new Tuple2<>(0.1, "Kingdom of %s"),
-						new Tuple2<>(0.02, "Empire of %s"),
-						new Tuple2<>(0.85, "%s")));
-				return generatePlaceName(format, requireUnique);
-			}
-		}
-		else if (type.equals(TextType.Mountain_range))
-		{
-			double probabilityOfCompiledName = 0.7;
-			if (r.nextDouble() < probabilityOfCompiledName)
-			{
-				return compileName("%s Range", requireUnique);
-			}
-			else
-			{
-				return generatePlaceName("%s Range", requireUnique);
-			}
-		}
-		else if (type.equals(TextType.Other_mountains))
-		{
-			OtherMountainsType mountainType = subType == null ? OtherMountainsType.Mountains : (OtherMountainsType)subType;
-			String format = getOtherMountainNameFormat(mountainType);
-			double probabilityOfCompiledName = 0.5;
-			if (r.nextDouble() < probabilityOfCompiledName)
-			{
-				return compileName(format, requireUnique);
-			}
-			else
-			{
+			case River: {
+				RiverType riverType = subType == null ? RiverType.Large : (RiverType) subType;
+				String format = getRiverNameFormat(riverType);
+				double probabilityOfCompiledName = 0.5;
+				if (r.nextDouble() < probabilityOfCompiledName) {
+					return compileName(format, requireUnique);
+				}
 				double probabilityOfPersonName = 0.4;
-				if (r.nextDouble() < probabilityOfPersonName)
-				{
+				if (r.nextDouble() < probabilityOfPersonName) {
 					// Person name
 					// Make the name possessive.
 					format = format.replace("%s", "%s's");
 					return generatePersonName(format, requireUnique);
-				}
-				else
-				{
+				} else {
 					return generatePlaceName(format, requireUnique);
 				}
 			}
-		}
-		else if (type.equals(TextType.City))
-		{
-			CityType cityType = (CityType)subType;
-			String structureName;
-			if (cityType.equals(CityType.Fortification))
-			{
-				structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						 new Tuple2<>(0.2, "Castle"),
-						 new Tuple2<>(0.2, "Fort"),
-						 new Tuple2<>(0.2, "Fortress"),
-						 new Tuple2<>(0.2, "Keep"),
-						 new Tuple2<>(0.2, "Citadel")));
-			}
-			else if (cityType.equals(CityType.City))
-			{
-				structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						 new Tuple2<>(0.75, "City"),
-						 new Tuple2<>(0.25, "Town")));
-			}
-			else if (cityType.equals(CityType.Town))
-			{
-				structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						 new Tuple2<>(0.2, "City"),
-						 new Tuple2<>(0.4, "Village"),
-						 new Tuple2<>(0.4, "Town")));
-			}
-			else if (cityType.equals(CityType.Homestead))
-			{
-				structureName = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						 new Tuple2<>(0.5, "Farm"),
-						 new Tuple2<>(0.5, "Village")));
-			}
-			else
-			{
-				throw new RuntimeException("Unknown city type: " + cityType);
-			}
-			
-			double probabilityOfPersonName = 0.5;
-			if (r.nextDouble() < probabilityOfPersonName)
-			{
-				String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						new Tuple2<>(0.1, structureName + " of %s"),
-						new Tuple2<>(0.04, "%s's " + structureName),
-						new Tuple2<>(0.04, structureName + " of %s"),
-						new Tuple2<>(0.04, structureName + " of %s"),
-						new Tuple2<>(0.04, "%s's " + structureName),
-						new Tuple2<>(0.04, "%s's " + structureName)));
-				return generatePersonName(format, requireUnique);	
-			}
-			else
-			{
-				String format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
-						new Tuple2<>(0.2, structureName + " of %s"),
-						new Tuple2<>(0.2, "%s " + structureName),
-						new Tuple2<>(0.02, "%s " + structureName),
-						new Tuple2<>(0.3, "%s")));
-				return generatePlaceName(format, requireUnique);
-			}
-		}
-		else if (type.equals(TextType.River))
-		{
-			RiverType riverType = subType == null ? RiverType.Large : (RiverType)subType;
-			String format = getRiverNameFormat(riverType);
-			double probabilityOfCompiledName = 0.5;
-			if (r.nextDouble() < probabilityOfCompiledName)
-			{
-				return compileName(format, requireUnique);
-			}
-			else
-			{
-				double probabilityOfPersonName = 0.4;
-				if (r.nextDouble() < probabilityOfPersonName)
-				{
-					// Person name
-					// Make the name possessive.
-					format = format.replace("%s", "%s's");
-					return generatePersonName(format, requireUnique);
-				}
-				else
-				{
-					return generatePlaceName(format, requireUnique);
-				}
-			}
-		}
-		else
-		{
-			throw new UnsupportedOperationException("Unknown text type: " + type);
+			default:
+				throw new UnsupportedOperationException("Unknown text type: " + type);
 		}
 	}
 	
@@ -609,26 +552,21 @@ public class TextDrawer
 	
 	private String getRiverNameFormat(RiverType riverType)
 	{
-		String format;
 		switch (riverType)
 		{
 			case Large:
-				format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+				return ProbabilityHelper.sampleCategorical(r, Arrays.asList(
 						new Tuple2<>(0.1, "%s Wash"),
 						new Tuple2<>(0.8, "%s River")));
-				break;
 			case Small:
-				format = ProbabilityHelper.sampleCategorical(r, Arrays.asList(
+				return ProbabilityHelper.sampleCategorical(r, Arrays.asList(
 						new Tuple2<>(0.1, "%s Bayou"),
 						new Tuple2<>(0.2, "%s Creek"),
 						new Tuple2<>(0.2, "%s Brook"),
 						new Tuple2<>(0.5, "%s Stream")));
-				break;
 			default:
 				throw new RuntimeException("Unknown river type: " + riverType);
 		}
-		
-		return format;
 	}
 	
 	private enum OtherMountainsType
@@ -660,21 +598,18 @@ public class TextDrawer
 		
 	public String generatePlaceName(String format, boolean requireUnique)
 	{
-		Supplier<String> nameCreator = () -> placeNameGenerator.generateName();
-		return innerCreateUniqueName(format, requireUnique, nameCreator);
+		return innerCreateUniqueName(format, requireUnique, placeNameGenerator::generateName);
 	}
 	
 	public String generatePersonName(String format, boolean requireUnique)
 	{
-		Supplier<String> nameCreator = () -> personNameGenerator.generateName();
-		return innerCreateUniqueName(format, requireUnique, nameCreator);
+		return innerCreateUniqueName(format, requireUnique, personNameGenerator::generateName);
 	}
 
 	
 	private String compileName(String format, boolean requireUnique)
 	{
-		Supplier<String> nameCreator = () -> nameCompiler.compileName();
-		return innerCreateUniqueName(format, requireUnique, nameCreator);
+		return innerCreateUniqueName(format, requireUnique, nameCompiler::compileName);
 	}
 	
 	private String innerCreateUniqueName(String format, boolean requireUnique, Supplier<String> nameCreator)
@@ -683,12 +618,12 @@ public class TextDrawer
 		
 		if (!requireUnique)
 		{
-			return 	String.format(format, nameCreator.get());
+			return 	format(format, nameCreator.get());
 		}
 		
 		for (@SuppressWarnings("unused") int retry : new Range(maxRetries))
 		{
-			String name = String.format(format, nameCreator.get());
+			String name = format(format, nameCreator.get());
 			if (!namesGenerated.contains(name))
 			{
 				namesGenerated.add(name);
@@ -703,17 +638,18 @@ public class TextDrawer
 	{
 		g.setFont(titleFontScaled);
 
-		List<Tuple2<TectonicPlate, Double>> oceanPlatesAndWidths = new ArrayList<>();
-		for (TectonicPlate p : graph.plates)
-			if (p.type == PlateType.Oceanic)
-				oceanPlatesAndWidths.add(new Tuple2<>(p, findWidth(p.centers)));
-		
-		List<Tuple2<TectonicPlate, Double>> landPlatesAndWidths = new ArrayList<>();
-		for (TectonicPlate p : graph.plates)
-			if (p.type == PlateType.Continental)
-				landPlatesAndWidths.add(new Tuple2<>(p, findWidth(p.centers)));
-		
+		var oceanPlatesAndWidths = graph.plates.stream()
+				.filter(p -> p.type == PlateType.Oceanic)
+				.map(p -> new Tuple2<>(p, findWidth(p.centers)))
+				.collect(toList());
+
+		var landPlatesAndWidths = graph.plates.stream()
+				.filter(p -> p.type == PlateType.Continental)
+				.map(p -> new Tuple2<>(p, findWidth(p.centers)))
+				.collect(toList());
+
 		List<Tuple2<TectonicPlate, Double>> titlePlatesAndWidths;
+		double thresholdForPuttingTitleOnLand = 0.3;
 		if (landPlatesAndWidths.size() > 0 && ((double)oceanPlatesAndWidths.size()) / landPlatesAndWidths.size() < thresholdForPuttingTitleOnLand)
 		{
 			titlePlatesAndWidths = landPlatesAndWidths;
@@ -730,8 +666,8 @@ public class TextDrawer
 			try
 			{	
 				if (drawNameHorizontal(map, g, generateNameOfType(TextType.Title, TitleType.Decorated, true),
-						extractLocationsFromCenters(plateAndWidth.getFirst().centers), graph, settings.drawBoldBackground, 
-						true, TextType.Title))
+						extractLocationsFromCenters(plateAndWidth.getFirst().centers), graph, settings.drawBoldBackground,
+						TextType.Title))
 				{
 					return;
 				}
@@ -739,7 +675,7 @@ public class TextDrawer
 				// The title didn't fit. Try drawing it with just a name.
 				if (drawNameHorizontal(map, g, generateNameOfType(TextType.Title, TitleType.NameOnly, true),
 						extractLocationsFromCenters(plateAndWidth.getFirst().centers), graph, settings.drawBoldBackground,
-						true, TextType.Title))
+						TextType.Title))
 				{
 					return;
 				}
@@ -754,41 +690,19 @@ public class TextDrawer
 		
 	private double findWidth(Set<Center> centers)
 	{
-		double min = Collections.min(centers, new Comparator<Center>()
-				{
-					public int compare(Center c1, Center c2)
-					{
-						return Double.compare(c1.loc.x, c2.loc.x);
-					}					
-				}).loc.x;
-		double max = Collections.max(centers, new Comparator<Center>()
-				{
-					public int compare(Center c1, Center c2)
-					{
-						return Double.compare(c1.loc.x, c2.loc.x);
-					}					
-				}).loc.x;
+		double min = min(centers, comparingDouble(c -> c.loc.x)).loc.x;
+		double max = max(centers, comparingDouble(c -> c.loc.x)).loc.x;
 		return max - min;
 	}
 		
 	private Set<Point> extractLocationsFromCenters(Set<Center> centers)
 	{
-		Set<Point> result = new TreeSet<Point>();
-		for (Center c : centers)
-		{
-			result.add(c.loc);
-		}
-		return result;
+		return centers.stream().map(c -> c.loc).collect(toCollection(TreeSet::new));
 	}
 
 	private Set<Point> extractLocationsFromCorners(Collection<Corner> corners)
 	{
-		Set<Point> result = new TreeSet<Point>();
-		for (Corner c : corners)
-		{
-			result.add(c.loc);
-		}
-		return result;
+		return corners.stream().map(c -> c.loc).collect(toCollection(TreeSet::new));
 	}
 
 	/**
@@ -796,18 +710,19 @@ public class TextDrawer
 	 */
 	private List<River> findRivers(WorldGraph graph)
 	{
-		List<River> rivers = new ArrayList<>();
-		Set<Corner> explored = new HashSet<>();
+		var rivers = new ArrayList<River>();
+		var explored = new HashSet<Corner>();
 		for (Edge edge : graph.edges)
 		{
-			if (edge.river >= riverMinWidth && edge.v0 != null && edge.v1 != null 
+			if (edge.river >= riverMinWidth
+					&& edge.v0 != null && edge.v1 != null
 					&& !explored.contains(edge.v0) && !explored.contains(edge.v1))
 			{
 				River river = followRiver(edge.v0, edge.v1);
 				
 				// This count shouldn't be necessary. For some reason followRiver(...) is returning
 				// rivers which contain many Corners already in explored.
-				int count = 0;
+				var count = 0;
 				for (Corner c : river)
 				{
 					if (explored.contains(c))
@@ -872,12 +787,11 @@ public class TextDrawer
 			
 			if (other == null)
 			{
-				// The only direction this river can go goes to a null corner. This is a base case.
+				// The only direction this river can go is to a null corner. This is a base case.
 				return result;
 			}
 
 			result.addAll(followRiver(head, other));
-			return result;
 		}
 		else
 		{
@@ -885,13 +799,7 @@ public class TextDrawer
 			
 			// Sort the river edges by river width.
 			List<Edge> edgeList = new ArrayList<>(riverEdges);
-			Collections.sort(edgeList, new Comparator<Edge>()
-					{
-						public int compare(Edge e0, Edge e1) 
-						{
-							return -Integer.compare(e0.river, e1.river);
-						}						
-					});
+			edgeList.sort((e0, e1) -> -Integer.compare(e0.river, e1.river));
 			Corner nextHead = null;
 			
 			// Find which edge contains "last".
@@ -958,8 +866,8 @@ public class TextDrawer
 			// Leave the other options for the global search to hit later.
 			
 			result.addAll(followRiver(head, nextHead));
-			return result;
 		}
+		return result;
 	}
 	
 	/**
@@ -1003,7 +911,7 @@ public class TextDrawer
 		
 		Font original = g.getFont();
 		Color originalColor = g.getColor();
-		Font background = g.getFont().deriveFont(1, (int)(g.getFont().getSize()));
+		Font background = g.getFont().deriveFont(Font.BOLD, g.getFont().getSize());
 		FontMetrics metrics = g.getFontMetrics(original);
 		
 		Point curLoc = new Point(location.x , location.y);
@@ -1023,32 +931,17 @@ public class TextDrawer
 	}
 
 	private boolean drawNameHorizontal(BufferedImage map, Graphics2D g, String name, Set<Point> locations,
-			WorldGraph graph, boolean boldBackground, boolean enableBoundsChecking, TextType textType)
-	{
-		return drawNameHorizontal(map, g, name, locations, graph, boldBackground, 0, enableBoundsChecking, 
-				textType);
-	}
-	
-	/**
-	 * 
-	 * Side effect: This adds a new MapText to mapTexts.
-	 * 
-	 * @param yOffset Distance added to the y direction when determining where to draw the name. Positive y is down.
-	 * @return True iff text was drawn.
-	 */
-	private boolean drawNameHorizontal(BufferedImage map, Graphics2D g, String name, Set<Point> locations,
-			WorldGraph graph, boolean boldBackground, double yOffset, boolean enableBoundsChecking, 
-			TextType textType)
+									   WorldGraph graph, boolean boldBackground, TextType textType)
 	{
 		if (name.length() == 0)
 			return false;
 		
 		Point centroid = findCentroid(locations);
 		
-		centroid.y += yOffset;
+		centroid.y += 0;
 		
 		MapText text = createMapText(name, centroid, 0.0, textType);
-		if (drawNameHorizontal(map, g, locations, graph, boldBackground, enableBoundsChecking, text))
+		if (drawNameHorizontal(map, g, locations, graph, boldBackground, true, text))
 		{
 			mapTexts.add(text);
 			return true;
@@ -1056,7 +949,7 @@ public class TextDrawer
 		if (locations.size() > 0)
 		{
 			// Try random locations to try to find a place to fit the text.
-			Point[] locationsArray = locations.toArray(new Point[locations.size()]);
+			Point[] locationsArray = locations.toArray(new Point[0]);
 			for (@SuppressWarnings("unused") int i : new Range(30))
 			{
 				// Select a few random locations and choose the one closest to the centroid.
@@ -1069,7 +962,7 @@ public class TextDrawer
 				Point loc = Helper.maxItem(samples, (point1, point2) -> -Double.compare(point1.distanceTo(centroid), point2.distanceTo(centroid)));
 
 				text = createMapText(name, loc, 0.0, textType);
-				if (drawNameHorizontal(map, g, locations, graph, boldBackground, enableBoundsChecking, text))
+				if (drawNameHorizontal(map, g, locations, graph, boldBackground, true, text))
 				{
 					mapTexts.add(text);
 					return true;
@@ -1090,17 +983,13 @@ public class TextDrawer
 			boolean enableBoundsChecking, MapText text)
 	{	
 		FontMetrics metrics = g.getFontMetrics(g.getFont());
-		int width = metrics.stringWidth(text.value);
-		int height = getFontHeight(metrics);
+		double width = metrics.stringWidth(text.value);
+		double height = getFontHeight(metrics);
 		Point textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
 
 		String[] parts = text.value.split(" ");
 		
-		if (parts.length > 1 && (
-			   !locations.contains(graph.findClosestCenter((int)textLocation.x - width/2, (int)textLocation.y - height/2).loc)
-			|| !locations.contains(graph.findClosestCenter((int)textLocation.x - width/2, (int)textLocation.y + height/2).loc)
-			|| !locations.contains(graph.findClosestCenter((int)textLocation.x + width/2, (int)textLocation.y - height/2).loc)
-			|| !locations.contains(graph.findClosestCenter((int)textLocation.x + width/2, (int)textLocation.y + height/2).loc)))
+		if (parts.length > 1 && !locations.contains(graph.findClosestCenter((int)textLocation.x - width/2, (int)textLocation.y - height/2).loc))
 		{		
 			// One or more of the corners doesn't fit in the region. Draw it on 2 lines.
 			int start = text.value.length()/2;
@@ -1119,10 +1008,10 @@ public class TextDrawer
 				pivot = closestR;
 			String nameLine1 = text.value.substring(0, pivot);
 			String nameLine2 = text.value.substring(pivot + 1);
-			Point ulCorner1 = new Point(textLocation.x - metrics.stringWidth(nameLine1)/2, 
-					textLocation.y - getFontHeight(metrics)/2);
-			Point ulCorner2 =  new Point(textLocation.x - metrics.stringWidth(nameLine2)/2,
-					textLocation.y + getFontHeight(metrics)/2);
+			Point ulCorner1 = new Point(textLocation.x - metrics.stringWidth(nameLine1)/2.0,
+					textLocation.y - getFontHeight(metrics)/2.0);
+			Point ulCorner2 =  new Point(textLocation.x - metrics.stringWidth(nameLine2)/2.0,
+					textLocation.y + getFontHeight(metrics)/2.0);
 			
 			// Make sure we don't draw on top of existing text. Only draw the text if both lines can be drawn.
 			// Check line 1.
@@ -1156,8 +1045,8 @@ public class TextDrawer
 		else
 		{	
 			// Make sure we don't draw on top of existing text.
-			java.awt.Rectangle bounds = new java.awt.Rectangle((int)textLocation.x - width/2, 
-					(int)textLocation.y - height/2, metrics.stringWidth(text.value), height);
+			java.awt.Rectangle bounds = new java.awt.Rectangle((int)(textLocation.x - width/2),
+					(int)(textLocation.y - height/2), metrics.stringWidth(text.value), (int)height);
 			//g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
 			Area area = new Area(bounds);
 			if (enableBoundsChecking && overlapsExistingTextOrCityOrIsOffMap(area))
@@ -1165,7 +1054,7 @@ public class TextDrawer
 				return false;
 			}
 			
-			text.areas = Collections.singletonList(area);
+			text.areas = singletonList(area);
 			
 			Point boundsLocation = new Point(bounds.getLocation().x, bounds.getLocation().y);
 			
@@ -1230,8 +1119,7 @@ public class TextDrawer
 			double y1 = regression.predict(1);
 			// Move the intercept to the origin.
 			y1 -= y0;
-			y0 = 0;
-			angle = Math.atan(y1/1.0);
+			angle = Math.atan(y1);
 		}
 		catch(NoDataException e)
 		{
@@ -1294,7 +1182,7 @@ public class TextDrawer
 			g.rotate(text.angle, pivot.x, pivot.y);
 			area = new Area(bounds);
 			area = area.createTransformedArea(g.getTransform());
-			if (enableBoundsChecking && overlapsExistingTextOrCityOrIsOffMap(area))
+			if (overlapsExistingTextOrCityOrIsOffMap(area))
 			{
 				// Give up.
 				//g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -1302,11 +1190,11 @@ public class TextDrawer
 				return false;
 			}
 		}
-		text.areas = Collections.singletonList(area);
+		text.areas = singletonList(area);
 		// Update the text location with the offset.
 		text.location = new Point(pivot.x / settings.resolution, pivot.y / settings.resolution);
 		
-		Point textStart = new Point((int)(bounds.getLocation().x), (int)(bounds.getLocation().y + metrics.getAscent()));
+		Point textStart = new Point(bounds.getLocation().x, bounds.getLocation().y + metrics.getAscent());
 		drawBackgroundBlendingForText(map, g, textStart, text.angle, metrics, text.value);
 		
 		//g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -1317,15 +1205,9 @@ public class TextDrawer
 		return true;
 	}
 	
-	private Set<Center> findPlateCentersWaterOnly(final WorldGraph graph, final TectonicPlate plate)
-	{		
-		Set<Center> plateCenters = new HashSet<Center>();
-		for (Center c : plate.centers)
-		{
-			if (c.isWater)
-				plateCenters.add(c);
-		}
-		return plateCenters;
+	private Set<Center> findPlateCentersWaterOnly(final TectonicPlate plate)
+	{
+		return plate.centers.stream().filter(c -> c.isWater).collect(toCollection(HashSet::new));
 	}
 
 	public Point findCentroid(Collection<Point> plateCenters)
@@ -1375,7 +1257,7 @@ public class TextDrawer
 	 */
 	private MapText createMapText(String text, Point location, double angle, TextType type)
 	{
-		return createMapText(text, location, angle, type, new ArrayList<Area>(0));
+		return createMapText(text, location, angle, type, new ArrayList<>(0));
 	}
 	
 	/**
@@ -1417,8 +1299,7 @@ public class TextDrawer
 		String name = generateNameOfTypeForTextEditor(type);
 		// Getting the id must be done after calling generateNameOfType because said method increments textCounter
 		// before generating the name.
-		MapText mapText = createMapText(name, location, 0.0, type, new ArrayList<Area>(0));
-		return mapText;
+		return createMapText(name, location, 0.0, type, new ArrayList<>(0));
 	}
 	
 
