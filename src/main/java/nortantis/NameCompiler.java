@@ -3,12 +3,14 @@ package nortantis;
 import nortantis.util.AssetsPath;
 import nortantis.util.Counter;
 import nortantis.util.Pair;
-import nortantis.util.Range;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
+
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.text.WordUtils.capitalize;
 
 /**
  * Creates names for rivers and mountains by putting nouns, verbs, and adjectives together.
@@ -18,11 +20,11 @@ import java.util.*;
 public class NameCompiler
 {
 	// The first part of each pair is the noun.
-	List<Pair<String>> nounAdjectivePairs;
-	List<Pair<String>> nounVerbPairs;
+	private final List<Pair<String>> nounAdjectivePairs;
+	private List<Pair<String>> nounVerbPairs;
 	// Used to decide whether to return a result from nounAdjectivePairs or nounVerbPairs.
 	private final Counter<String> counter;
-	Random r;
+	private final Random r;
 	public void setSeed(long seed)
 	{
 		r.setSeed(seed);
@@ -61,48 +63,22 @@ public class NameCompiler
 
 		this.r = r;
 		counter = new Counter<>();
-		counter.addCount("adjectives", this.nounAdjectivePairs.size());
-		counter.addCount("verbs", this.nounVerbPairs.size());
-
-
+		counter.add("adjectives", this.nounAdjectivePairs.size());
+		counter.add("verbs", this.nounVerbPairs.size());
 	}
 
 	private List<Pair<String>> convertToPresentTense(List<Pair<String>> verbPairs)
 	{
-		// Convert verbs to present tense.
-		List<Pair<String>> result = new ArrayList<>();
-		for (int i : new Range(verbPairs.size()))
-		{
-			String verb = verbPairs.get(i).getSecond();
-			String presentTenseVerb = convertVerbToPresentTense(verb);
-			result.add(new Pair<>(verbPairs.get(i).getFirst(), presentTenseVerb));
-		}
-		return result;
+		return verbPairs.stream()
+				.map(x -> new Pair<>(x.getFirst(), convertVerbToPresentTense(x.getSecond())))
+				.collect(toList());
 	}
 
 	private List<Pair<String>> capitalizeFirstLetters(List<Pair<String>> pairs)
 	{
-		List<Pair<String>> result = new ArrayList<>();
-		for (int i : new Range(pairs.size()))
-		{
-			String noun = capitalizeAllFirstLetter(pairs.get(i).getFirst());
-			String pos = capitalizeAllFirstLetter(pairs.get(i).getSecond());
-			result.add(new Pair<>(noun, pos));
-		}
-		return result;
-	}
-
-	private String capitalizeAllFirstLetter(String str)
-	{
-		char[] chars = str.toCharArray();
-		for (int i : new Range(0, chars.length))
-		{
-			if ((i == 0 || chars[i - 1] == ' ') && Character.isLowerCase(chars[i]))
-			{
-				chars[i] = Character.toUpperCase(str.charAt(i));
-			}
-		}
-		return  String.valueOf(chars);
+		return pairs.stream()
+				.map(x -> new Pair<>(capitalize(x.getFirst()), capitalize(x.getSecond())))
+				.collect(toList());
 	}
 
 	public String compileName()

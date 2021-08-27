@@ -71,12 +71,11 @@ public class RunSwing
 	private BGColorPreviewPanel landDisplayPanel;
 	private ActionListener backgroundImageButtonGroupListener;
 	private JComboBox<String> dimensionsComboBox;
-	private Dimension backgroundDisplayMaxSize = new Dimension(512, 288);
-	private int backgroundDisplayCenterX = 667;
+	private final Dimension backgroundDisplayMaxSize = new Dimension(512, 288);
+	private final int backgroundDisplayCenterX = 667;
 	float fractalPower;
 	private JTextField textRandomSeedTextField;
 	public MapEdits edits;
-	private boolean showTextWarning = true;
 	/**
 	 * A flag to prevent warnings about text edits while loading settings into the gui.
 	 */
@@ -111,13 +110,10 @@ public class RunSwing
 	private JSlider borderWidthSlider;
 	private JCheckBox drawBorderCheckbox;
 	private JRadioButton rdbtnTransparent;
-	private JLabel lblFrayedEdgeSize;
 	private JSlider frayedEdgeSizeSlider;
 	private JSlider frayedEdgeBlurSlider;
 	private JCheckBox frayedEdgeCheckbox;
 	public JMenuItem clearEditsMenuItem;
-	private JMenu editorMenu;
-	private JMenuItem launchEditorMenuItem;
 	private JLabel lblSize;
 	private JLabel lblEdgeLandtowaterRatio;
 	private JLabel lblCenterLandtowaterRatio;
@@ -131,14 +127,12 @@ public class RunSwing
 	private JLabel lblBrightnessRange;
 	private JLabel lblMapEditsMessage;
 	private JSlider cityProbabilitySlider;
-	public final double cityFrequencySliderScale = 100.0 * 1.0/SettingsGenerator.maxCityProbabillity;
+	public final double cityFrequencySliderScale = 100.0 /SettingsGenerator.maxCityProbabillity;
 	private JLabel cityProbabilityLabel;
 	private JButton btnChooseLandBlurColor;
-	private JLabel label_7;
 	private JRadioButton jaggedLinesButton;
 	private JRadioButton smoothLinesButton;
 	private JRadioButton concentricWavesButton;
-	private JLabel lblCityIconsSubfolder;
 	private JComboBox<String> cityIconsSetComboBox;
 
 	
@@ -155,12 +149,12 @@ public class RunSwing
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args)
+	public static void main(String... args)
 	{
 		try
 		{
 			Path path = AssetsPath.get("fonts", "Herculanum-Regular.ttf");
-			Font font = createFont(TRUETYPE_FONT, newInputStream(path.resolve(path)));
+			Font font = createFont(TRUETYPE_FONT, newInputStream(path));
 			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | IOException | FontFormatException e)
@@ -171,8 +165,7 @@ public class RunSwing
 		EventQueue.invokeLater(() -> {
 			try
 			{
-				RunSwing window = new RunSwing();
-				window.frame.setVisible(true);
+				new RunSwing().frame.setVisible(true);
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -189,10 +182,11 @@ public class RunSwing
 		
 		try
 		{
-			if (Files.exists(Paths.get(UserPreferences.getInstance().lastLoadedSettingsFile)))
+			Path lastLoadedSettingsFile = Path.of(UserPreferences.getInstance().lastLoadedSettingsFile);
+			if (Files.exists(lastLoadedSettingsFile))
 			{
-				loadSettingsIntoGUI(Path.of(UserPreferences.getInstance().lastLoadedSettingsFile));
-				openSettingsFilePath = Paths.get(UserPreferences.getInstance().lastLoadedSettingsFile);
+				loadSettingsIntoGUI(lastLoadedSettingsFile);
+				openSettingsFilePath = lastLoadedSettingsFile;
 				updateFrameTitle();
 			}
 			else
@@ -275,7 +269,6 @@ public class RunSwing
             			}
             			UserPreferences.getInstance().save();
             			frame.dispose();
-            			System.exit(0);
             		}
             	}
             	catch(Exception ex)
@@ -308,48 +301,44 @@ public class RunSwing
 		btnGenerate.setToolTipText("Generate a map with the settings above.");
 		btnGenerate.setBounds(0, 0, 112, 25);
 		generatePanel.add(btnGenerate);
-		btnGenerate.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent arg0) 
-			{	
-				btnGenerate.setEnabled(false);
-				btnPreview.setEnabled(false);
-				final MapSettings settings = getSettingsFromGUI();
-				
-				txtConsoleOutput.setText("");
-			    SwingWorker<BufferedImage, Void> worker = new SwingWorker<BufferedImage, Void>() 
-			    {
-			        @Override
-			        public BufferedImage doInBackground() throws Exception
-			        {
-						ImageCache.clear();
-						
-						BufferedImage map = new MapCreator().createMap(settings, null, null);
-						
-						Logger.println("Opening the map in your system's default image editor.");
-						String fileName = ImageHelper.openImageInSystemDefaultEditor(map, "map_" + settings.randomSeed);
-						Logger.println("Map written to " + fileName);
-						return map;
-			        }		
-			        
-			        @Override
-			        public void done()
-			        {
-			        	try
-			        	{
-			        		get();
-			        	}
-						catch (Exception ex)
-						{
-							handleBackgroundThreadException(ex);
-						}
-			        	btnGenerate.setEnabled(true);
-						btnPreview.setEnabled(true);
-			        }
-			    };
-			    worker.execute();
-			 
-			}
+		btnGenerate.addActionListener(arg0 -> {
+			btnGenerate.setEnabled(false);
+			btnPreview.setEnabled(false);
+			final MapSettings settings = getSettingsFromGUI();
+
+			txtConsoleOutput.setText("");
+			var worker = new SwingWorker<BufferedImage, Void>()
+			{
+				@Override
+				public BufferedImage doInBackground() throws Exception
+				{
+					ImageCache.clear();
+
+					BufferedImage map = new MapCreator().createMap(settings, null, null);
+
+					Logger.println("Opening the map in your system's default image editor.");
+					String fileName = ImageHelper.openImageInSystemDefaultEditor(map, "map_" + settings.randomSeed);
+					Logger.println("Map written to " + fileName);
+					return map;
+				}
+
+				@Override
+				public void done()
+				{
+					try
+					{
+						get();
+					}
+					catch (Exception ex)
+					{
+						handleBackgroundThreadException(ex);
+					}
+					btnGenerate.setEnabled(true);
+					btnPreview.setEnabled(true);
+				}
+			};
+			worker.execute();
+
 		});
 		
 		previewPanel = new ImagePanel();
@@ -1088,8 +1077,8 @@ public class RunSwing
 		grungeSlider.setMajorTickSpacing(500);
 		grungeSlider.setBounds(580, 252, 245, 79);
 		effectsPanel.add(grungeSlider);
-		
-		label_7 = new JLabel("Line style:");
+
+		JLabel label_7 = new JLabel("Line style:");
 		label_7.setBounds(10, 22, 95, 14);
 		effectsPanel.add(label_7);
 		
@@ -1176,8 +1165,8 @@ public class RunSwing
 		frayedEdgeBlurSlider.setMajorTickSpacing(100);
 		frayedEdgeBlurSlider.setBounds(627, 63, 245, 79);
 		borderPanel.add(frayedEdgeBlurSlider);
-		
-		lblFrayedEdgeSize = new JLabel("Frayed edge size:");
+
+		JLabel lblFrayedEdgeSize = new JLabel("Frayed edge size:");
 		lblFrayedEdgeSize.setToolTipText("The number of polygons used when creating the frayed border. Higher values make the fray smaller.");
 		lblFrayedEdgeSize.setBounds(461, 192, 163, 15);
 		borderPanel.add(lblFrayedEdgeSize);
@@ -1211,8 +1200,8 @@ public class RunSwing
 		cityProbabilitySlider.setMaximum(100);
 		cityProbabilitySlider.setMajorTickSpacing(25);
 		iconsPanel.add(cityProbabilitySlider);
-		
-		lblCityIconsSubfolder = new JLabel("City icon type:");
+
+		JLabel lblCityIconsSubfolder = new JLabel("City icon type:");
 		lblCityIconsSubfolder.setToolTipText("Higher values create more cities. Lower values create less cities. Zero means no cities.");
 		lblCityIconsSubfolder.setBounds(12, 121, 114, 15);
 		iconsPanel.add(lblCityIconsSubfolder);
@@ -1588,10 +1577,10 @@ public class RunSwing
 			
 		});
 
-		editorMenu = new JMenu("Editor");
+		JMenu editorMenu = new JMenu("Editor");
 		menuBar.add(editorMenu);
-		
-		launchEditorMenuItem = new JMenuItem("Launch Editor");
+
+		JMenuItem launchEditorMenuItem = new JMenuItem("Launch Editor");
 		launchEditorMenuItem.setAccelerator(KeyStroke.getKeyStroke("control E"));
 		launchEditorMenuItem.addActionListener(new ActionListener()
 		{
@@ -2308,17 +2297,15 @@ public class RunSwing
         	int n = JOptionPane.showConfirmDialog(
                     frame, "Settings have been modfied. Save changes?", "",
                     JOptionPane.YES_NO_CANCEL_OPTION);
-            if (n == JOptionPane.YES_OPTION) 
-            {
-            	saveSettings(null);
-            }
-            else if (n == JOptionPane.NO_OPTION)
-            {
-            }
-            else if (n == JOptionPane.CANCEL_OPTION)
-            {
-            	return true;
-            }
+			switch (n) {
+				case JOptionPane.YES_OPTION:
+					saveSettings(null);
+					break;
+				case JOptionPane.NO_OPTION:
+					break;
+				case JOptionPane.CANCEL_OPTION:
+					return true;
+			}
          }
         
         return false;

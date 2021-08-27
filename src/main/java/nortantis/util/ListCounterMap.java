@@ -15,20 +15,26 @@ import java.util.TreeMap;
  */
 public class ListCounterMap <T extends Comparable<T>> implements Serializable
 {
-	private static final long serialVersionUID = 1L;
-	private Map<List<T>, Counter<T>> map;
-	
-	public ListCounterMap()
-	{
-		map = new TreeMap<>();
-	}
+	private final Map<List<T>, Counter<T>> map = new TreeMap<>((a, b) -> {
+		for (var i = 0; i < Math.min(a.size(), b.size()); i++)
+		{
+			var c = a.get(i).compareTo(b.get(i));
+			if (c < 0)
+				return -1;
+			if (c > 0)
+				return 1;
+		}
+
+		// So far all elements are the same.
+		return Integer.compare(a.size(), b.size());
+	});
 	
 	public int size()
 	{
-		return map.keySet().size();
+		return map.size();
 	}
 	
-	public void increamentCount(List<T> key, T value)
+	public void incrementCount(List<T> key, T value)
 	{
 		Counter<T> counter = map.get(key);
 		if (counter == null)
@@ -36,7 +42,7 @@ public class ListCounterMap <T extends Comparable<T>> implements Serializable
 			counter = new Counter<T>();
 			map.put(key, counter);
 		}
-		counter.incrementCount(value);
+		counter.increment(value);
 	}
 	
 	public double getCount(List<T> key, T value)
@@ -44,7 +50,7 @@ public class ListCounterMap <T extends Comparable<T>> implements Serializable
 		Counter<T> counter = map.get(key);
 		if (counter == null)
 			return 0.0;
-		return counter.getCount(value);
+		return counter.get(value);
 	}
 	
 	/**
@@ -55,9 +61,7 @@ public class ListCounterMap <T extends Comparable<T>> implements Serializable
 	public T sampleConditional(Random r, List<T> key)
 	{
 		Counter<T> counter = map.get(key);
-		if (counter == null)
-			return null;
-		return counter.sample(r);
+		return counter == null ? null : counter.sample(r);
 	}
 		
 	@Override
@@ -68,9 +72,9 @@ public class ListCounterMap <T extends Comparable<T>> implements Serializable
 		{
 			List<T> key = entry.getKey();
 			Counter<T> counter = entry.getValue();
-			
-			result.append("key: " + key + "\n");
-			result.append("value: " + counter + "\n\n");
+
+			result.append("key: ").append(key).append("\n")
+					.append("value: ").append(counter).append("\n\n");
 		}
 		return result.toString();
 	}
@@ -79,10 +83,14 @@ public class ListCounterMap <T extends Comparable<T>> implements Serializable
 	{
 		ListCounterMap<Character> cMap = new ListCounterMap<>();
 		Random r = new Random();
-		
-		cMap.increamentCount(Arrays.asList('a', 'b'), 'c');
-		
-		cMap.sampleConditional(r, Arrays.asList('a', 'b'));
+
+		List<Character> key = Arrays.asList('a', 'b');
+
+		cMap.incrementCount(key, 'c');
+
+		Character character = cMap.sampleConditional(r, key);
+
+		System.out.println(character);
 	}
 
 }

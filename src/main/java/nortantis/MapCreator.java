@@ -24,14 +24,14 @@ import static java.util.stream.Collectors.toCollection;
 
 public class MapCreator
 {
-	private final double regionBlurColorScale = 0.7;
+	private static final double regionBlurColorScale = 0.7;
+	private static final double baseResolution = 1536;
 
-	
-	
+
+
 	private Random r;
 	// This is a base width for determining how large to draw text and effects.
-	private static final double baseResolution = 1536;
-	
+
 	public MapCreator()
 	{
 	}

@@ -1,17 +1,11 @@
 package nortantis.nlp;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.IntStream;
-
 import nortantis.NotEnoughNamesException;
-import nortantis.util.ComparableList;
 import nortantis.util.ListCounterMap;
 import nortantis.util.Range;
+
+import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Used to generate words using character level n-grams.
@@ -46,7 +40,7 @@ public class CharacterNGram
 		{
 			for (int i : new Range(phrase.length()))
 			{
-				List<Character> lastChars = new ComparableList<>(n - 1);
+				List<Character> lastChars = new ArrayList<>(n - 1);
 				for (int j = i - n + 1; j < i; j++)
 				{
 					if (j < 0)
@@ -55,10 +49,10 @@ public class CharacterNGram
 						lastChars.add(phrase.charAt(j));
 				}
 				
-				lcMap.increamentCount(lastChars, phrase.charAt(i));
+				lcMap.incrementCount(lastChars, phrase.charAt(i));
 			}
 			// Add the end token.
-			List<Character> lastChars = new ComparableList<>(n - 1);
+			List<Character> lastChars = new ArrayList<>(n - 1);
 			for (int j = phrase.length() - n + 1; j < phrase.length(); j++)
 			{
 				if (j < 0)
@@ -66,7 +60,7 @@ public class CharacterNGram
 				else
 					lastChars.add(phrase.charAt(j));
 			}
-			lcMap.increamentCount(lastChars, endToken);
+			lcMap.incrementCount(lastChars, endToken);
 		}
 		
 		namesFromCorpora = new HashSet<>(phrases);
@@ -96,7 +90,7 @@ public class CharacterNGram
 	{
 		if (lcMap.size() == 0)
 			throw new IllegalStateException("At least one book must be selected to generate text.");
-		List<Character> lastChars = new ComparableList<>();
+		List<Character> lastChars = new ArrayList<>();
 		for (@SuppressWarnings("unused") int i : new Range(n - 1))
 		{
 			lastChars.add(startToken);

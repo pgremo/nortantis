@@ -12,16 +12,10 @@ import java.util.function.Supplier;
  * @param <K>
  * @param <V>
  */
-@SuppressWarnings("serial")
 public class HashMapF <K, V> extends HashMap<K, V>
 {
-	private Supplier<V> defaultCreateFunction;
-	
-	public HashMapF()
-	{
-		super();
-	}
-	
+	private final Supplier<V> defaultCreateFunction;
+
 	public HashMapF(Supplier<V> defaultCreateFunction)
 	{
 		super();
