@@ -6,6 +6,8 @@ import hoten.voronoi.Corner;
 import nortantis.editor.CenterEdit;
 import nortantis.editor.MapEdits;
 import nortantis.util.*;
+import org.apache.commons.collections4.ListValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.io.FilenameUtils;
 
 import java.awt.*;
@@ -19,10 +21,10 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Function;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static java.util.Collections.*;
-import static java.util.Comparator.*;
-import static java.util.stream.Collectors.*;
+import static java.util.Comparator.comparingDouble;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 public class IconDrawer 
@@ -162,8 +164,8 @@ public class IconDrawer
 	public void clearAndAddIconsFromEdits(MapEdits edits, double sizeMultiplyer)
 	{
 		iconsToDraw.clear();
-		ListMap<String, Tuple2<BufferedImage, BufferedImage>> mountainImagesById = getAllIconGroupsAndMasksForType(mountainsName);
-		ListMap<String, Tuple2<BufferedImage, BufferedImage>> hillImagesById = getAllIconGroupsAndMasksForType(hillsName);
+		var mountainImagesById = getAllIconGroupsAndMasksForType(mountainsName);
+		var hillImagesById = getAllIconGroupsAndMasksForType(hillsName);
 		List<Tuple2<BufferedImage, BufferedImage>> duneImages = getAllIconGroupsAndMasksForType(sandDunesName).get("dunes");
 		int duneWidth = findDuneWidth();
 		Map<String, Tuple3<BufferedImage, BufferedImage, Integer>> cityImages = loadIconsWithWidths(citiesName);
@@ -472,7 +474,7 @@ public class IconDrawer
 
         // Maps mountain range ids (the ids in the file names) to list of hill images and their masks.
         // The hill image file names must use the same ids as the mountain ranges.
-        ListMap<String, Tuple2<BufferedImage, BufferedImage>> hillImagesById = getAllIconGroupsAndMasksForType(hillsName);
+        ListValuedMap<String, Tuple2<BufferedImage, BufferedImage>> hillImagesById = getAllIconGroupsAndMasksForType(hillsName);
         
         // Warn if images are missing
         for (String hillGroupId : hillImagesById.keySet())
@@ -749,7 +751,7 @@ public class IconDrawer
        		// Don't draw trees if they would all be size zero.
        		return;
        	}
-        for (List<Tuple2<BufferedImage, BufferedImage>> imageGroup: treesById.values())
+        for (var imageGroup: treesById.asMap().values())
         {
         	for (Tuple2<BufferedImage, BufferedImage> tuple : imageGroup)
         	{
@@ -841,8 +843,8 @@ public class IconDrawer
        		BufferedImage mask = imagesAndMasks.get(index).getSecond();
            	     
            	// Draw the image such that it is centered in the center of c.
-           	int x = (int) (loc.x);
-           	int y = (int) (loc.y);
+           	int x = (int) loc.x;
+           	int y = (int) loc.y;
            	
            	double sqrtSize = Math.sqrt(cSize);
            	x += rand.nextGaussian() * sqrtSize*2.0;
@@ -933,10 +935,11 @@ public class IconDrawer
 	/**
 	 * Loads groups if icons, using iconType as a key word to filter on. 
 	 * The second image in the tuples is the mask, which is generated based on the image loaded from disk.
+	 * @return
 	 */
-	private ListMap<String, Tuple2<BufferedImage, BufferedImage>> getAllIconGroupsAndMasksForType(final String iconType)
+	private ListValuedMap<String, Tuple2<BufferedImage, BufferedImage>> getAllIconGroupsAndMasksForType(final String iconType)
 	{
-		var imagesPerGroup = new ListMap<String, Tuple2<BufferedImage, BufferedImage>>();
+		var imagesPerGroup = new ArrayListValuedHashMap<String, Tuple2<BufferedImage, BufferedImage>>();
 
 		var groupNames = getIconGroupNames(iconType);
 		for (var groupName : groupNames)
@@ -959,7 +962,7 @@ public class IconDrawer
 				var icon = ImageCache.getInstance().getImageFromFile(path);
 				var mask = ImageCache.getInstance().getOrCreateImage(format("mask %s", path), () -> createMask(icon));
 	
-				imagesPerGroup.add(groupName, new Tuple2<>(icon, mask));
+				imagesPerGroup.put(groupName, new Tuple2<>(icon, mask));
 			}
 		}
 		return imagesPerGroup;
