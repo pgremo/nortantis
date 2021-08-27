@@ -12,10 +12,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.awt.*;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
@@ -201,8 +199,7 @@ public class MapSettings implements Serializable
 			mpObj.put("type", text.type.toString());
 			list.add(mpObj);
 		}
-		String json = list.toJSONString();
-		return json;
+		return list.toJSONString();
 	}
 	
 	
@@ -234,8 +231,7 @@ public class MapSettings implements Serializable
 			}
 			list.add(mpObj);
 		}
-		String json = list.toJSONString();
-		return json;
+		return list.toJSONString();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -249,8 +245,7 @@ public class MapSettings implements Serializable
 			mpObj.put("regionId", regionEdit.regionId);
 			list.add(mpObj);
 		}
-		String json = list.toJSONString();
-		return json;
+		return list.toJSONString();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -264,8 +259,7 @@ public class MapSettings implements Serializable
 			mpObj.put("index", eEdit.index);
 			list.add(mpObj);
 		}
-		String json = list.toJSONString();
-		return json;
+		return list.toJSONString();
 	}	
 		
 	private String colorToString(Color c)
@@ -325,7 +319,7 @@ public class MapSettings implements Serializable
 				{
 					return OceanEffect.Ripples;
 				}
-				return parseBoolean(str2) ? OceanEffect.Ripples : OceanEffect.Ripples;
+				return OceanEffect.Ripples;
 			}
 			return OceanEffect.valueOf(str);
 		});
@@ -333,10 +327,10 @@ public class MapSettings implements Serializable
 		edgeLandToWaterProbability = getProperty("edgeLandToWaterProbability", () -> Double.parseDouble(props.getProperty("edgeLandToWaterProbability")));
 		frayedBorder = getProperty("frayedBorder", () -> parseBoolean(props.getProperty("frayedBorder")));
 		frayedBorderColor = getProperty("frayedBorderColor", () -> parseColor(props.getProperty("frayedBorderColor")));
-		frayedBorderBlurLevel = getProperty("frayedBorderBlurLevel", () -> (int)(Integer.parseInt(props.getProperty("frayedBorderBlurLevel"))));
+		frayedBorderBlurLevel = getProperty("frayedBorderBlurLevel", () -> Integer.parseInt(props.getProperty("frayedBorderBlurLevel")));
 		grungeWidth = getProperty("grungeWidth", () -> {
 			String str = props.getProperty("grungeWidth");
-			return str == null ? 0 : (int)(Integer.parseInt(str));
+			return str == null ? 0 : Integer.parseInt(str);
 		});
 		cityProbability = getProperty("cityProbability", () -> {
 			String str = props.getProperty("cityProbability");
@@ -353,7 +347,7 @@ public class MapSettings implements Serializable
 		});
 		pointPrecision = getProperty("pointPrecision", () -> {
 			String str = props.getProperty("pointPrecision");
-			return (str == null || str == "") ? 10.0 : Double.parseDouble(str); // 10.0 was the value used before I made a setting for it.
+			return (str == null || str.equals("")) ? 10.0 : Double.parseDouble(str); // 10.0 was the value used before I made a setting for it.
 		});
 		
 		
@@ -417,12 +411,12 @@ public class MapSettings implements Serializable
 		drawRegionColors = getProperty("drawRegionColors", () ->
 		{
 			String str = props.getProperty("drawRegionColors");
-			return str == null ? true : parseBoolean(str);
+			return str == null || parseBoolean(str);
 		});
 		regionsRandomSeed = getProperty("regionsRandomSeed", () ->
 		{
 			String str = props.getProperty("regionsRandomSeed");
-			return str == null ? 0 : (long)Long.parseLong(str);			
+			return str == null ? 0 : Long.parseLong(str);
 		});
 		hueRange = getProperty("hueRange", () -> 
 		{

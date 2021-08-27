@@ -1,11 +1,10 @@
 package nortantis;
 
-import java.awt.geom.Area;
+import hoten.voronoi.Center;
+
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Set;
-
-import hoten.voronoi.Center;
 
 /**
  * Holds pieces of a map created while generating it which are needed for editing it. This is also used to cache some parts

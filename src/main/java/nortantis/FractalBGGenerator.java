@@ -1,17 +1,15 @@
 package nortantis;
 
-import static java.lang.System.out;
+import nortantis.util.ImageHelper;
+import org.jtransforms.fft.FloatFFT_2D;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
-
-import org.jtransforms.fft.FloatFFT_2D;
-
-import nortantis.util.ImageHelper;
+import static java.lang.System.out;
 
 public class FractalBGGenerator
 {
@@ -22,7 +20,6 @@ public class FractalBGGenerator
 	 * @param p The power in the fractal exponent. This controls how smooth the result is.
 	 * @param contrast The contrast of the resulting image. 1 means full. Less than one will
 	 * scale the pixel values in the result about the central value.
-	 * @throws IOException 
 	 */
 	public static BufferedImage generate(Random rand, float p, int width, int height, float contrast)
 	{
@@ -86,9 +83,8 @@ public class FractalBGGenerator
 		
 		
 		ImageHelper.setContrast(data, 0.5f - contrast/2f, 0.5f + contrast/2f);
-				
-		BufferedImage result = ImageHelper.arrayToImage(data, 0, height, 0, width, BufferedImage.TYPE_BYTE_GRAY);
-		return result;
+
+		return ImageHelper.arrayToImage(data, 0, height, 0, width, BufferedImage.TYPE_BYTE_GRAY);
 
 	}
 

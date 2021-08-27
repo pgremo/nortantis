@@ -27,7 +27,7 @@ public class ExampleNameGenerator
 		{
 			System.out.println(textDrawer.generatePersonName("%s", true));
 		}
-		System.out.println("");
+		System.out.println();
 
 		System.out.println("Place names: ");
 		for (@SuppressWarnings("unused") int i : new Range(numberToGenerate))
@@ -35,6 +35,5 @@ public class ExampleNameGenerator
 			System.out.println(textDrawer.generatePlaceName("%s", true));
 		}
 
-		return;
 	}
 }

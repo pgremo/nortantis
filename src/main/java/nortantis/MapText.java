@@ -12,7 +12,6 @@ import hoten.geom.Point;
  * @author joseph
  *
  */
-@SuppressWarnings("serial")
 public class MapText implements Serializable
 {
 	public String value;
@@ -45,7 +44,7 @@ public class MapText implements Serializable
 
 	public MapText(String text, Point location, double angle, TextType type)
 	{
-		this(text, location, angle, type, new ArrayList<Area>(0));
+		this(text, location, angle, type, new ArrayList<>(0));
 	}
 
 	@Override

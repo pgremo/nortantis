@@ -4,4 +4,4 @@ public enum PlateType
 {
 	Oceanic, 
 	Continental
-};
+}

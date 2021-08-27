@@ -34,12 +34,7 @@ public class DimensionDouble implements Comparable<DimensionDouble>
 			return 1;
 		
 		int c2 = Double.compare(height, other.height);
-		if (c2 < 0)
-			return -1;
-		if (c2 > 0)
-			return 1;
-	
-		return 0;
+		return Integer.signum(c2);
 	}
 
 }

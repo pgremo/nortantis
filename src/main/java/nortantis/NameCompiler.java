@@ -8,7 +8,6 @@ import nortantis.util.Range;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -22,13 +21,13 @@ public class NameCompiler
 	List<Pair<String>> nounAdjectivePairs;
 	List<Pair<String>> nounVerbPairs;
 	// Used to decide whether to return a result from nounAdjectivePairs or nounVerbPairs.
-	private Counter<String> counter;
+	private final Counter<String> counter;
 	Random r;
 	public void setSeed(long seed)
 	{
 		r.setSeed(seed);
 	}
-	private Set<String> dict;
+	private final Set<String> dict;
 
 	public NameCompiler(Random r, List<Pair<String>> nounAdjectivePairs,
 			List<Pair<String>> nounVerbPairs)
@@ -54,12 +53,10 @@ public class NameCompiler
 		}
 
 		this.nounVerbPairs = convertToPresentTense(nounVerbPairs);
-		nounVerbPairs = null;
 
 		// Make all first letters capital.
 		this.nounAdjectivePairs = capitalizeFirstLetters(nounAdjectivePairs);
 		this.nounVerbPairs = capitalizeFirstLetters(this.nounVerbPairs);
-		nounAdjectivePairs = null;
 
 
 		this.r = r;
@@ -163,8 +160,8 @@ public class NameCompiler
 	/**
 	 * Use rules from http://www.oxforddictionaries.com/us/words/verb-tenses-adding-ed-and-ing
 	 * and some rules I made to convert a verb to present tense.
-	 * @param verb
-	 * @return
+	 * @param verb to convert
+	 * @return converted verb
 	 */
 	String convertVerbToPresentTense(String verb)
 	{

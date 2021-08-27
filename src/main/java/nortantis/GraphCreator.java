@@ -1,19 +1,16 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Random;
-
 import hoten.voronoi.nodename.as3delaunay.Voronoi;
 import nortantis.MapSettings.LineStyle;
 import nortantis.util.AssetsPath;
 import nortantis.util.ImageHelper;
 import nortantis.util.Logger;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.util.Random;
 
 /**
  * TestDriver.java
@@ -82,9 +79,8 @@ public class GraphCreator
         BufferedImage mountainTexture = BackgroundGenerator.generateUsingWhiteNoiseConvolution(rand, mountains, graph.getHeight(), graph.getWidth(), false);
         //ImageHelper.write(mountainTexture, "mountainTexture.png");
         subtractTextureFromHeightMapUsingSeaLevel(heightMap, mountainTexture);
-        mountainTexture = null;
-        
-		double elapsedTime = System.currentTimeMillis() - startTime;
+
+        double elapsedTime = System.currentTimeMillis() - startTime;
 		Logger.println("Time to draw heightmap: " + elapsedTime
 				/ 1000.0);
 
@@ -132,9 +128,8 @@ public class GraphCreator
         final Voronoi v = new Voronoi(numSites, width, height, r, null);
 
          //assemble the voronoi structure into a usable graph object representing a map
-        final WorldGraph graph = new WorldGraph(v, numLloydRelaxations, r, sizeMultiplyer, pointPrecision);
-        
-        return graph;
+
+        return new WorldGraph(v, numLloydRelaxations, r, sizeMultiplyer, pointPrecision);
     }
 
 

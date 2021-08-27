@@ -1,13 +1,12 @@
 package nortantis;
 
-import java.awt.Color;
+import hoten.voronoi.Center;
+
+import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import hoten.geom.Point;
-import hoten.voronoi.Center;
 
 /**
  * Represents a political region on the map.
@@ -16,7 +15,7 @@ import hoten.voronoi.Center;
  */
 public class Region
 {
-	private Set<Center> centers;
+	private final Set<Center> centers;
 	public Set<Center> getCenters() { return Collections.unmodifiableSet(centers); }
 	public int id;
 	public Color backgroundColor;
@@ -72,34 +71,7 @@ public class Region
 	{
 		return centers.contains(c);
 	}
-	
-	public Point findCentroid()
-	{
-		return WorldGraph.findCentroid(centers);
-	}
-	
-	public Set<Region> findNeighbors()
-	{
-		Set<Region> result = new HashSet<>();
-		for (Center c : centers)
-		{
-			for (Center n : c.neighbors)
-			{
-				if (n.region == null)
-				{
-					continue;
-				}
-				
-				if (n.region != c.region)
-				{
-					result.add(n.region);
-				}
-			}
-		}
-		
-		return result;
-	}
-	
+
 	@Override
 	public int hashCode()
 	{

@@ -19,7 +19,7 @@ public class Background
 	DimensionDouble mapBounds;
 	Dimension borderBounds;
 	BufferedImage borderBackground;
-	private boolean backgroundFromFilesNotGenerated;
+	private final boolean backgroundFromFilesNotGenerated;
 	boolean shouldDrawRegionColors;
 	private ImageHelper.ColorifyAlgorithm landColorifyAlgorithm;
 	// regionIndexes is a gray scale image where the level of each pixel is the index of the region it is in.
@@ -71,7 +71,6 @@ public class Background
 				else
 				{
 					land = ImageHelper.colorify(removeBorderPadding(landGeneratedBackground), settings.landColor, landColorifyAlgorithm);
-					landGeneratedBackground = null;
 				}
 			}
 			else if (settings.generateBackgroundFromTexture)
@@ -184,7 +183,6 @@ public class Background
 				landColorifyAlgorithm = ImageHelper.ColorifyAlgorithm.none;
 				land = ImageHelper.createWhiteTransparentImage((int)mapBounds.getWidth(), (int)mapBounds.getHeight());
 				ocean = land;
-				landGeneratedBackground = land;
 			}
 			
 			if (settings.drawRegionColors)
@@ -271,10 +269,9 @@ public class Background
 						mapBoundsPlusBorder.getHeight());
 				// Change the resolution to match the new bounds.
 				settings.resolution *= newBounds.width / mapBoundsPlusBorder.width;
-				
-				DimensionDouble scaledMapBounds = new DimensionDouble(settings.generatedWidth * settings.resolution, 
+
+				mapBounds = new DimensionDouble(settings.generatedWidth * settings.resolution,
 						settings.generatedHeight * settings.resolution);
-				mapBounds = scaledMapBounds;
 			}
 			return mapBounds;
 		}
@@ -298,12 +295,12 @@ public class Background
 	
 	private BufferedImage removeBorderPadding(BufferedImage image)
 	{
-		return ImageHelper.extractRegion(image, borderWidthScaled, borderWidthScaled, 
-				(int)(image.getWidth() - borderWidthScaled * 2),
-				(int)(image.getHeight() - borderWidthScaled * 2));
+		return ImageHelper.extractRegion(image, borderWidthScaled, borderWidthScaled,
+				image.getWidth() - borderWidthScaled * 2,
+				image.getHeight() - borderWidthScaled * 2);
 	}
 	
-	public void doSetupThatNeedsGraph(MapSettings settings, WorldGraph graph)
+	public void doSetupThatNeedsGraph(WorldGraph graph)
 	{
 		if (shouldDrawRegionColors)
 		{
@@ -339,7 +336,7 @@ public class Background
 		}
 		
 		Color[] regionBackgroundColors = graph.regions.stream().map(
-				reg -> reg.backgroundColor).toArray(size -> new Color[size]);
+				reg -> reg.backgroundColor).toArray(Color[]::new);
 				
 		return ImageHelper.colorifyMulti(fractalBG, regionBackgroundColors, pixelColors, colorfiyAlgorithm);
 	}

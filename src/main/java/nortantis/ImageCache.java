@@ -1,11 +1,11 @@
 package nortantis;
 
+import nortantis.util.ConcurrentHashMapF;
+import nortantis.util.ImageHelper;
+
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.function.Supplier;
-
-import nortantis.util.ConcurrentHashMapF;
-import nortantis.util.ImageHelper;
 
 /**
  * Caches icons in memory to avoid recreating or reloading them.
@@ -17,17 +17,17 @@ public class ImageCache
 	/**
 	 * Maps original images, to scaled width, to scaled images.
 	 */
-	private ConcurrentHashMapF<BufferedImage, ConcurrentHashMapF<Integer, BufferedImage>> scaledCache; 
+	private final ConcurrentHashMapF<BufferedImage, ConcurrentHashMapF<Integer, BufferedImage>> scaledCache;
 	
 	/**
 	 * Maps file path (or any string key) to images.
 	 */
-	private ConcurrentHashMapF<String, BufferedImage> fileCache;
+	private final ConcurrentHashMapF<String, BufferedImage> fileCache;
 
 	/**
 	 * Maps string keys to images generated (not loaded directly from files).
 	 */
-	private ConcurrentHashMapF<String, BufferedImage> generatedImageCache;
+	private final ConcurrentHashMapF<String, BufferedImage> generatedImageCache;
 
 	/**
 	 * Singleton
@@ -51,7 +51,7 @@ public class ImageCache
 		// There is a small chance the 2 different threads might both add the same image at the same time, 
 		// but if that did happen it would only results in a little bit of duplicated work, not a functional
 		// problem.
-		return scaledCache.getOrCreate(icon, () -> new ConcurrentHashMapF<>()).getOrCreate(width, 
+		return scaledCache.getOrCreate(icon, ConcurrentHashMapF::new).getOrCreate(width,
 				() -> ImageHelper.scaleByWidth(icon, width));
 	}
 	

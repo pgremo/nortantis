@@ -1,26 +1,5 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.Area;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import hoten.voronoi.Center;
 import hoten.voronoi.Edge;
 import nortantis.MapSettings.OceanEffect;
@@ -28,11 +7,18 @@ import nortantis.editor.CenterEdit;
 import nortantis.editor.EdgeEdit;
 import nortantis.editor.MapEdits;
 import nortantis.editor.RegionEdit;
-import nortantis.util.AssetsPath;
-import nortantis.util.ImageHelper;
-import nortantis.util.Logger;
-import nortantis.util.Pair;
-import nortantis.util.Range;
+import nortantis.util.*;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
 
@@ -132,7 +118,7 @@ public class MapCreator
 		applyCenterEdits(graph, settings.edits);
 		applyEdgeEdits(graph, settings.edits);
  		
-		background.doSetupThatNeedsGraph(settings, graph);
+		background.doSetupThatNeedsGraph(graph);
 		if (mapParts == null)
 		{
 			background.landBeforeRegionColoring = null;
@@ -165,7 +151,6 @@ public class MapCreator
 		List<Set<Center>> mountainGroups = pair.getFirst();
 		// All mountain ranges and smaller groups of mountains extended to include nearby hills.
 		List<Set<Center>> mountainAndHillGroups = pair.getSecond();
-		pair = null;
 		if (mapParts != null)
 		{
 			mapParts.mountainGroups = mountainGroups;
@@ -186,7 +171,7 @@ public class MapCreator
 		}
 		
 
-		BufferedImage map = null;
+		BufferedImage map;
 		{	
 			// Combine land and ocean images.
 			map = ImageHelper.maskWithColor(background.land, Color.black, landMask, false);
@@ -231,9 +216,10 @@ public class MapCreator
 					Color[] colors;
 					if (graph.regions.size() > 0)
 					{
-						colors = graph.regions.stream().map(reg -> new Color((int)(reg.backgroundColor.getRed() * regionBlurColorScale), 
+						colors = graph.regions.stream()
+								.map(reg -> new Color((int)(reg.backgroundColor.getRed() * regionBlurColorScale),
 								(int)(reg.backgroundColor.getGreen() * regionBlurColorScale), (int)(reg.backgroundColor.getBlue() * regionBlurColorScale)))
-								.toArray(size -> new Color[size]);
+								.toArray(Color[]::new);
 					}
 					else
 					{
@@ -294,15 +280,15 @@ public class MapCreator
 			// Create city areas for the text drawer.
 			cities = iconDrawer.addOrUnmarkCities(settings.resolution, false);
 		}
-		
+
 		if (settings.drawRoads)
 		{
 			// TODO put back
-			//RoadDrawer roadDrawer = new RoadDrawer(r, settings, graph, iconDrawer); 
+			//RoadDrawer roadDrawer = new RoadDrawer(r, settings, graph, iconDrawer);
 			//roadDrawer.markRoads();
 			//roadDrawer.drawRoads(map, sizeMultiplier);
 		}
-		
+
 		if (mapParts != null)
 		{
 			mapParts.cityDrawTasks = cities;
@@ -357,7 +343,6 @@ public class MapCreator
 					int maxPixelValue = ImageHelper.getMaxPixelValue(BufferedImage.TYPE_BYTE_GRAY);
 					oceanBlur = ImageHelper.convolveGrayscale(coastlineMask, kernel, true, 0f, ((float)settings.oceanEffectsColor.getAlpha()) / ((float)(maxPixelValue)));
 					// Remove the ocean blur from the land side of the borders.
-					oceanBlur = ImageHelper.maskWithColor(oceanBlur, Color.black, landMask, true);
 				}
 				else
 				{
@@ -392,16 +377,15 @@ public class MapCreator
 							ImageHelper.subtract(oceanBlur, blur);
 						}
 					}
-					
-					oceanBlur = ImageHelper.maskWithColor(oceanBlur, Color.black, landMask, true);
+
 				}
+				oceanBlur = ImageHelper.maskWithColor(oceanBlur, Color.black, landMask, true);
 
 				map = ImageHelper.maskWithColor(map, settings.oceanEffectsColor, oceanBlur, true);
 				landBackground = ImageHelper.maskWithColor(landBackground, settings.oceanEffectsColor, oceanBlur, true);
 			}	
 		}
-		coastlineMask = null;
-		
+
 		// Draw coast lines.
 		{
 			Graphics2D g = map.createGraphics();
@@ -438,8 +422,7 @@ public class MapCreator
 						
 			textDrawer.drawText(graph, map, landBackground, mountainGroups, cities);
 		}
-		landBackground = null;
-		
+
 		if (settings.drawBorder)
 		{
 			Logger.println("Adding border.");
@@ -475,8 +458,7 @@ public class MapCreator
 			// Use the random number generator the same whether or not we draw a frayed border.
 			r.nextLong();
 		}
-		background = null;
-		
+
 		if (settings.grungeWidth > 0)
 		{
 			Logger.println("Adding grunge.");
@@ -661,11 +643,7 @@ public class MapCreator
 		for (EdgeEdit eEdit : edits.edgeEdits)
 		{				
 			Edge edge = graph.edges.get(eEdit.index);
-			boolean needsRebuild = false;
-			if (eEdit.riverLevel != edge.river && edge.d0 != null)
-			{
-				needsRebuild = true;
-			}
+			boolean needsRebuild = eEdit.riverLevel != edge.river && edge.d0 != null;
 			graph.edges.get(eEdit.index).river = eEdit.riverLevel;
 			if (needsRebuild)
 			{
@@ -1042,7 +1020,7 @@ public class MapCreator
 		g.setColor(Color.white);
 		g.fillRect(0, 0, blurBoxWidth + blurLevel, blurBoxWidth + blurLevel);
 		
-		int rectWidth = (int)(resolutionScale);
+		int rectWidth = (int) resolutionScale;
 		if (rectWidth == 0)
 			rectWidth = 1;
 		

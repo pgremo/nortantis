@@ -5,7 +5,6 @@ import java.io.Serializable;
 /**
  * Stores which icon, if any, to draw for a center.
  */
-@SuppressWarnings("serial")
 public class CenterIcon implements Serializable
 {
 	public CenterIconType iconType;

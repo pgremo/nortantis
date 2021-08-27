@@ -12,7 +12,6 @@ import java.util.function.Supplier;
  * @param <K>
  * @param <V>
  */
-@SuppressWarnings("serial")
 public class ConcurrentHashMapF <K, V> extends ConcurrentHashMap<K, V>
 {
 

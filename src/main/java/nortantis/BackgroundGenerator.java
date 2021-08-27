@@ -29,7 +29,7 @@ public class BackgroundGenerator
 	 * "Random Phase Textures: Theory and Synthesis" by Bruno Galerne, Yann Gousseau, and Jean-Michel Morel. Specifically, from the section
 	 * "Synthesizing Textures With Arbitrary Sizes", I'm using step 2, but not steps 1 and 3. Instead of step 1 I'm using the original image.
 	 * I compensate for this by increasing alpha in step 2. Instead of step 3 I'm convolving with white noise, which seems to work just as well.
-	 * @param rand
+	 * @param rand randomizer
 	 * @param texture If this is a color image (not type BufferedImage.TYPE_INT_RGB), then I generate a color result by processing each channel 
 	 * separately similar to what Bruno Galerne do, except I use histogram matching to get the color levels right.
 	 * @param targetRows Number of rows in the result.
@@ -125,8 +125,7 @@ public class BackgroundGenerator
 			}
 			
 			BufferedImage grayImage = ImageHelper.convolveGrayscale(randomImage, kernel, true);
-			kernel = null;
-			
+
 			if (numberOfColorChannels == 1)
 			{
 				allChannels = grayImage;

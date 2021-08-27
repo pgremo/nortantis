@@ -1,23 +1,20 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import nortantis.MapSettings.LineStyle;
 import nortantis.MapSettings.OceanEffect;
 import nortantis.util.AssetsPath;
 import nortantis.util.ProbabilityHelper;
 import nortantis.util.Range;
+
+import java.awt.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * For randomly generating settings with which to generate a map.
@@ -109,7 +106,7 @@ public class SettingsGenerator
 		{
 			// Random border type.
 			int index = Math.abs(rand.nextInt()) % borderTypes.size();
-			settings.borderType = borderTypes.toArray(new String[borderTypes.size()])[index];
+			settings.borderType = borderTypes.toArray(new String[0])[index];
 			if (settings.borderType.equals("dashes"))
 			{
 				settings.frayedBorder = false;
@@ -194,7 +191,7 @@ public class SettingsGenerator
 		{
 			settings.books.addAll(allBooks);
 		}
-		else if (allBooks.size() > 0)
+		else
 		{
 			int numBooks = 2 + Math.abs(rand.nextInt(allBooks.size() - 1));
 			List<String> booksRemaining = new ArrayList<>(allBooks);

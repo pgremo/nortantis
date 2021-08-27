@@ -1,51 +1,29 @@
 package nortantis;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.FilenameUtils;
-
 import hoten.geom.Point;
 import hoten.voronoi.Center;
 import hoten.voronoi.Corner;
 import nortantis.editor.CenterEdit;
 import nortantis.editor.MapEdits;
-import nortantis.util.AssetsPath;
-import nortantis.util.Coordinate;
-import nortantis.util.HashMapF;
-import nortantis.util.Helper;
-import nortantis.util.ImageHelper;
-import nortantis.util.ListMap;
-import nortantis.util.Logger;
-import nortantis.util.Pair;
-import nortantis.util.Range;
-import nortantis.util.Tuple2;
-import nortantis.util.Tuple3;
+import nortantis.util.*;
+import org.apache.commons.io.FilenameUtils;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+
+import static java.lang.String.*;
+import static java.util.Collections.*;
+import static java.util.Comparator.*;
 import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toSet;
 
 public class IconDrawer 
 {
@@ -61,16 +39,8 @@ public class IconDrawer
 	// If a polygon is this number times meanPolygonWidth wide, no icon will be drawn on it.
 	final double maxMeansToDraw = 5.0;
 	double maxSizeToDrawIcon;
-	// Max gap (in polygons) between mountains for considering them a single group. Warning:
-	// there tend to be long polygons along edges, so if this value is much more than 2, 
-	// mountains near the ocean may be connected despite long distances between them..
-	private final int maxGapSizeInMountainClusters = 2;
 	private final int maxGapBetweenBiomeGroups = 2;
-	// Mountain images are scaled by this.
-	private final double mountainScale = 1.0;
-	// Hill images are scaled by this.
-	private final double hillScale = 0.5;	
-	private HashMapF<Center, List<IconDrawTask>> iconsToDraw;
+	private final HashMapF<Center, List<IconDrawTask>> iconsToDraw;
 	WorldGraph graph;
 	Random rand;
 	/**
@@ -78,7 +48,7 @@ public class IconDrawer
 	 */
 	public Map<Integer, CenterIcon> centerIcons;
 	public Map<Integer, CenterTrees> trees;
-	private String cityIconsSetName;
+	private final String cityIconsSetName;
 
 	public IconDrawer(WorldGraph graph, Random rand, String cityIconsSetName)
 	{
@@ -163,21 +133,13 @@ public class IconDrawer
 	 */
 	public Pair<List<Set<Center>>> findMountainAndHillGroups()
 	{
-		List<Set<Center>> mountainGroups = findCenterGroups(graph, maxGapSizeInMountainClusters, new Function<Center, Boolean>()
-				{
-					public Boolean apply(Center center)
-					{
-						return center.isMountain;
-					}
-				});
+		// Max gap (in polygons) between mountains for considering them a single group. Warning:
+		// there tend to be long polygons along edges, so if this value is much more than 2,
+		// mountains near the ocean may be connected despite long distances between them..
+		int maxGapSizeInMountainClusters = 2;
+		List<Set<Center>> mountainGroups = findCenterGroups(graph, maxGapSizeInMountainClusters, center -> center.isMountain);
 		
-		List<Set<Center>> mountainAndHillGroups = findCenterGroups(graph, maxGapSizeInMountainClusters, new Function<Center, Boolean>()
-		{
-			public Boolean apply(Center center)
-			{
-				return center.isMountain || center.isHill;
-			}
-		});
+		List<Set<Center>> mountainAndHillGroups = findCenterGroups(graph, maxGapSizeInMountainClusters, center -> center.isMountain || center.isHill);
 
 		// Assign mountain group ids to each center that is in a mountain group.
 		int curId = 0;
@@ -260,7 +222,7 @@ public class IconDrawer
 					iconsToDraw.getOrCreate(center).add(new IconDrawTask(duneImage, 
 		       				mask, center.loc, duneWidth, true, false));								
 				}
-				else if (cEdit.icon.iconType == CenterIconType.City && cityImages != null && !cityImages.isEmpty())
+				else if (cEdit.icon.iconType == CenterIconType.City && !cityImages.isEmpty())
 				{
 					BufferedImage cityImage;
 					BufferedImage mask;
@@ -269,8 +231,8 @@ public class IconDrawer
 					{
 						cityIconName = cEdit.icon.iconName;
 					}
-					else if (cityImages.size() > 0)
-					{
+					else {
+						cityImages.size();
 						cityIconName = chooseNewGroupId(cityImages.keySet(), cEdit.icon.iconName);
 					}
 					if (cityIconName != null)
@@ -297,7 +259,7 @@ public class IconDrawer
 	private String chooseNewGroupId(Set<String> groupIds, String oldGroupId)
 	{
 		int randomIndex = Math.abs(oldGroupId.hashCode() % groupIds.size());
-		return groupIds.toArray(new String[groupIds.size()])[randomIndex];
+		return groupIds.toArray(new String[0])[randomIndex];
 	}
 
 	/**
@@ -422,30 +384,19 @@ public class IconDrawer
 	 */
 	public void drawAllIcons(BufferedImage map, BufferedImage background)
 	{	
-		List<IconDrawTask> tasks = new ArrayList<IconDrawTask>(iconsToDraw.size());
-		for (Map.Entry<Center, List<IconDrawTask>> entry : iconsToDraw.entrySet())
+		var tasks = new ArrayList<IconDrawTask>(iconsToDraw.size());
+		for (var entry : iconsToDraw.entrySet())
 		{
 			if (!entry.getKey().isWater)
 			{
 				tasks.addAll(entry.getValue());
 			}
 		}
-		Collections.sort(tasks);
+		sort(tasks);
 		
 
 		// Scale the icons in parallel.
-		List<Runnable> jobs = new ArrayList<>();
-		for (final IconDrawTask task : tasks)
-		{
-			jobs.add(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-			       	task.scaleIcon();
-				}			
-			});
-		}
+		var jobs = tasks.stream().<Runnable>map(task -> task::scaleIcon).collect(toList());
 		Helper.processInParallel(jobs);
 		
 		for (final IconDrawTask task : tasks)
@@ -512,8 +463,8 @@ public class IconDrawer
 	public List<Set<Center>> addMountainsAndHills(List<Set<Center>> mountainGroups, List<Set<Center>> mountainAndHillGroups)
 	{				
         // Maps mountain range ids (the ids in the file names) to list of mountain images and their masks.
-        ListMap<String, Tuple2<BufferedImage, BufferedImage>> mountainImagesById = getAllIconGroupsAndMasksForType(mountainsName);
-        if (mountainImagesById == null || mountainImagesById.isEmpty())
+        var mountainImagesById = getAllIconGroupsAndMasksForType(mountainsName);
+        if (mountainImagesById.isEmpty())
         {
         	Logger.println("No mountain images were found. Mountain images will not be drawn.");
         	return mountainGroups;
@@ -606,20 +557,24 @@ public class IconDrawer
 	{
 		// Find the center's size along the x axis.
     	double cSize = findCenterWidthBetweenNeighbors(c);
-    	return (int)(cSize * mountainScale);
+		// Mountain images are scaled by this.
+		double mountainScale = 1.0;
+		return (int)(cSize * mountainScale);
 	}
 	
 	private int findScaledHillSize(Center c)
 	{
 		// Find the center's size along the x axis.
     	double cSize = findCenterWidthBetweenNeighbors(c);
-    	return (int)(cSize * hillScale);
+		// Hill images are scaled by this.
+		double hillScale = 0.5;
+		return (int)(cSize * hillScale);
 	}
 	
 	public void addSandDunes()
 	{
-		ListMap<String, Tuple2<BufferedImage, BufferedImage>> sandGroups = getAllIconGroupsAndMasksForType("sand");
-		if (sandGroups == null || sandGroups.isEmpty())
+		var sandGroups = getAllIconGroupsAndMasksForType("sand");
+		if (sandGroups.isEmpty())
 		{
 			Logger.println("Sand dunes will not be drawn because no sand images were found.");
 			return;
@@ -634,14 +589,8 @@ public class IconDrawer
 			return;
         }
         
-   		List<Set<Center>> groups = findCenterGroups(graph, maxGapBetweenBiomeGroups, 
-				new Function<Center, Boolean>()
-				{
-					public Boolean apply(Center center)
-					{
-						return center.biome.equals(Biome.TEMPERATE_DESERT);
-					}
-				});
+   		var groups = findCenterGroups(graph, maxGapBetweenBiomeGroups,
+				center -> center.biome.equals(Biome.TEMPERATE_DESERT));
    		
    		// This is the probability that a temperate desert will be a dune field.
    		double duneProbabilityPerBiomeGroup = 0.6;
@@ -679,8 +628,7 @@ public class IconDrawer
 		return (int)(averageWidth * 1.5);
 	}
 		
-	public void addTrees() throws IOException
-	{
+	public void addTrees() {
 		addCenterTrees();
 		drawTreesForAllCenters();
 	}
@@ -711,7 +659,7 @@ public class IconDrawer
 		return result;
 	}
 	
-	private static List<ForestType> forestTypes;
+	private static final List<ForestType> forestTypes;
 	static
 	{
 		forestTypes = new ArrayList<>();
@@ -730,14 +678,8 @@ public class IconDrawer
         {
         	if (forest.biomeFrequency != 1.0)
         	{
-        		List<Set<Center>> groups = findCenterGroups(graph, maxGapBetweenBiomeGroups, 
-        				new Function<Center, Boolean>()
-        				{
-        					public Boolean apply(Center center)
-        					{
-        						return center.biome.equals(forest.biome);
-        					}
-        				});
+        		List<Set<Center>> groups = findCenterGroups(graph, maxGapBetweenBiomeGroups,
+						center -> center.biome.equals(forest.biome));
         		for (Set<Center> group : groups)
         		{
         			if (rand.nextDouble() < forest.biomeFrequency)
@@ -793,8 +735,8 @@ public class IconDrawer
 		double avgHeight = sum / graph.centers.size();
 		
 	       // Load the images and masks.
-        ListMap<String, Tuple2<BufferedImage, BufferedImage>> treesById = getAllIconGroupsAndMasksForType(treesName);
-        if (treesById == null || treesById.isEmpty())
+        var treesById = getAllIconGroupsAndMasksForType(treesName);
+        if (treesById.isEmpty())
         {
 			Logger.println("Trees will not be drawn because no tree images were found.");
 			return;
@@ -826,26 +768,25 @@ public class IconDrawer
         	{
         		if (cTrees.treeType != null && treesById.containsKey(cTrees.treeType))
         		{
-		        	drawTreesAtCenterAndCorners(graph, cTrees.density, treesById.get(cTrees.treeType), avgHeight,
+		        	drawTreesAtCenterAndCorners(cTrees.density, treesById.get(cTrees.treeType), avgHeight,
 								cornersWithTreesDrawn, c, cTrees.randomSeed);
 	        		}
         	}
         }
 	}
 
-	private void drawTreesAtCenterAndCorners(WorldGraph graph,
-			double density, List<Tuple2<BufferedImage, BufferedImage>> imagesAndMasks, double avgCenterHeight, 
-			boolean[] cornersWithTreesDrawn, Center center, long randomSeed)
+	private void drawTreesAtCenterAndCorners(double density, List<Tuple2<BufferedImage, BufferedImage>> imagesAndMasks, double avgCenterHeight,
+											 boolean[] cornersWithTreesDrawn, Center center, long randomSeed)
 	{
 		Random rand = new Random(randomSeed);
-		drawTrees(graph, imagesAndMasks, avgCenterHeight, center.loc, density, center, rand);
+		drawTrees(imagesAndMasks, avgCenterHeight, center.loc, density, center, rand);
 			
 		// Draw trees at the neighboring corners too.
 		for (Corner corner : center.corners)
 		{
 			if (!cornersWithTreesDrawn[corner.index])
 			{
-				drawTrees(graph, imagesAndMasks, avgCenterHeight, corner.loc,
+				drawTrees(imagesAndMasks, avgCenterHeight, corner.loc,
 						density, center, rand);
 				cornersWithTreesDrawn[corner.index] = true;
 			}
@@ -870,31 +811,17 @@ public class IconDrawer
 			this.density = density;
 			this.biomeFrequency = biomeFrequency;
 		}
-	};
+	}
 	
 	private double findCenterWidthBetweenNeighbors(Center c)
 	{
-    	Center eastMostNeighbor = Collections.max(c.neighbors, new Comparator<Center>()
-    			{
-					public int compare(Center c1, Center c2)
-					{				
-						return Double.compare(c1.loc.x, c2.loc.x);
-					}
-    			});
-       	Center westMostNeighbor = Collections.min(c.neighbors, new Comparator<Center>()
-    			{
-					public int compare(Center c1, Center c2)
-					{				
-						return Double.compare(c1.loc.x, c2.loc.x);
-					}
-    			});
-       	double cSize = Math.abs(eastMostNeighbor.loc.x - westMostNeighbor.loc.x);
-       	return cSize;
+    	Center eastMostNeighbor = max(c.neighbors, comparingDouble(c2 -> c2.loc.x));
+       	Center westMostNeighbor = min(c.neighbors, comparingDouble(c2 -> c2.loc.x));
+		return Math.abs(eastMostNeighbor.loc.x - westMostNeighbor.loc.x);
 	}
 
-	private void drawTrees(WorldGraph graph,
-			List<Tuple2<BufferedImage, BufferedImage>> imagesAndMasks, double cSize, Point loc,
-			double forestDensity, Center center, Random rand)
+	private void drawTrees(List<Tuple2<BufferedImage, BufferedImage>> imagesAndMasks, double cSize, Point loc,
+						   double forestDensity, Center center, Random rand)
 	{
 		if (imagesAndMasks == null || imagesAndMasks.isEmpty())
 		{
@@ -921,7 +848,7 @@ public class IconDrawer
            	x += rand.nextGaussian() * sqrtSize*2.0;
            	y += rand.nextGaussian() * sqrtSize*2.0;
         	
-           	iconsToDraw.getOrCreate(center).add(new IconDrawTask(image, mask, new Point(x, y), (int)image.getWidth(), false, false));	           	
+           	iconsToDraw.getOrCreate(center).add(new IconDrawTask(image, mask, new Point(x, y), image.getWidth(), false, false));
        	}
 	}
 	
@@ -984,7 +911,7 @@ public class IconDrawer
 			BufferedImage mask;
 			
 			icon = ImageCache.getInstance().getImageFromFile(path);
-			mask = ImageCache.getInstance().getOrCreateImage("mask " + path.toString(), () -> createMask(icon));
+			mask = ImageCache.getInstance().getOrCreateImage(format("mask %s", path), () -> createMask(icon));
 			
 			
 			int width;
@@ -995,7 +922,7 @@ public class IconDrawer
 			}
 			catch (RuntimeException e)
 			{
-				throw new RuntimeException("Unable to load icon " + path.toString() + ". Make sure the default width of the image is stored at the end of the file name in the format width=<number>. Example: myCityIcon width=64.png. Error: " + e.getMessage(), e);
+				throw new RuntimeException(format("Unable to load icon %s. Make sure the default width of the image is stored at the end of the file name in the format width=<number>. Example: myCityIcon width=64.png. Error: %s", path, e.getMessage()), e);
 			}
 			imagesAndMasks.put(fileNameBaseWithoutWidth, new Tuple3<>(icon, mask, width));
 		}
@@ -1030,7 +957,7 @@ public class IconDrawer
 				}
 
 				var icon = ImageCache.getInstance().getImageFromFile(path);
-				var mask = ImageCache.getInstance().getOrCreateImage("mask " + path.toString(), () -> createMask(icon));
+				var mask = ImageCache.getInstance().getOrCreateImage(format("mask %s", path), () -> createMask(icon));
 	
 				imagesPerGroup.add(groupName, new Tuple2<>(icon, mask));
 			}
@@ -1069,8 +996,8 @@ public class IconDrawer
 	
 	public static Set<String> getIconGroupFileNamesWithoutWidthOrExtension(String iconType, String groupName, String cityIconSetName)
 	{
-		String[] folderNames = getIconGroupFileNames(iconType, groupName, cityIconSetName);
-		Set<String> result = new HashSet<String>();
+		var folderNames = getIconGroupFileNames(iconType, groupName, cityIconSetName);
+		var result = new HashSet<String>();
 		for (int i : new Range(folderNames.length))
 		{
 			result.add(getFileNameBaseWithoutWidth(folderNames[i]));
@@ -1174,8 +1101,8 @@ public class IconDrawer
 	 * which is the name of the icon set. Under the icon set folder either image files or group folders of image files.
 	 * 
 	 * If an icon type supports sets, it should also return a value from getSetName.
-	 * @param iconType
-	 * @return
+	 * @param iconType query
+	 * @return true if it uses the iconType set
 	 */
 	private static boolean doesUseSets(String iconType)
 	{
@@ -1189,8 +1116,8 @@ public class IconDrawer
 	 * should draw the map background vs draw the icons already drawn behind that icon. If a pixel is transparent in the icon, and the
 	 * corresponding pixel is white in the mask, then the map background is drawn for that pixel. But if the map pixel is black, then there
 	 * is no special handling when drawing that pixel, so whatever was drawn in that place on the map before it will be visible. 
-	 * @param icon
-	 * @return
+	 * @param icon icon to create a mask for
+	 * @return icon with mask applied
 	 */
 	public static BufferedImage createMask(BufferedImage icon)
 	{

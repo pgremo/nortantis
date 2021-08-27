@@ -15,7 +15,7 @@ import static java.nio.file.FileSystems.getFileSystem;
 import static java.nio.file.FileSystems.newFileSystem;
 
 public class AssetsPath {
-    private static Path assetsPath;
+    private static final Path assetsPath;
 
     static {
         var items = getProperty("java.class.path").split(":");

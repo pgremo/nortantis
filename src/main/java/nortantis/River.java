@@ -10,7 +10,7 @@ import hoten.voronoi.Corner;
 
 public class River implements Iterable<Corner>
 {
-	private Set<Corner> corners;
+	private final Set<Corner> corners;
 	private int width;
 	
 	public River()

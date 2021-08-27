@@ -6,7 +6,6 @@ import java.io.Serializable;
  * The trees to draw at a center.
  *
  */
-@SuppressWarnings("serial")
 public class CenterTrees implements Serializable
 {
 	public String treeType;

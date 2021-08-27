@@ -8,7 +8,7 @@ package nortantis;
  */
 public class ComplexArray 
 {
-	private float[][] array;
+	private final float[][] array;
 	
 	/**
 	 * Creates a 2D array of complex numbers

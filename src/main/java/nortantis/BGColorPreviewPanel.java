@@ -12,7 +12,6 @@ import nortantis.util.ImageHelper;
 /**
  * For showing a preview of a background color when choosing the background color of a map.
  */
-@SuppressWarnings("serial")
 public class BGColorPreviewPanel extends ImagePanel implements ChangeListener
 {
 	private JColorChooser colorChooser;

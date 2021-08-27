@@ -17,16 +17,16 @@ public class CurveCreator
 	 * @param p2 The end of the curve
 	 * @param p3 Control point for controlling the curve shape
 	 * @param numPoints Approximate number of points to create
-	 * @return
+	 * @return of points that define the curve
 	 */
 	public static List<Point> createCurve(Point p0, Point p1, Point p2, Point p3, int numPoints)
 	{
 		if (numPoints == 0)
 		{
-			return new ArrayList<Point>(0);
+			return new ArrayList<>(0);
 		}
 		
-		List<Point> curve = new ArrayList<Point>(numPoints + 2);
+		var curve = new ArrayList<Point>(numPoints + 2);
 
 		double t0 = 0.0f;
 		double t1 = calcT(t0, p0, p1);
