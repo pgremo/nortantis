@@ -1,7 +1,7 @@
 package nortantis.nlp;
 
 import nortantis.NotEnoughNamesException;
-import nortantis.util.ListCounterMap;
+import nortantis.util.Counter;
 import nortantis.util.Range;
 
 import java.util.*;
@@ -16,7 +16,7 @@ public class CharacterNGram
 {
 	private final int n;
 	private final Random r;
-	private final ListCounterMap<Character> lcMap;
+	private final Map<List<Character>, Counter<Character>> lcMap;
 	private Set<String> namesFromCorpora;
 	
 	private final char startToken = 0;
@@ -31,7 +31,7 @@ public class CharacterNGram
 	{
 		this.n = n;
 		this.r = r;
-		this.lcMap = new ListCounterMap<>();
+		this.lcMap = new HashMap<>();
 	}
 	
 	public void addData(Collection<String> phrases)
@@ -46,7 +46,7 @@ public class CharacterNGram
 					lastChars.add(j < 0 ? startToken : phrase.charAt(j));
 				}
 				
-				lcMap.incrementCount(lastChars, phrase.charAt(i));
+				lcMap.computeIfAbsent(lastChars, x -> new Counter<>()).add(phrase.charAt(i));
 			}
 			// Add the end token.
 			var lastChars = new ArrayList<Character>(n - 1);
@@ -54,7 +54,7 @@ public class CharacterNGram
 			{
 				lastChars.add(j < 0 ? startToken : phrase.charAt(j));
 			}
-			lcMap.incrementCount(lastChars, endToken);
+			lcMap.computeIfAbsent(lastChars, x -> new Counter<>()).add(endToken);
 		}
 		
 		namesFromCorpora = new HashSet<>(phrases);
@@ -94,7 +94,8 @@ public class CharacterNGram
 		char next;
 		do
 		{
-			next = lcMap.sampleConditional(r, lastChars);
+			var counter = lcMap.get(lastChars);
+			next = counter == null ? null : counter.sample(r);
 			lastChars.remove(0);
 			lastChars.add(next);
 			if (next != endToken)
