@@ -7,6 +7,7 @@ import nortantis.editor.CenterEdit;
 import nortantis.editor.MapEdits;
 import nortantis.util.*;
 import org.apache.commons.collections4.ListValuedMap;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.io.FilenameUtils;
 
@@ -42,7 +43,7 @@ public class IconDrawer
 	final double maxMeansToDraw = 5.0;
 	double maxSizeToDrawIcon;
 	private final int maxGapBetweenBiomeGroups = 2;
-	private final HashMapF<Center, List<IconDrawTask>> iconsToDraw;
+	private final MultiValuedMap<Center, IconDrawTask> iconsToDraw;
 	WorldGraph graph;
 	Random rand;
 	/**
@@ -54,7 +55,7 @@ public class IconDrawer
 
 	public IconDrawer(WorldGraph graph, Random rand, String cityIconsSetName)
 	{
-		iconsToDraw = new HashMapF<>(() -> new ArrayList<>(1));
+		iconsToDraw = new ArrayListValuedHashMap<>();
 		this.graph = graph;
 		this.rand = rand;
 		this.cityIconsSetName = cityIconsSetName;
@@ -81,6 +82,10 @@ public class IconDrawer
 		}
 		
 		return widthSum / count;
+	}
+
+	private static List<IconDrawTask> get() {
+		return new ArrayList<>(1);
 	}
 
 	public void markMountains()
@@ -192,7 +197,7 @@ public class IconDrawer
 								cEdit.icon.iconIndex % mountainImagesById.get(groupId).size()).getFirst();
 						BufferedImage mask = mountainImagesById.get(groupId).get(
 								cEdit.icon.iconIndex % mountainImagesById.get(groupId).size()).getSecond();
-						iconsToDraw.getOrCreate(center).add(new IconDrawTask(mountainImage, 
+						iconsToDraw.put(center, new IconDrawTask(mountainImage,
 			       				mask, center.loc, scaledSize, true, false));
 					}
 				}
@@ -211,7 +216,7 @@ public class IconDrawer
 								cEdit.icon.iconIndex % hillImagesById.get(groupId).size()).getFirst();
 						BufferedImage mask = hillImagesById.get(groupId).get(
 								cEdit.icon.iconIndex % hillImagesById.get(groupId).size()).getSecond();
-						iconsToDraw.getOrCreate(center).add(new IconDrawTask(hillImage, 
+						iconsToDraw.put(center, new IconDrawTask(hillImage,
 			       				mask, center.loc, scaledSize, true, false));	
 					}
 				}
@@ -221,7 +226,7 @@ public class IconDrawer
 							cEdit.icon.iconIndex % duneImages.size()).getFirst();
 					BufferedImage mask = duneImages.get(
 							cEdit.icon.iconIndex % duneImages.size()).getSecond();
-					iconsToDraw.getOrCreate(center).add(new IconDrawTask(duneImage, 
+					iconsToDraw.put(center, new IconDrawTask(duneImage,
 		       				mask, center.loc, duneWidth, true, false));								
 				}
 				else if (cEdit.icon.iconType == CenterIconType.City && !cityImages.isEmpty())
@@ -241,7 +246,7 @@ public class IconDrawer
 					{
 						cityImage = cityImages.get(cityIconName).getFirst();
 						mask = cityImages.get(cityIconName).getSecond();
-						iconsToDraw.getOrCreate(center).add(
+						iconsToDraw.put(center,
 								new IconDrawTask(cityImage, mask, center.loc, 
 										(int)(cityImages.get(cityIconName).getThird() * sizeMultiplyer), true, true, cityIconName));
 					}
@@ -387,7 +392,7 @@ public class IconDrawer
 	public void drawAllIcons(BufferedImage map, BufferedImage background)
 	{	
 		var tasks = new ArrayList<IconDrawTask>(iconsToDraw.size());
-		for (var entry : iconsToDraw.entrySet())
+		for (var entry : iconsToDraw.asMap().entrySet())
 		{
 			if (!entry.getKey().isWater)
 			{
@@ -442,7 +447,7 @@ public class IconDrawer
 				{
 					if (addIconDrawTasks)
 					{
-						iconsToDraw.getOrCreate(c).add(task);
+						iconsToDraw.put(c, task);
 		           		centerIcons.put(c.index, new CenterIcon(CenterIconType.City, cityName));
 					}
 	           		
@@ -524,7 +529,7 @@ public class IconDrawer
 		           	if (scaledSize >= 1)
 		           	{	
 			           	// Draw the image such that it is centered in the center of c.
-		           		iconsToDraw.getOrCreate(c).add(new IconDrawTask(imagesInRange.get(i).getFirst(), 
+		           		iconsToDraw.put(c, new IconDrawTask(imagesInRange.get(i).getFirst(),
 		           				imagesInRange.get(i).getSecond(), c.loc, scaledSize, true, false));
 		           		centerIcons.put(c.index, new CenterIcon(CenterIconType.Mountain, fileNameRangeId, i));
 		           	}
@@ -543,7 +548,7 @@ public class IconDrawer
 		           		// Make sure the image will be at least 1 pixel wide.
 			           	if (scaledSize >= 1)
 			           	{
-			           		iconsToDraw.getOrCreate(c).add(new IconDrawTask(imagesInGroup.get(i).getFirst(), 
+			           		iconsToDraw.put(c, new IconDrawTask(imagesInGroup.get(i).getFirst(),
 			           				imagesInGroup.get(i).getSecond(), c.loc, scaledSize, true, false));
 			           		centerIcons.put(c.index, new CenterIcon(CenterIconType.Hill, fileNameRangeId, i));
 			           	}
@@ -614,7 +619,7 @@ public class IconDrawer
 						c.isSandDunes = true;
 						
 						int i = rand.nextInt(duneImages.size());
-		           		iconsToDraw.getOrCreate(c).add(new IconDrawTask(duneImages.get(i).getFirst(), 
+		           		iconsToDraw.put(c, new IconDrawTask(duneImages.get(i).getFirst(),
 		           				duneImages.get(i).getSecond(), c.loc, width, true, false));
 		           		centerIcons.put(c.index, new CenterIcon(CenterIconType.Dune, "sand", i));
 					}
@@ -850,7 +855,7 @@ public class IconDrawer
            	x += rand.nextGaussian() * sqrtSize*2.0;
            	y += rand.nextGaussian() * sqrtSize*2.0;
         	
-           	iconsToDraw.getOrCreate(center).add(new IconDrawTask(image, mask, new Point(x, y), image.getWidth(), false, false));
+           	iconsToDraw.put(center, new IconDrawTask(image, mask, new Point(x, y), image.getWidth(), false, false));
        	}
 	}
 	
