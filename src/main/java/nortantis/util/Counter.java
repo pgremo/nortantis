@@ -12,15 +12,6 @@ public class Counter<T extends Comparable<T>> extends AbstractBagDecorator<T> {
     }
 
     public T sample(Random r) {
-        var uniformSample = r.nextInt(size());
-
-        double acc = 0;
-        for (var item : uniqueSet()) {
-            acc += getCount(item);
-            if (acc >= uniformSample)
-                return item;
-        }
-
-        throw new IllegalStateException("unable to find sample");
+        return stream().skip(r.nextInt(size())).findFirst().get();
     }
 }
