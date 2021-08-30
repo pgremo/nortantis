@@ -2,7 +2,6 @@ package nortantis;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
@@ -33,8 +32,9 @@ import hoten.voronoi.NoisyEdges;
 import hoten.voronoi.VoronoiGraph;
 import hoten.voronoi.nodename.as3delaunay.Voronoi;
 import nortantis.MapSettings.LineStyle;
-import nortantis.util.Helper;
 import nortantis.util.Range;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * TestGraphImpl.java
@@ -897,7 +897,9 @@ public class WorldGraph extends VoronoiGraph
     		{
     			// Choose a center at random.
 	    		// Choose one of it's neighbors not in the same plate.
-	    		List<Center> neighborsNotInSamePlate = Helper.filter(c.neighbors, otherC -> c.tectonicPlate != otherC.tectonicPlate);
+				List<Center> neighborsNotInSamePlate = c.neighbors.stream()
+						.filter(otherC -> c.tectonicPlate != otherC.tectonicPlate)
+						.collect(toList());
 	    		Center neighbor = neighborsNotInSamePlate.get(rand.nextInt(neighborsNotInSamePlate.size()));
     		
      		

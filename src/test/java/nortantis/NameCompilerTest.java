@@ -1,7 +1,5 @@
 package nortantis;
 
-import nortantis.util.Helper;
-import nortantis.util.Pair;
 import nortantis.util.Range;
 import org.junit.Test;
 
@@ -9,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 public class NameCompilerTest
@@ -19,8 +17,7 @@ public class NameCompilerTest
 	@Test
 	public void test()
 	{
-		final NameCompiler compiler = new NameCompiler(new Random(), new ArrayList<Pair<String>>(),
-				new ArrayList<Pair<String>>());
+		final NameCompiler compiler = new NameCompiler(new Random(), new ArrayList<>(), new ArrayList<>());
 		// My examples.
 		{
 			List<String> before = Arrays.asList(
@@ -38,7 +35,7 @@ public class NameCompilerTest
 					"forgave",
 					"seen",
 					"set");
-			List<String> after = Helper.map(before, item -> compiler.convertVerbToPresentTense(item));
+			List<String> after = before.stream().map(compiler::convertVerbToPresentTense).collect(toList());
 			List<String> expected = Arrays.asList(
 					"travelling", // I'm using a British dictionary apparently.
 					"distilling",
@@ -78,13 +75,7 @@ public class NameCompilerTest
 					"afflict",
 					"looked",
 					"rest");
-			List<String> after = Helper.map(before, new Function<String, String>()
-					{
-						public String apply(String item)
-						{
-							return compiler.convertVerbToPresentTense(item);
-						}
-					});
+			List<String> after = before.stream().map(compiler::convertVerbToPresentTense).collect(toList());
 			List<String> expected = Arrays.asList(
 					"redeeming",
 					"stretching",

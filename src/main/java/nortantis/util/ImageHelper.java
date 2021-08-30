@@ -1,35 +1,26 @@
 package nortantis.util;
 
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
-
+import hoten.geom.Point;
+import nortantis.ComplexArray;
+import nortantis.DimensionDouble;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.math3.analysis.function.Sinc;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.jtransforms.fft.FloatFFT_2D;
-
-import hoten.geom.Point;
-import nortantis.ComplexArray;
-import nortantis.DimensionDouble;
-import nortantis.IconDrawer;
 import pl.edu.icm.jlargearrays.ConcurrencyUtils;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Random;
 
 import static java.nio.file.Files.newInputStream;
 

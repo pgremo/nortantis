@@ -7,7 +7,6 @@ import java.io.Serializable;
  * @author joseph
  *
  */
-@SuppressWarnings("serial")
 public class Tuple2<F, S> implements Serializable
 {
 	private F f;

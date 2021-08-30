@@ -3,6 +3,9 @@ package nortantis.util;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -170,7 +173,14 @@ public class HistogramEqualizer
 			exportStr.append(histogram[pixelVal]);
 			exportStr.append("\n");
 		}
-		Helper.writeToFile(csvFileName, exportStr.toString());
+		try
+		{
+			Files.writeString(Path.of(csvFileName), exportStr.toString());
+		}
+		catch(IOException ex)
+		{
+			System.out.println("Helper.writeToFile caught error: " + ex.getMessage());
+		}
 	}
 
 

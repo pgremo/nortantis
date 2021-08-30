@@ -45,13 +45,14 @@ class IconDrawTask implements Comparable<IconDrawTask>
        	this.fileName = fileName;
 	}
 	
-	public void scaleIcon()
+	public IconDrawTask scaleIcon()
 	{
 		if (needsScale)
 		{
 	       	icon = ImageCache.getInstance().getScaledImage(icon, scaledWidth);
 	      	mask = ImageCache.getInstance().getScaledImage(mask, scaledWidth);
 		}
+		return this;
 	}
 	
 	public Area createArea()

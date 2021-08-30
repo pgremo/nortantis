@@ -23,9 +23,10 @@ import java.util.*;
 import java.util.function.Function;
 
 import static java.lang.String.format;
-import static java.util.Collections.*;
+import static java.util.Collections.max;
+import static java.util.Collections.min;
 import static java.util.Comparator.comparingDouble;
-import static java.util.stream.Collectors.toList;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toSet;
 
 public class IconDrawer 
@@ -82,10 +83,6 @@ public class IconDrawer
 		}
 		
 		return widthSum / count;
-	}
-
-	private static List<IconDrawTask> get() {
-		return new ArrayList<>(1);
 	}
 
 	public void markMountains()
@@ -233,7 +230,7 @@ public class IconDrawer
 				{
 					BufferedImage cityImage;
 					BufferedImage mask;
-					String cityIconName = null;
+					String cityIconName;
 					if (cityImages.containsKey(cEdit.icon.iconName))
 					{
 						cityIconName = cEdit.icon.iconName;
@@ -391,29 +388,13 @@ public class IconDrawer
 	 */
 	public void drawAllIcons(BufferedImage map, BufferedImage background)
 	{	
-		var tasks = new ArrayList<IconDrawTask>(iconsToDraw.size());
-		for (var entry : iconsToDraw.asMap().entrySet())
-		{
-			if (!entry.getKey().isWater)
-			{
-				tasks.addAll(entry.getValue());
-			}
-		}
-		sort(tasks);
-		
-
-		// Scale the icons in parallel.
-		var jobs = tasks.stream().<Runnable>map(task -> task::scaleIcon).collect(toList());
-		Helper.processInParallel(jobs);
-		
-		for (final IconDrawTask task : tasks)
-		{
-			if (!isIconTouchingWater(task))
-			{
-				drawIconWithBackgroundAndMask(map, task.icon, task.mask, background, (int)task.centerLoc.x,
-						(int)task.centerLoc.y, task.ignoreMaxSize);
-			}
-		}		
+		iconsToDraw.entries().stream()
+				.filter(entry -> !entry.getKey().isWater)
+				.map(Map.Entry::getValue)
+				.map(IconDrawTask::scaleIcon)
+				.filter(not(this::isIconTouchingWater))
+				.forEach(task -> drawIconWithBackgroundAndMask(map, task.icon, task.mask, background, (int)task.centerLoc.x,
+						(int)task.centerLoc.y, task.ignoreMaxSize));
 	}
 	
 	/**
@@ -642,7 +623,7 @@ public class IconDrawer
 	
 	public static Set<TreeType> getTreeTypesForBiome(Biome biome)
 	{
-		Set<TreeType> result = new TreeSet<TreeType>();
+		var result = new TreeSet<TreeType>();
 		for (final ForestType forest : forestTypes)
 		{
 			if (forest.biome == biome)
@@ -652,20 +633,7 @@ public class IconDrawer
 		}
 		return result;
 	}
-	
-	public static Set<Biome> getBiomesForTreeType(TreeType type)
-	{
-		Set<Biome> result = new TreeSet<>();
-		for (final ForestType forest : forestTypes)
-		{
-			if (forest.treeType == type)
-			{
-				result.add(forest.biome);
-			}
-		}
-		return result;
-	}
-	
+
 	private static final List<ForestType> forestTypes;
 	static
 	{

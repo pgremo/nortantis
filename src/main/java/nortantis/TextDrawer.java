@@ -958,8 +958,10 @@ public class TextDrawer
 				{
 					samples.add(locationsArray[r.nextInt(locationsArray.length)]);
 				}
-				
-				Point loc = Helper.maxItem(samples, (point1, point2) -> -Double.compare(point1.distanceTo(centroid), point2.distanceTo(centroid)));
+
+				Point loc = samples.stream()
+						.max((point1, point2) -> -Double.compare(point1.distanceTo(centroid), point2.distanceTo(centroid)))
+						.orElse(null);
 
 				text = createMapText(name, loc, 0.0, textType);
 				if (drawNameHorizontal(map, g, locations, graph, boldBackground, true, text))

@@ -158,7 +158,7 @@ public class MapSettings implements Serializable
 
 		result.setProperty("drawText", drawText + "");
 		result.setProperty("textRandomSeed", textRandomSeed + "");
-		result.setProperty("books", Helper.toStringWithSeparator(books, "\t"));
+		result.setProperty("books", String.join("\t", books));
 		result.setProperty("titleFont", fontToString(titleFont));
 		result.setProperty("regionFont", fontToString(regionFont));
 		result.setProperty("mountainRangeFont", fontToString(mountainRangeFont));

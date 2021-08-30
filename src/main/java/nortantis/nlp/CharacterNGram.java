@@ -5,7 +5,9 @@ import nortantis.util.Counter;
 import nortantis.util.Range;
 
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.util.function.Predicate.not;
 
 /**
  * Used to generate words using character level n-grams.
@@ -62,22 +64,12 @@ public class CharacterNGram
 	
 	public String generateNameNotInCorpora() throws NotEnoughNamesException
 	{
-		final int maxRetries = 20;
-		for (@SuppressWarnings("unused") int retry : new Range(maxRetries))
-		{
-			String name = generateName();
-			if (name.length() < 2)
-			{
-				continue;
-			}
-			if (!namesFromCorpora.contains(name))
-			{
-				// This name never appeared in the corpora.
-				return name;
-			}
-		}
-		
-		throw new NotEnoughNamesException();
+		return Stream.generate(this::generateName)
+				.limit(20)
+				.filter(x -> x.length() >= 2)
+				.filter(not(namesFromCorpora::contains))
+				.findFirst()
+				.orElseThrow(NotEnoughNamesException::new);
 	}
 	
 	private String generateName()
@@ -108,11 +100,11 @@ public class CharacterNGram
 	
 	public static void main(String[] args)
 	{
-		List<String> strs = Arrays.asList("yellow", "bannana", "yellowish", "corn", "corn and rice", "corn without rice", "yellow corn");
+		var data = Arrays.asList("yellow", "bannana", "yellowish", "corn", "corn and rice", "corn without rice", "yellow corn");
 		CharacterNGram generator = new CharacterNGram(new Random(), 3);
-		generator.addData(strs);
-		IntStream.range(1, 10)
-				.mapToObj(x -> generator.generateName())
+		generator.addData(data);
+		Stream.generate(generator::generateName)
+				.limit(10)
 				.forEach(System.out::println);
 	}
 }

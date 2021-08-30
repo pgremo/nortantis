@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Like Pair except the equals function considers 2 of these objects of equal if the order of first and 2nd have been swapped.
  *
  */
-@SuppressWarnings("serial")
 public class OrderlessPair<T> implements Serializable
 {
 	private T f;

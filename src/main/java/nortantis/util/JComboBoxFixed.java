@@ -10,7 +10,6 @@ import javax.swing.JComboBox;
  *
  * @param <T>
  */
-@SuppressWarnings("serial")
 public class JComboBoxFixed<T> extends JComboBox<T>
 {
 	 /** 
