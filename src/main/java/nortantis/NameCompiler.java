@@ -83,7 +83,7 @@ public class NameCompiler
 
 	public String compileName()
 	{
-		if (counter.sample(r).equals("adjectives"))
+		if (counter.random(r).equals("adjectives"))
 		{
 			if (nounAdjectivePairs.size() == 0)
 			{

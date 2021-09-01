@@ -11,7 +11,16 @@ public class Counter<T extends Comparable<T>> extends AbstractBagDecorator<T> {
         super(new HashBag<>());
     }
 
-    public T sample(Random r) {
-        return stream().skip(r.nextInt(size())).findFirst().get();
+    public Counter(T... items){
+        this();
+        addAll(items);
+    }
+
+    public void addAll(T... items) {
+        for (var item : items) add(item);
+    }
+
+    public T random(Random r) {
+        return stream().skip(r.nextInt(size())).findFirst().orElse(null);
     }
 }

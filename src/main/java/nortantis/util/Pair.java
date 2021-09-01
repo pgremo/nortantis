@@ -6,7 +6,6 @@ import java.io.Serializable;
  * A 2-tuple of objects which are the same type and don't have to be comparable.
  *
  */
-@SuppressWarnings("serial")
 public class Pair<T> implements Serializable
 {
 	private T f;

@@ -3,20 +3,28 @@ package nortantis;
 import nortantis.nlp.CharacterNGram;
 import nortantis.util.Range;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.max;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.text.WordUtils.capitalize;
 
 public class NameGenerator
 {
-	private CharacterNGram nGram;
+	private final CharacterNGram nGram;
 	double averageWordLength;
 	double maxWordLengthComparedToAverage;
-	private double probabilityOfKeepingNameLength1;
-	private double probabilityOfKeepingNameLength2;
-	private double probabilityOfKeepingNameLength3;
-	private Random rand;
-	private final String romanNumeralString = "I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,XVII,XVIII,XIX,XX";
-	private Set<String> romanNumerals;
+	private final double probabilityOfKeepingNameLength1;
+	private final double probabilityOfKeepingNameLength2;
+	private final double probabilityOfKeepingNameLength3;
+	private final Random rand;
+	private final Set<String> romanNumerals;
 	
 	/**
 	 * @param maxWordLengthComparedToAverage Any name generated which contains a word (separated by spaces) which is longer than
@@ -52,28 +60,23 @@ public class NameGenerator
 		}
 		
 		nGram.addData(placeNames);
-		
-		romanNumerals = new HashSet<String>(Arrays.asList(romanNumeralString.split(",")));
+
+		String romanNumeralString = "I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,XVII,XVIII,XIX,XX";
+		romanNumerals = new HashSet<>(asList(romanNumeralString.split(",")));
 	}
 
 	public String generateName() throws NotEnoughNamesException
 	{		
-		String name = null;
-		String longestWord = null;
+		String name;
+		String longestWord;
 		do
 		{
 			name = nGram.generateNameNotInCorpora();
-			longestWord = Collections.max(Arrays.asList(name.split(" ")), new Comparator<String>()
-			{
-				public int compare(String s1, String s2)
-				{
-					return Integer.compare(s1.length(), s2.length());
-				}
-			});
+			longestWord = max(asList(name.split(" ")), comparingInt(String::length));
 		}
 		while ((longestWord.length() > averageWordLength * maxWordLengthComparedToAverage) || isTooShort(name));
 		// Capitalize first letter of generated names, including for multi-word names.
-		name = capitalizeAllFirstLetters(name);
+		name = capitalize(name);
 		name = capitalizeRomanNumerals(name);
 	
 		return name;
@@ -81,32 +84,23 @@ public class NameGenerator
 	
 	private boolean isTooShort(String name)
 	{
-		if (name.length() == 1)
-		{
-			return rand.nextDouble() > probabilityOfKeepingNameLength1;
+		double v = rand.nextDouble();
+		switch (name.length()) {
+			case 1:
+				return v > probabilityOfKeepingNameLength1;
+			case 2:
+				return v > probabilityOfKeepingNameLength2;
+			case 3:
+				return v > probabilityOfKeepingNameLength3;
+			default:
+				return false;
 		}
-		if (name.length() == 2)
-		{
-			return rand.nextDouble() > probabilityOfKeepingNameLength2;
-		}
-		if (name.length() == 3)
-		{
-			return rand.nextDouble() > probabilityOfKeepingNameLength3;
-		}
-		return false;
 	}
-	
-	private String capitalizeAllFirstLetters(String str)
-	{
-		return Arrays.stream(str.split(" "))
-				.map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1))
-				.collect(Collectors.joining(" "));
-	}
-	
+
 	private String capitalizeRomanNumerals(String str)
 	{
-		return Arrays.stream(str.split(" "))
+		return stream(str.split(" "))
 				.map(s -> romanNumerals.contains(s.toUpperCase()) ? s.toUpperCase() : s)
-				.collect(Collectors.joining(" "));
+				.collect(joining(" "));
 	}
 }

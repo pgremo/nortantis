@@ -3,7 +3,7 @@ package nortantis;
 import nortantis.MapSettings.LineStyle;
 import nortantis.MapSettings.OceanEffect;
 import nortantis.util.AssetsPath;
-import nortantis.util.ProbabilityHelper;
+import nortantis.util.Counter;
 import nortantis.util.Range;
 
 import java.awt.*;
@@ -61,7 +61,7 @@ public class SettingsGenerator
 		{
 			oceanColor = rand.nextInt(2) == 1 ? settings.landColor : settings.oceanColor;
 		}
-		settings.oceanEffect = ProbabilityHelper.sampleEnumUniform(rand, OceanEffect.class);
+		settings.oceanEffect = new Counter<>(OceanEffect.values()).random(rand);
 		settings.oceanEffectSize = 10 + Math.abs(rand.nextInt(40));
 		settings.landBlur = 10 + Math.abs(rand.nextInt(40));
 		
@@ -129,7 +129,7 @@ public class SettingsGenerator
 		Set<String> cityIconSets = IconDrawer.getIconSets(IconDrawer.citiesName);
 		if (cityIconSets.size() > 0)
 		{
-			settings.cityIconSetName = ProbabilityHelper.sampleUniform(rand, new ArrayList<>(cityIconSets));
+			settings.cityIconSetName = new ArrayList<>(cityIconSets).get(rand.nextInt(cityIconSets.size()));
 		}
 		
 		settings.drawRegionColors = rand.nextDouble() > 0.25;
@@ -157,7 +157,7 @@ public class SettingsGenerator
 			
 			if (textureFiles.size() > 0)
 			{
-				settings.backgroundTextureImage = ProbabilityHelper.sampleUniform(rand, textureFiles);
+				settings.backgroundTextureImage = textureFiles.get(rand.nextInt(textureFiles.size()));
 			}
 		}
 		
@@ -181,7 +181,7 @@ public class SettingsGenerator
 		settings.edgeLandToWaterProbability = Math.round(settings.edgeLandToWaterProbability * 100.0) / 100.0;
 		settings.centerLandToWaterProbability = Math.round(settings.centerLandToWaterProbability * 100.0) / 100.0;
 		
-		Dimension dimension = RunSwing.parseGenerateBackgroundDimensionsFromDropdown(ProbabilityHelper.sampleUniform(rand, RunSwing.getAllowedDimmensions()));
+		Dimension dimension = RunSwing.parseGenerateBackgroundDimensionsFromDropdown(RunSwing.getAllowedDimmensions().get(rand.nextInt(RunSwing.getAllowedDimmensions().size())));
 		settings.generatedWidth = dimension.width;
 		settings.generatedHeight = dimension.height;
 		
@@ -203,7 +203,7 @@ public class SettingsGenerator
 			}
 		}
 		
-		settings.lineStyle = ProbabilityHelper.sampleEnumUniform(rand, LineStyle.class);
+		settings.lineStyle = new Counter<>(LineStyle.values()).random(rand);
 				
 		return settings;
 	}

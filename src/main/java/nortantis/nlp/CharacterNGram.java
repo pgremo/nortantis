@@ -66,7 +66,7 @@ public class CharacterNGram
 	{
 		return Stream.generate(this::generateName)
 				.limit(20)
-				.filter(x -> x.length() >= 2)
+				.filter(x -> x.length() > 1)
 				.filter(not(namesFromCorpora::contains))
 				.findFirst()
 				.orElseThrow(NotEnoughNamesException::new);
@@ -87,7 +87,7 @@ public class CharacterNGram
 		do
 		{
 			var counter = lcMap.get(lastChars);
-			next = counter == null ? null : counter.sample(r);
+			next = counter == null ? null : counter.random(r);
 			lastChars.remove(0);
 			lastChars.add(next);
 			if (next != endToken)
