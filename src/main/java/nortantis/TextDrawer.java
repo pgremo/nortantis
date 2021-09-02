@@ -482,9 +482,9 @@ public class TextDrawer
 
 				if (r.nextDouble() < 0.5) {
 					var chain = new MarkovChain<Supplier<String>>();
-					chain.addAll(Stream.of(() -> structureName, () -> "of", personNameGenerator::generateName), 3);
-					chain.addAll(Stream.of(personNameGenerator::generateName, () -> "'s", () -> structureName), 2);
-					return chain.randomWalk(r).map(Supplier::get).collect(joining(" "));
+					chain.addAll(Stream.of(() -> structureName, () -> " of ", personNameGenerator::generateName), 3);
+					chain.addAll(Stream.of(personNameGenerator::generateName, () -> "'s ", () -> structureName), 2);
+					return chain.randomWalk(r).map(Supplier::get).collect(joining());
 				} else {
 					var chain = new MarkovChain<Supplier<String>>();
 					chain.addAll(Stream.of(() -> structureName, () -> "of", placeNameGenerator::generateName), 10);

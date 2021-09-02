@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.BorderFactory;
@@ -32,7 +31,6 @@ import javax.swing.SwingWorker;
 import hoten.voronoi.Center;
 import hoten.voronoi.Edge;
 import hoten.voronoi.VoronoiGraph;
-import nortantis.ImageCache;
 import nortantis.ImagePanel;
 import nortantis.MapCreator;
 import nortantis.MapParts;
@@ -92,7 +90,7 @@ public abstract class EditorTool
 	private BufferedImage createPlaceholderImage()
 	{
 		String message = "Drawing the map. Some details like borders and grunge are not shown in edit mode.";
-		Font font = MapSettings.parseFont("URW Chancery L 0 25");
+		Font font = Font.decode("URW Chancery L 0 25");
 		Point textBounds = TextDrawer.getTextBounds(message, font);
 		BufferedImage placeHolder = new BufferedImage(textBounds.x + 10, textBounds.y + 20, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = placeHolder.createGraphics();

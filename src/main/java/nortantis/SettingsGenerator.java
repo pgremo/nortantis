@@ -1,5 +1,6 @@
 package nortantis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nortantis.MapSettings.LineStyle;
 import nortantis.MapSettings.OceanEffect;
 import nortantis.util.AssetsPath;
@@ -22,13 +23,13 @@ import java.util.stream.Collectors;
  */
 public class SettingsGenerator
 {
-	private static final Path defaultSettingsFile = AssetsPath.get("internal", "old_paper.properties");
+	private static final Path defaultSettingsFile = AssetsPath.get("internal", "old_paper.json");
 	public static int minWorldSize = 2000;
 	public static int maxWorldSize = 30000;
 	public static int worldSizePrecision = 1000;
 	public static double maxCityProbabillity = 1.0/40.0;
 
-	public static MapSettings generate()
+	public static MapSettings generate(ObjectMapper mapper)
 	{
 		if (!Files.exists(defaultSettingsFile))
 		{
@@ -41,8 +42,16 @@ public class SettingsGenerator
 		{
 			rand.nextInt();
 		}
-		
-		MapSettings settings = new MapSettings(defaultSettingsFile);
+
+		MapSettings settings;
+		try {
+			settings = mapper
+					.reader()
+					.readValue(defaultSettingsFile.toFile(), MapSettings.class);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 		settings.pointPrecision = MapSettings.defaultPointPrecision;
 		
 		setRandomSeeds(settings, rand);
