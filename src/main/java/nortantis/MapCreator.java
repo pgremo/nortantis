@@ -146,11 +146,11 @@ public class MapCreator
 		iconDrawer.markMountains();
 		iconDrawer.markHills();
 		iconDrawer.markCities(settings.cityProbability);
-		Pair<List<Set<Center>>> pair = iconDrawer.findMountainAndHillGroups();
+		var pair = iconDrawer.findMountainAndHillGroups();
 		// All mountain ranges and smaller groups of mountains (include mountains that are alone).
-		List<Set<Center>> mountainGroups = pair.getFirst();
+		var mountainGroups = pair.first();
 		// All mountain ranges and smaller groups of mountains extended to include nearby hills.
-		List<Set<Center>> mountainAndHillGroups = pair.getSecond();
+		var mountainAndHillGroups = pair.second();
 		if (mapParts != null)
 		{
 			mapParts.mountainGroups = mountainGroups;
@@ -260,7 +260,7 @@ public class MapCreator
 		if (needToAddIcons)
 		{
 			Logger.println("Adding mountains and hills.");
-			iconDrawer.addMountainsAndHills(mountainGroups, mountainAndHillGroups);
+			iconDrawer.addMountainsAndHills(mountainAndHillGroups);
 			if (mapParts != null)
 				mapParts.mountainGroups = mountainGroups;
 
@@ -276,7 +276,7 @@ public class MapCreator
 		else
 		{
 			// Create mountain groups for the text drawer.
-			mountainGroups = iconDrawer.findMountainAndHillGroups().getFirst();
+			mountainGroups = iconDrawer.findMountainAndHillGroups().first();
 			// Create city areas for the text drawer.
 			cities = iconDrawer.addOrUnmarkCities(settings.resolution, false);
 		}

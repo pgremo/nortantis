@@ -20,8 +20,8 @@ import static org.apache.commons.text.WordUtils.capitalize;
 public class NameCompiler
 {
 	// The first part of each pair is the noun.
-	private final List<Pair<String>> nounAdjectivePairs;
-	private List<Pair<String>> nounVerbPairs;
+	private final List<Pair<String, String>> nounAdjectivePairs;
+	private List<Pair<String, String>> nounVerbPairs;
 	// Used to decide whether to return a result from nounAdjectivePairs or nounVerbPairs.
 	private final Counter<String> counter;
 	private final Random r;
@@ -31,8 +31,8 @@ public class NameCompiler
 	}
 	private final Set<String> dict;
 
-	public NameCompiler(Random r, List<Pair<String>> nounAdjectivePairs,
-			List<Pair<String>> nounVerbPairs)
+	public NameCompiler(Random r, List<Pair<String, String>> nounAdjectivePairs,
+			List<Pair<String, String>> nounVerbPairs)
 	{
 		// Load the word dictionary.
 		List<String> lines;
@@ -67,17 +67,17 @@ public class NameCompiler
 		counter.add("verbs", this.nounVerbPairs.size());
 	}
 
-	private List<Pair<String>> convertToPresentTense(List<Pair<String>> verbPairs)
+	private List<Pair<String, String>> convertToPresentTense(List<Pair<String, String>> verbPairs)
 	{
 		return verbPairs.stream()
-				.map(x -> new Pair<>(x.getFirst(), convertVerbToPresentTense(x.getSecond())))
+				.map(x -> new Pair<>(x.first(), convertVerbToPresentTense(x.second())))
 				.collect(toList());
 	}
 
-	private List<Pair<String>> capitalizeFirstLetters(List<Pair<String>> pairs)
+	private List<Pair<String, String>> capitalizeFirstLetters(List<Pair<String, String>> pairs)
 	{
 		return pairs.stream()
-				.map(x -> new Pair<>(capitalize(x.getFirst()), capitalize(x.getSecond())))
+				.map(x -> new Pair<>(capitalize(x.first()), capitalize(x.second())))
 				.collect(toList());
 	}
 
@@ -89,23 +89,23 @@ public class NameCompiler
 			{
 				return "";
 			}
-			Pair<String> pair = nounAdjectivePairs.get(r.nextInt(nounAdjectivePairs.size()));
+			var pair = nounAdjectivePairs.get(r.nextInt(nounAdjectivePairs.size()));
 			double d = r.nextDouble();
 			String result;
 			if (d < 1.0/3.0)
 			{
 				// Just return the noun.
-				result = pair.getFirst();
+				result = pair.first();
 			}
 			else if (d < 2.0/3.0)
 			{
 				// Just return the adjective.
-				result = pair.getSecond();
+				result = pair.second();
 			}
 			else
 			{
 				// Return both.
-				result = pair.getSecond() + " " + pair.getFirst();
+				result = pair.second() + " " + pair.first();
 			}
 			return result;
 		}
@@ -115,18 +115,18 @@ public class NameCompiler
 			{
 				return "";
 			}
-			Pair<String> pair = nounVerbPairs.get(r.nextInt(nounVerbPairs.size()));
+			var pair = nounVerbPairs.get(r.nextInt(nounVerbPairs.size()));
 			double d = r.nextDouble();
 			String result;
 			if (d < 0.5)
 			{
 				// Just return the noun.
-				result = pair.getFirst();
+				result = pair.first();
 			}
 			else
 			{
 				// Return both.
-				result = pair.getSecond() + " " + pair.getFirst();
+				result = pair.second() + " " + pair.first();
 			}
 
 			return result;

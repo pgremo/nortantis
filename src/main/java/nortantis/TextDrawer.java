@@ -70,8 +70,8 @@ public class TextDrawer
 
 		var placeNames = new ArrayList<String>();
 		var personNames = new ArrayList<String>();
-		var nounAdjectivePairs = new ArrayList<Pair<String>>();
-		var nounVerbPairs = new ArrayList<Pair<String>>();
+		var nounAdjectivePairs = new ArrayList<Pair<String, String>>();
+		var nounVerbPairs = new ArrayList<Pair<String, String>>();
 		for (String book : settings.books)
 		{
 			placeNames.addAll(readNameList(AssetsPath.get("books", book +"_place_names.txt")));
@@ -102,7 +102,7 @@ public class TextDrawer
 
 	}
 
-	private List<Pair<String>> readStringPairs(Path filename)
+	private List<Pair<String, String>> readStringPairs(Path filename)
 	{
 		try {
 			var counter = new AtomicInteger();
@@ -313,18 +313,17 @@ public class TextDrawer
 			Point textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
 
 			switch (text.type) {
-				case Title:
+				case Title -> {
 					g.setFont(titleFontScaled);
 					TectonicPlate plate = graph.getTectonicPlateAt(textLocation.x, textLocation.y);
 					drawNameHorizontal(map, g, extractLocationsFromCenters(plate.centers),
 							graph, settings.drawBoldBackground, false, text);
-					break;
-				case City:
-				case Other_mountains:
+				}
+				case City, Other_mountains -> {
 					g.setFont(citiesAndOtherMountainsFontScaled);
 					drawNameRotated(map, g, 0, false, text);
-					break;
-				case Region:
+				}
+				case Region -> {
 					g.setFont(regionFontScaled);
 					Center center = graph.findClosestCenter(textLocation.x, textLocation.y);
 					Set<Center> plateCenters;
@@ -335,15 +334,15 @@ public class TextDrawer
 					}
 					Set<Point> locations = extractLocationsFromCenters(plateCenters);
 					drawNameHorizontal(map, g, locations, graph, settings.drawBoldBackground, false, text);
-					break;
-				case Mountain_range:
+				}
+				case Mountain_range -> {
 					g.setFont(mountainRangeFontScaled);
 					drawNameRotated(map, g, 0, false, text);
-					break;
-				case River:
+				}
+				case River -> {
 					g.setFont(riverFontScaled);
 					drawNameRotated(map, g, 0, false, text);
-					break;
+				}
 			}
 		}
 
@@ -362,23 +361,15 @@ public class TextDrawer
 			nameCompiler.setSeed(System.currentTimeMillis());
 		}
 
-		Object subType = null;
-
-		switch (type) {
-			case Title:
-				subType = new Counter<>(TitleType.values()).random(r);
-				break;
-			case Other_mountains:
-				subType = new Counter<>(OtherMountainsType.values()).random(r);
-				break;
-			case River:
-				subType = new Counter<>(RiverType.values()).random(r);
-				break;
-			case City:
-				// In the editor you add city icons in a different tool than city text, so we have no way of knowing what icon, if any, this city name is for.
-				subType = new Counter<>(CityType.values()).random(r);
-				break;
-		}
+		Object subType = switch (type) {
+			case Title -> new Counter<>(TitleType.values()).random(r);
+			case Other_mountains -> new Counter<>(OtherMountainsType.values()).random(r);
+			case River -> new Counter<>(RiverType.values()).random(r);
+			case City ->
+					// In the editor you add city icons in a different tool than city text, so we have no way of knowing what icon, if any, this city name is for.
+					new Counter<>(CityType.values()).random(r);
+			default -> null;
+		};
 
 		try
 		{
@@ -401,7 +392,7 @@ public class TextDrawer
 	private String generateNameOfType(TextType type, Object subType, boolean requireUnique)
 	{
 		switch (type) {
-			case Title: {
+			case Title -> {
 				TitleType titleType = subType == null ? TitleType.Decorated : (TitleType) subType;
 
 				switch (titleType) {
@@ -417,7 +408,7 @@ public class TextDrawer
 						throw new IllegalArgumentException("Unknown title type: " + titleType);
 				}
 			}
-			case Region: {
+			case Region -> {
 				if (r.nextDouble() < 0.2) {
 					var chain = new MarkovChain<Supplier<String>>();
 					chain.addAll(Stream.of(() -> "Kingdom of", personNameGenerator::generateName), 5);
@@ -431,14 +422,14 @@ public class TextDrawer
 					return chain.randomWalk(r).map(Supplier::get).collect(joining(" "));
 				}
 			}
-			case Mountain_range: {
+			case Mountain_range -> {
 				if (r.nextDouble() < 0.7) {
 					return compileName("%s Range", requireUnique);
 				} else {
 					return generatePlaceName("%s Range", requireUnique);
 				}
 			}
-			case Other_mountains: {
+			case Other_mountains -> {
 				OtherMountainsType mountainType = subType == null ? OtherMountainsType.Mountains : (OtherMountainsType) subType;
 				String format = getOtherMountainNameFormat(mountainType);
 				if (r.nextDouble() < 0.5) {
@@ -454,30 +445,25 @@ public class TextDrawer
 					}
 				}
 			}
-			case City: {
+			case City -> {
 				String structureName;
 				switch ((CityType) subType) {
-					case Fortification:
-						structureName = new Counter<>("Castle", "Fort", "Fortress", "Keep", "Citadel").random(r);
-						break;
-					case City:
+					case Fortification -> structureName = new Counter<>("Castle", "Fort", "Fortress", "Keep", "Citadel").random(r);
+					case City -> {
 						var city = new Counter<String>();
 						city.add("City", 3);
 						city.add("Town", 1);
 						structureName = city.random(r);
-						break;
-					case Town:
+					}
+					case Town -> {
 						var town = new Counter<String>();
 						town.add("City", 1);
 						town.add("Village", 2);
 						town.add("Town", 2);
 						structureName = town.random(r);
-						break;
-					case Homestead:
-						structureName = new Counter<>("Farm", "Village").random(r);
-						break;
-					default:
-						throw new RuntimeException(format("Unknown city type: %s", subType));
+					}
+					case Homestead -> structureName = new Counter<>("Farm", "Village").random(r);
+					default -> throw new RuntimeException(format("Unknown city type: %s", subType));
 				}
 
 				if (r.nextDouble() < 0.5) {
@@ -493,7 +479,7 @@ public class TextDrawer
 					return chain.randomWalk(r).map(Supplier::get).collect(joining(" "));
 				}
 			}
-			case River: {
+			case River -> {
 				RiverType riverType = subType == null ? RiverType.Large : (RiverType) subType;
 				String format = getRiverNameFormat(riverType);
 				if (r.nextDouble() < 0.5) {
@@ -508,45 +494,38 @@ public class TextDrawer
 					return generatePlaceName(format, requireUnique);
 				}
 			}
-			default:
-				throw new UnsupportedOperationException("Unknown text type: " + type);
+			default -> throw new UnsupportedOperationException("Unknown text type: " + type);
 		}
 	}
 
 	private String getOtherMountainNameFormat(OtherMountainsType mountainType)
 	{
-		switch (mountainType)
-		{
-			case Mountains:
-				return "%s Mountains";
-			case Peak:
-				return "%s Peak";
-			case TwinPeaks:
-				return "%s Twin Peaks";
-			default:
-				throw new RuntimeException("Unknown mountain group type: " + mountainType);
-		}
+		return switch (mountainType) {
+			case Mountains -> "%s Mountains";
+			case Peak -> "%s Peak";
+			case TwinPeaks -> "%s Twin Peaks";
+		};
 
 	}
 
 	private String getRiverNameFormat(RiverType riverType)
 	{
-		switch (riverType)
-		{
-			case Large:
+		switch (riverType) {
+			case Large -> {
 				var large = new Counter<String>();
 				large.add("%s Wash", 1);
 				large.add("%s River", 8);
 				return large.random(r);
-			case Small:
+			}
+			case Small -> {
 				var small = new Counter<String>();
 				small.add("%s Bayou", 1);
 				small.add("%s Creek", 2);
 				small.add("%s Brook", 2);
 				small.add("%s Stream", 5);
 				return small.random(r);
-			default:
-				throw new RuntimeException("Unknown river type: " + riverType);
+			}
+			default -> throw new RuntimeException("Unknown river type: " + riverType);
 		}
 	}
 
@@ -616,15 +595,15 @@ public class TextDrawer
 
 		var oceanPlatesAndWidths = graph.plates.stream()
 				.filter(p -> p.type == PlateType.Oceanic)
-				.map(p -> new Tuple2<>(p, findWidth(p.centers)))
+				.map(p -> new Pair<>(p, findWidth(p.centers)))
 				.collect(toList());
 
 		var landPlatesAndWidths = graph.plates.stream()
 				.filter(p -> p.type == PlateType.Continental)
-				.map(p -> new Tuple2<>(p, findWidth(p.centers)))
+				.map(p -> new Pair<>(p, findWidth(p.centers)))
 				.collect(toList());
 
-		List<Tuple2<TectonicPlate, Double>> titlePlatesAndWidths;
+		List<Pair<TectonicPlate, Double>> titlePlatesAndWidths;
 		double thresholdForPuttingTitleOnLand = 0.3;
 		if (landPlatesAndWidths.size() > 0 && ((double)oceanPlatesAndWidths.size()) / landPlatesAndWidths.size() < thresholdForPuttingTitleOnLand)
 		{
@@ -636,13 +615,13 @@ public class TextDrawer
 		}
 
 		// Try drawing the title in each plate in titlePlatesAndWidths, starting from the widest plate to the narrowest.
-		titlePlatesAndWidths.sort((t1, t2) -> -t1.getSecond().compareTo(t2.getSecond()));
-		for (Tuple2<TectonicPlate, Double> plateAndWidth : titlePlatesAndWidths)
+		titlePlatesAndWidths.sort((t1, t2) -> -t1.second().compareTo(t2.second()));
+		for (Pair<TectonicPlate, Double> plateAndWidth : titlePlatesAndWidths)
 		{
 			try
 			{
 				if (drawNameHorizontal(map, g, generateNameOfType(TextType.Title, TitleType.Decorated, true),
-						extractLocationsFromCenters(plateAndWidth.getFirst().centers), graph, settings.drawBoldBackground,
+						extractLocationsFromCenters(plateAndWidth.first().centers), graph, settings.drawBoldBackground,
 						TextType.Title))
 				{
 					return;
@@ -650,7 +629,7 @@ public class TextDrawer
 
 				// The title didn't fit. Try drawing it with just a name.
 				if (drawNameHorizontal(map, g, generateNameOfType(TextType.Title, TitleType.NameOnly, true),
-						extractLocationsFromCenters(plateAndWidth.getFirst().centers), graph, settings.drawBoldBackground,
+						extractLocationsFromCenters(plateAndWidth.first().centers), graph, settings.drawBoldBackground,
 						TextType.Title))
 				{
 					return;

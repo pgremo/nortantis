@@ -160,7 +160,7 @@ public class LandWaterTool extends EditorTool
 						selectColorFromMapButton.setSelected(false);
 						selectedRegion = null;
 					}
-					RunSwing.showColorPickerWithPreviewPanel(toolOptionsPanel, colorDisplay, "Text color");
+					RunSwing.showColorPickerWithPreviewPanel(toolOptionsPanel, colorDisplay);
 				}
 			});
 			

@@ -6,7 +6,6 @@ import nortantis.util.AssetsPath;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Random;
 
 import static java.lang.String.join;
@@ -30,7 +29,6 @@ public class NameGen {
             readAllLines(file).stream()
                     .map(String::toLowerCase)
                     .map(Syllables::syllables)
-                    .map(Arrays::stream)
                     .forEach(chain::addAll);
         } catch (IOException e) {
             throw new RuntimeException(e);

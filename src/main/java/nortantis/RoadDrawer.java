@@ -2,7 +2,7 @@ package nortantis;
 
 import hoten.voronoi.Center;
 import hoten.voronoi.Edge;
-import nortantis.util.OrderlessPair;
+import nortantis.util.Pair;
 import nortantis.util.Range;
 
 import java.awt.*;
@@ -56,16 +56,16 @@ public class RoadDrawer
 		{
 			if (center.isCity)
 			{
-				Set<Center> partition = graph.breadthFirstSearch((c) -> !c.isMountain && !c.isWater, center);
+				var partition = graph.breadthFirstSearch((c) -> !c.isMountain && !c.isWater, center);
 				
-				Set<Center> connectedCities = partition.stream().filter((c) -> c.isCity).collect(Collectors.toSet());
+				var connectedCities = partition.stream().filter((c) -> c.isCity).collect(Collectors.toSet());
 				
-				Set<OrderlessPair<Center>> roadsAttemptedToAdd = new HashSet<>();
+				var roadsAttemptedToAdd = new HashSet<Pair<Center, Center>>();
 				
 				// Determine which cities will have roads between them
 				for (Center city : connectedCities)
 				{
-					OrderlessPair<Center> pair = new OrderlessPair<Center>(center, city);
+					var pair = new Pair<Center, Center>(center, city);
 					if (!roadsAttemptedToAdd.contains(pair))
 					{
 						// Store which roads I have already drawn so that I don't redraw them later

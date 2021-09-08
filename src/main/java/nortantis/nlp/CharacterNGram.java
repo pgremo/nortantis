@@ -19,7 +19,7 @@ public class CharacterNGram
 	private final int n;
 	private final Random r;
 	private final Map<List<Character>, Counter<Character>> lcMap;
-	private Set<String> namesFromCorpora;
+	private final Set<String> namesFromCorpora = new HashSet<>();
 	
 	private final char startToken = 0;
 	private final char endToken = 4;
@@ -40,28 +40,31 @@ public class CharacterNGram
 	{
 		for (var phrase : phrases)
 		{
-			for (var i : new Range(phrase.length()))
-			{
-				var lastChars = new ArrayList<Character>(n - 1);
-				for (int j = i - n + 1; j < i; j++)
-				{
-					lastChars.add(j < 0 ? startToken : phrase.charAt(j));
-				}
-				
-				lcMap.computeIfAbsent(lastChars, x -> new Counter<>()).add(phrase.charAt(i));
-			}
-			// Add the end token.
+			add(phrase);
+		}
+	}
+
+	public void add(String phrase) {
+		for (var i : new Range(phrase.length()))
+		{
 			var lastChars = new ArrayList<Character>(n - 1);
-			for (var j = phrase.length() - n + 1; j < phrase.length(); j++)
+			for (int j = i - n + 1; j < i; j++)
 			{
 				lastChars.add(j < 0 ? startToken : phrase.charAt(j));
 			}
-			lcMap.computeIfAbsent(lastChars, x -> new Counter<>()).add(endToken);
+
+			lcMap.computeIfAbsent(lastChars, x -> new Counter<>()).add(phrase.charAt(i));
 		}
-		
-		namesFromCorpora = new HashSet<>(phrases);
+		// Add the end token.
+		var lastChars = new ArrayList<Character>(n - 1);
+		for (var j = phrase.length() - n + 1; j < phrase.length(); j++)
+		{
+			lastChars.add(j < 0 ? startToken : phrase.charAt(j));
+		}
+		lcMap.computeIfAbsent(lastChars, x -> new Counter<>()).add(endToken);
+		namesFromCorpora.add(phrase);
 	}
-	
+
 	public String generateNameNotInCorpora() throws NotEnoughNamesException
 	{
 		return Stream.generate(this::generateName)
