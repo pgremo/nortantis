@@ -140,7 +140,7 @@ public class RunSwing
 	private JLabel lblBrightnessRange;
 	private JLabel lblMapEditsMessage;
 	private JSlider cityProbabilitySlider;
-	public final double cityFrequencySliderScale = 100.0 /SettingsGenerator.maxCityProbabillity;
+	public final double cityFrequencySliderScale = 100.0 /SettingsGenerator.maxCityProbability;
 	private JLabel cityProbabilityLabel;
 	private JButton btnChooseLandBlurColor;
 	private JRadioButton jaggedLinesButton;
@@ -1281,9 +1281,8 @@ public class RunSwing
 			booksPanel.setEnabled(drawTextCheckBox.isSelected());
 			for (var component : booksPanel.getComponents())
 			{
-				if (component instanceof JCheckBox)
+				if (component instanceof JCheckBox checkBox)
 				{
-					var checkBox = (JCheckBox)component;
 					checkBox.setEnabled(drawTextCheckBox.isSelected());
 				}
 			}
@@ -1929,7 +1928,7 @@ public class RunSwing
 		frayedEdgeSizeSlider.setValue(settings.frayedBorderSize);
 		grungeSlider.setValue(settings.grungeWidth);
 		cityProbabilitySlider.setValue((int)(settings.cityProbability * cityFrequencySliderScale));
-		initializeComboBoxItems(cityIconsSetComboBox, IconDrawer.getIconSets(IconDrawer.citiesName), settings.cityIconSetName);
+		initializeComboBoxItems(cityIconsSetComboBox, IconDrawer.getIconSets(IconType.cities), settings.cityIconSetName);
 		if (settings.lineStyle.equals(LineStyle.Jagged))
 		{
 			jaggedLinesButton.setSelected(true);
@@ -2091,8 +2090,7 @@ public class RunSwing
 		settings.books = new TreeSet<>();
 		for (var component : booksPanel.getComponents())
 		{
-			if (!(component instanceof JCheckBox)) continue;
-			var checkBox = (JCheckBox)component;
+			if (!(component instanceof JCheckBox checkBox)) continue;
 			if (!checkBox.isSelected()) continue;
 			settings.books.add(checkBox.getText());
 		}

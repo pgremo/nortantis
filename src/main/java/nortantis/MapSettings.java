@@ -82,7 +82,7 @@ public class MapSettings implements Serializable {
     public boolean drawRoads = true;
     public double cityProbability;
     public LineStyle lineStyle = LineStyle.Jagged;
-    public String cityIconSetName = IconDrawer.getIconSets(IconDrawer.citiesName)
+    public String cityIconSetName = IconDrawer.getIconSets(IconType.cities)
             .stream()
             .findFirst().orElse("");
     public double pointPrecision = 10.0; // Not exposed for editing. Only for backwards compatibility so I can change it without braking older settings files that have edits.

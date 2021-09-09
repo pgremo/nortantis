@@ -572,9 +572,9 @@ orders	clear
 others	most
 others	paired
 pair	good
-pairs	leader-and-second
-pairs	leader-second
-pairs	several
+tuples	leader-and-second
+tuples	leader-second
+tuples	several
 part	other
 personnel	possible
 point	strong

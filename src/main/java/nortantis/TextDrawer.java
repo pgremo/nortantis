@@ -10,7 +10,6 @@ import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -68,22 +67,28 @@ public class TextDrawer
 		this.originalSeed = settings.textRandomSeed;
 		this.namesGenerated = new HashSet<>();
 
-		var placeNames = new ArrayList<String>();
-		var personNames = new ArrayList<String>();
-		var nounAdjectivePairs = new ArrayList<Pair<String, String>>();
-		var nounVerbPairs = new ArrayList<Pair<String, String>>();
-		for (String book : settings.books)
-		{
-			placeNames.addAll(readNameList(AssetsPath.get("books", book +"_place_names.txt")));
-			personNames.addAll(readNameList(AssetsPath.get("books", book +"_person_names.txt")));
-			nounAdjectivePairs.addAll(readStringPairs(AssetsPath.get("books", book + "_noun_adjective_pairs.txt")));
-			nounVerbPairs.addAll(readStringPairs(AssetsPath.get("books", book + "_noun_verb_pairs.txt")));
-		}
+		var base = AssetsPath.get("books");
+		var placeNames = settings.books.stream()
+				.map(x -> base.resolve(x + "_place_names.txt"))
+				.flatMap(this::readNameList)
+				.collect(toList());
+		var personNames = settings.books.stream()
+				.map(x -> base.resolve(x + "_person_names.txt"))
+				.flatMap(this::readNameList)
+				.collect(toList());
+		var nounAdjectivePairs = settings.books.stream()
+				.map(x -> base.resolve(x + "_noun_adjective_pairs.txt"))
+				.flatMap(this::readStringPairs)
+				.collect(toList());
+		var nounVerbPairs = settings.books.stream()
+				.map(x -> base.resolve(x + "_noun_verb_pairs.txt"))
+				.flatMap(this::readStringPairs)
+				.collect(toList());
 
-		double maxWordLengthComparedToAverage = 2.0;
-		double probabilityOfKeepingNameLength1 = 0.0;
-		double probabilityOfKeepingNameLength2 = 0.0;
-		double probabilityOfKeepingNameLength3 = 0.3;
+		var maxWordLengthComparedToAverage = 2.0;
+		var probabilityOfKeepingNameLength1 = 0.0;
+		var probabilityOfKeepingNameLength2 = 0.0;
+		var probabilityOfKeepingNameLength3 = 0.3;
 		placeNameGenerator = new NameGenerator(r, placeNames, maxWordLengthComparedToAverage, probabilityOfKeepingNameLength1, probabilityOfKeepingNameLength2, probabilityOfKeepingNameLength3);
 		personNameGenerator = new NameGenerator(r, personNames, maxWordLengthComparedToAverage, probabilityOfKeepingNameLength1, probabilityOfKeepingNameLength2, probabilityOfKeepingNameLength3);
 
@@ -102,7 +107,7 @@ public class TextDrawer
 
 	}
 
-	private List<Pair<String, String>> readStringPairs(Path filename)
+	private Stream<Tuple2<String, String>> readStringPairs(Path filename)
 	{
 		try {
 			var counter = new AtomicInteger();
@@ -116,20 +121,18 @@ public class TextDrawer
 							System.out.printf("Warning: No string pair found in %s at line %d.%n", filename, counter.get());
 					})
 					.filter(x -> x.length == 2)
-					.map(x -> new Pair<>(x[0], x[1]))
-					.collect(toList());
+					.map(x -> new Tuple2<>(x[0], x[1]));
 		} catch (IOException e) {
 			throw new RuntimeException(format("Unable to read names from the file %s", filename), e);
 		}
 	}
 
-	private List<String> readNameList(Path filename)
+	private Stream<String> readNameList(Path filename)
 	{
 		try {
 			return Files.readAllLines(filename)
 					.stream()
-					.filter(not(String::isBlank))
-					.collect(toList());
+					.filter(not(String::isBlank));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to read names from the file " + filename, e);
 		}
@@ -164,28 +167,28 @@ public class TextDrawer
 
 		graphBounds = new Area(new java.awt.Rectangle(0, 0, graph.getWidth(), graph.getHeight()));
 
-		Graphics2D g = map.createGraphics();
+		var g = map.createGraphics();
 		g.setColor(settings.textColor);
 
 		addTitle(map, graph, g);
 
 		g.setFont(citiesAndOtherMountainsFontScaled);
 		// Get the height of the city/mountain font.
-		FontMetrics metrics = g.getFontMetrics(g.getFont());
-		int cityMountainFontHeight = getFontHeight(metrics);
-		for (IconDrawTask city : cityDrawTasks)
+		var metrics = g.getFontMetrics(g.getFont());
+		var cityMountainFontHeight = getFontHeight(metrics);
+		for (var city : cityDrawTasks)
 		{
-			Set<Point> cityLoc = new HashSet<>(1);
+			var cityLoc = new HashSet<Point>(1);
 			cityLoc.add(city.centerLoc);
-			String cityName = generateNameOfType(TextType.City, findCityTypeFromCityFileName(city.fileName), true);
-			double cityYNameOffset = 18;
+			var cityName = generateNameOfType(TextType.City, findCityTypeFromCityFileName(city.fileName), true);
+			var cityYNameOffset = 18.0;
 			drawNameRotated(map, g, cityName, cityLoc, city.scaledHeight/2.0 + (cityYNameOffset + cityMountainFontHeight/2.0) * settings.resolution, true, TextType.City);
 		}
 
 		g.setFont(regionFontScaled);
-		for (Region region : graph.regions)
+		for (var region : graph.regions)
 		{
-			Set<Point> locations = extractLocationsFromCenters(region.getCenters());
+			var locations = extractLocationsFromCenters(region.getCenters());
 			String name;
 			try
 			{
@@ -199,9 +202,9 @@ public class TextDrawer
 					TextType.Region);
 		}
 
-		for (Set<Center> mountainRange : mountainRanges)
+		for (var mountainRange : mountainRanges)
 		{
-			int mountainRangeMinSize = 50;
+			var mountainRangeMinSize = 50;
 			if (mountainRange.size() >= mountainRangeMinSize)
 			{
 				g.setFont(mountainRangeFontScaled);
@@ -212,13 +215,13 @@ public class TextDrawer
 			{
 				g.setFont(citiesAndOtherMountainsFontScaled);
 				// y offset added to name of mountain groups smaller than a range.
-				double mountainGroupYOffset = 67;
+				var mountainGroupYOffset = 67.0;
 				if (mountainRange.size() >= 2)
 				{
 					if (mountainRange.size() == 2)
 					{
-						Point location = findCentroid(extractLocationsFromCenters(mountainRange));
-						MapText text = createMapText(generateNameOfType(TextType.Other_mountains, OtherMountainsType.TwinPeaks, true), location, 0.0, TextType.Other_mountains);
+						var location = findCentroid(extractLocationsFromCenters(mountainRange));
+						var text = createMapText(generateNameOfType(TextType.Other_mountains, OtherMountainsType.TwinPeaks, true), location, 0.0, TextType.Other_mountains);
 						if (drawNameRotated(map, g, mountainGroupYOffset * settings.resolution, true, text))
 						{
 							mapTexts.add(text);
@@ -233,8 +236,8 @@ public class TextDrawer
 				}
 				else
 				{
-					Point location = findCentroid(extractLocationsFromCenters(mountainRange));
-					MapText text = createMapText(generateNameOfType(TextType.Other_mountains, OtherMountainsType.Peak, true), location, 0.0, TextType.Other_mountains);
+					var location = findCentroid(extractLocationsFromCenters(mountainRange));
+					var text = createMapText(generateNameOfType(TextType.Other_mountains, OtherMountainsType.Peak, true), location, 0.0, TextType.Other_mountains);
 					if (drawNameRotated(map, g, mountainGroupYOffset * settings.resolution, true, text))
 					{
 						mapTexts.add(text);
@@ -244,19 +247,19 @@ public class TextDrawer
 		}
 
 		g.setFont(riverFontScaled);
-		List<River> rivers = findRivers(graph);
-		for (River river : rivers)
+		var rivers = findRivers(graph);
+		for (var river : rivers)
 		{
 			// Rivers shorter than this will not be named. This must be at least 3.
-			int riverMinLength = 3;
+			var riverMinLength = 3;
 			if (river.size() >= riverMinLength)
 			{
-				int largeRiverWidth = 4;
-				RiverType riverType = river.getWidth() >= largeRiverWidth ? RiverType.Large : RiverType.Small;
+				var largeRiverWidth = 4;
+				var riverType = river.getWidth() >= largeRiverWidth ? RiverType.Large : RiverType.Small;
 
-				Set<Point> locations = extractLocationsFromCorners(river.getCorners());
+				var locations = extractLocationsFromCorners(river.getCorners());
 				// This is how far away from a river it's name will be drawn.
-				double riverNameRiseHeight = -32;
+				var riverNameRiseHeight = -32.0;
 				drawNameRotated(map, g, generateNameOfType(TextType.River, riverType, true), locations,
 						riverNameRiseHeight * settings.resolution, true, TextType.River);
 			}
@@ -268,7 +271,7 @@ public class TextDrawer
 
 	private CityType findCityTypeFromCityFileName(String cityFileNameNoExtension)
 	{
-		String name = cityFileNameNoExtension.toLowerCase();
+		var name = cityFileNameNoExtension.toLowerCase();
 		if (Stream.of("fort", "castle", "keep", "citadel").anyMatch(name::contains))
 		{
 			return CityType.Fortification;
@@ -298,24 +301,24 @@ public class TextDrawer
 	 */
 	public synchronized void drawUserModifiedText(BufferedImage map, WorldGraph graph)
 	{
-		Graphics2D g = map.createGraphics();
+		var g = map.createGraphics();
 
 		g.setColor(settings.textColor);
 
 		// Draw all text the user has (potentially) modified.
-		for (MapText text : settings.edits.text)
+		for (var text : settings.edits.text)
 		{
 			if (text.value == null || text.value.trim().length() == 0)
 			{
 				continue;
 			}
 
-			Point textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
+			var textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
 
 			switch (text.type) {
 				case Title -> {
 					g.setFont(titleFontScaled);
-					TectonicPlate plate = graph.getTectonicPlateAt(textLocation.x, textLocation.y);
+					var plate = graph.getTectonicPlateAt(textLocation.x, textLocation.y);
 					drawNameHorizontal(map, g, extractLocationsFromCenters(plate.centers),
 							graph, settings.drawBoldBackground, false, text);
 				}
@@ -325,14 +328,14 @@ public class TextDrawer
 				}
 				case Region -> {
 					g.setFont(regionFontScaled);
-					Center center = graph.findClosestCenter(textLocation.x, textLocation.y);
+					var center = graph.findClosestCenter(textLocation.x, textLocation.y);
 					Set<Center> plateCenters;
 					if (center.isWater) {
 						plateCenters = findPlateCentersWaterOnly(center.tectonicPlate);
 					} else {
 						plateCenters = center.region.getCenters();
 					}
-					Set<Point> locations = extractLocationsFromCenters(plateCenters);
+					var locations = extractLocationsFromCenters(plateCenters);
 					drawNameHorizontal(map, g, locations, graph, settings.drawBoldBackground, false, text);
 				}
 				case Mountain_range -> {
@@ -361,7 +364,7 @@ public class TextDrawer
 			nameCompiler.setSeed(System.currentTimeMillis());
 		}
 
-		Object subType = switch (type) {
+		var subType = switch (type) {
 			case Title -> new Counter<>(TitleType.values()).random(r);
 			case Other_mountains -> new Counter<>(OtherMountainsType.values()).random(r);
 			case River -> new Counter<>(RiverType.values()).random(r);
@@ -393,7 +396,7 @@ public class TextDrawer
 	{
 		switch (type) {
 			case Title -> {
-				TitleType titleType = subType == null ? TitleType.Decorated : (TitleType) subType;
+				var titleType = subType == null ? TitleType.Decorated : (TitleType) subType;
 
 				switch (titleType) {
 					case Decorated:
@@ -430,8 +433,8 @@ public class TextDrawer
 				}
 			}
 			case Other_mountains -> {
-				OtherMountainsType mountainType = subType == null ? OtherMountainsType.Mountains : (OtherMountainsType) subType;
-				String format = getOtherMountainNameFormat(mountainType);
+				var mountainType = subType == null ? OtherMountainsType.Mountains : (OtherMountainsType) subType;
+				var format = getOtherMountainNameFormat(mountainType);
 				if (r.nextDouble() < 0.5) {
 					return compileName(format, requireUnique);
 				} else {
@@ -480,8 +483,8 @@ public class TextDrawer
 				}
 			}
 			case River -> {
-				RiverType riverType = subType == null ? RiverType.Large : (RiverType) subType;
-				String format = getRiverNameFormat(riverType);
+				var riverType = subType == null ? RiverType.Large : (RiverType) subType;
+				var format = getRiverNameFormat(riverType);
 				if (r.nextDouble() < 0.5) {
 					return compileName(format, requireUnique);
 				}
@@ -575,7 +578,7 @@ public class TextDrawer
 	private String innerCreateUniqueName(String format, boolean requireUnique, Supplier<String> nameCreator)
 	{
         String name;
-        int maxRetries = 20;
+		var maxRetries = 20;
         do {
             name = format(format, nameCreator.get());
             maxRetries--;
@@ -595,16 +598,16 @@ public class TextDrawer
 
 		var oceanPlatesAndWidths = graph.plates.stream()
 				.filter(p -> p.type == PlateType.Oceanic)
-				.map(p -> new Pair<>(p, findWidth(p.centers)))
+				.map(p -> new Tuple2<>(p, findWidth(p.centers)))
 				.collect(toList());
 
 		var landPlatesAndWidths = graph.plates.stream()
 				.filter(p -> p.type == PlateType.Continental)
-				.map(p -> new Pair<>(p, findWidth(p.centers)))
+				.map(p -> new Tuple2<>(p, findWidth(p.centers)))
 				.collect(toList());
 
-		List<Pair<TectonicPlate, Double>> titlePlatesAndWidths;
-		double thresholdForPuttingTitleOnLand = 0.3;
+		List<Tuple2<TectonicPlate, Double>> titlePlatesAndWidths;
+		var thresholdForPuttingTitleOnLand = 0.3;
 		if (landPlatesAndWidths.size() > 0 && ((double)oceanPlatesAndWidths.size()) / landPlatesAndWidths.size() < thresholdForPuttingTitleOnLand)
 		{
 			titlePlatesAndWidths = landPlatesAndWidths;
@@ -616,7 +619,7 @@ public class TextDrawer
 
 		// Try drawing the title in each plate in titlePlatesAndWidths, starting from the widest plate to the narrowest.
 		titlePlatesAndWidths.sort((t1, t2) -> -t1.second().compareTo(t2.second()));
-		for (Pair<TectonicPlate, Double> plateAndWidth : titlePlatesAndWidths)
+		for (var plateAndWidth : titlePlatesAndWidths)
 		{
 			try
 			{
@@ -645,8 +648,8 @@ public class TextDrawer
 
 	private double findWidth(Set<Center> centers)
 	{
-		double min = min(centers, comparingDouble(c -> c.loc.x)).loc.x;
-		double max = max(centers, comparingDouble(c -> c.loc.x)).loc.x;
+		var min = min(centers, comparingDouble(c -> c.loc.x)).loc.x;
+		var max = max(centers, comparingDouble(c -> c.loc.x)).loc.x;
 		return max - min;
 	}
 
@@ -667,13 +670,13 @@ public class TextDrawer
 	{
 		var rivers = new ArrayList<River>();
 		var explored = new HashSet<Corner>();
-		for (Edge edge : graph.edges)
+		for (var edge : graph.edges)
 		{
 			if (edge.river >= riverMinWidth
 					&& edge.v0 != null && edge.v1 != null
 					&& !explored.contains(edge.v0) && !explored.contains(edge.v1))
 			{
-				River river = followRiver(edge.v0, edge.v1);
+				var river = followRiver(edge.v0, edge.v1);
 
 				// This count shouldn't be necessary. For some reason followRiver(...) is returning
 				// rivers which contain many Corners already in explored.
@@ -707,12 +710,12 @@ public class TextDrawer
 		assert head != null;
 		assert !head.equals(last);
 
-		River result = new River();
+		var result = new River();
 		result.add(head);
 		result.add(last);
 
-		Set<Edge> riverEdges = new TreeSet<>();
-		for (Edge e : head.protrudes)
+		var riverEdges = new TreeSet<Edge>();
+		for (var e : head.protrudes)
 			if (e.river >= riverMinWidth)
 				riverEdges.add(e);
 
@@ -729,7 +732,7 @@ public class TextDrawer
 		{
 			// Find the other river corner which is not "last".
 			Corner other = null;
-			for (Edge e : riverEdges)
+			for (var e : riverEdges)
 				if (head.equals(e.v0) && !last.equals(e.v1))
 				{
 					other = e.v1;
@@ -753,13 +756,13 @@ public class TextDrawer
 			// There are more than 2 river edges connected to head.
 
 			// Sort the river edges by river width.
-			List<Edge> edgeList = new ArrayList<>(riverEdges);
+			var edgeList = new ArrayList<>(riverEdges);
 			edgeList.sort((e0, e1) -> -Integer.compare(e0.river, e1.river));
 			Corner nextHead = null;
 
 			// Find which edge contains "last".
-			int indexOfLast = -1;
-			for (int i : new Range(edgeList.size()))
+			var indexOfLast = -1;
+			for (var i : new Range(edgeList.size()))
 			{
 				if (last == edgeList.get(i).v0 || last == edgeList.get(i).v1)
 				{
@@ -831,26 +834,26 @@ public class TextDrawer
 	 */
 	private void drawBackgroundBlendingForText(BufferedImage map, Graphics2D g, Point textStart, double angle, FontMetrics metrics, String text)
 	{
-		int textWidth = metrics.stringWidth(text);
-		int textHeight = getFontHeight(metrics);
+		var textWidth = metrics.stringWidth(text);
+		var textHeight = getFontHeight(metrics);
 
 		// This magic number below is a result of trial and error to get the blur levels to look right.
-		int kernelSize = (int)((13.0 / 54.0) * textHeight);
+		var kernelSize = (int)((13.0 / 54.0) * textHeight);
 		if (kernelSize == 0)
 		{
 			return;
 		}
-		int padding = kernelSize/2;
+		var padding = kernelSize/2;
 
-		BufferedImage textBG = new BufferedImage(textWidth + padding*2, textHeight + padding*2, BufferedImage.TYPE_BYTE_GRAY);
+		var textBG = new BufferedImage(textWidth + padding*2, textHeight + padding*2, BufferedImage.TYPE_BYTE_GRAY);
 
-		Graphics2D bG = textBG.createGraphics();
+		var bG = textBG.createGraphics();
 		bG.setFont(g.getFont());
 		bG.setColor(Color.white);
 		bG.drawString(text, padding, padding + metrics.getAscent());
 
 		// Use convolution to make a hazy background for the text.
-		BufferedImage haze = ImageHelper.convolveGrayscale(textBG, ImageHelper.createGaussianKernel(kernelSize), true);
+		var haze = ImageHelper.convolveGrayscale(textBG, ImageHelper.createGaussianKernel(kernelSize), true);
 		// Threshold it and convolve it again to make the haze bigger.
 		ImageHelper.threshold(haze, 1);
 		haze = ImageHelper.convolveGrayscale(haze, ImageHelper.createGaussianKernel(kernelSize), true);
@@ -864,13 +867,13 @@ public class TextDrawer
 		if (name.length() == 0)
 			return;
 
-		Font original = g.getFont();
-		Color originalColor = g.getColor();
-		Font background = g.getFont().deriveFont(Font.BOLD, g.getFont().getSize());
-		FontMetrics metrics = g.getFontMetrics(original);
+		var original = g.getFont();
+		var originalColor = g.getColor();
+		var background = g.getFont().deriveFont(Font.BOLD, g.getFont().getSize());
+		var metrics = g.getFontMetrics(original);
 
-		Point curLoc = new Point(location.x , location.y);
-		for (int i : new Range(name.length()))
+		var curLoc = new Point(location.x , location.y);
+		for (var i : new Range(name.length()))
 		{
 			if (boldBackground)
 			{
@@ -891,11 +894,11 @@ public class TextDrawer
 		if (name.length() == 0)
 			return false;
 
-		Point centroid = findCentroid(locations);
+		var centroid = findCentroid(locations);
 
 		centroid.y += 0;
 
-		MapText text = createMapText(name, centroid, 0.0, textType);
+		var text = createMapText(name, centroid, 0.0, textType);
 		if (drawNameHorizontal(map, g, locations, graph, boldBackground, true, text))
 		{
 			mapTexts.add(text);
@@ -904,17 +907,17 @@ public class TextDrawer
 		if (locations.size() > 0)
 		{
 			// Try random locations to try to find a place to fit the text.
-			Point[] locationsArray = locations.toArray(new Point[0]);
-			for (@SuppressWarnings("unused") int i : new Range(30))
+			var locationsArray = locations.toArray(new Point[0]);
+			for (@SuppressWarnings("unused") var i : new Range(30))
 			{
 				// Select a few random locations and choose the one closest to the centroid.
-				List<Point> samples = new ArrayList<>(3);
-				for (@SuppressWarnings("unused") int sampleNumber : new Range(5))
+				var samples = new ArrayList<Point>(3);
+				for (@SuppressWarnings("unused") var sampleNumber : new Range(5))
 				{
 					samples.add(locationsArray[r.nextInt(locationsArray.length)]);
 				}
 
-				Point loc = samples.stream()
+				var loc = samples.stream()
 						.max((point1, point2) -> -Double.compare(point1.distanceTo(centroid), point2.distanceTo(centroid)))
 						.orElse(null);
 
@@ -939,22 +942,22 @@ public class TextDrawer
 			Set<Point> locations, WorldGraph graph, boolean boldBackground,
 			boolean enableBoundsChecking, MapText text)
 	{
-		FontMetrics metrics = g.getFontMetrics(g.getFont());
-		double width = metrics.stringWidth(text.value);
-		double height = getFontHeight(metrics);
-		Point textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
+		var metrics = g.getFontMetrics(g.getFont());
+		int width = metrics.stringWidth(text.value);
+		int height = getFontHeight(metrics);
+		var textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
 
-		String[] parts = text.value.split(" ");
+		var parts = text.value.split(" ");
 
-		if (parts.length > 1 && !locations.contains(graph.findClosestCenter((int)textLocation.x - width/2, (int)textLocation.y - height/2).loc))
+		if (parts.length > 1 && !locations.contains(graph.findClosestCenter((int)textLocation.x - width/2.0, (int)textLocation.y - height/2.0).loc))
 		{
 			// One or more of the corners doesn't fit in the region. Draw it on 2 lines.
-			int start = text.value.length()/2;
-			int closestL = start;
+			var start = text.value.length()/2;
+			var closestL = start;
 			for (; closestL >= 0; closestL--)
 				if (text.value.charAt(closestL) == ' ')
 						break;
-			int closestR = start;
+			var closestR = start;
 			for (; closestR < text.value.length(); closestR++)
 				if (text.value.charAt(closestR) == ' ')
 						break;
@@ -963,38 +966,38 @@ public class TextDrawer
 				pivot = closestL;
 			else
 				pivot = closestR;
-			String nameLine1 = text.value.substring(0, pivot);
-			String nameLine2 = text.value.substring(pivot + 1);
-			Point ulCorner1 = new Point(textLocation.x - metrics.stringWidth(nameLine1)/2.0,
+			var nameLine1 = text.value.substring(0, pivot);
+			var nameLine2 = text.value.substring(pivot + 1);
+			var ulCorner1 = new Point(textLocation.x - metrics.stringWidth(nameLine1)/2.0,
 					textLocation.y - getFontHeight(metrics)/2.0);
-			Point ulCorner2 =  new Point(textLocation.x - metrics.stringWidth(nameLine2)/2.0,
+			var ulCorner2 =  new Point(textLocation.x - metrics.stringWidth(nameLine2)/2.0,
 					textLocation.y + getFontHeight(metrics)/2.0);
 
 			// Make sure we don't draw on top of existing text. Only draw the text if both lines can be drawn.
 			// Check line 1.
-			java.awt.Rectangle bounds1 = new java.awt.Rectangle((int)ulCorner1.x,
+			var bounds1 = new java.awt.Rectangle((int)ulCorner1.x,
 					(int)ulCorner1.y, metrics.stringWidth(nameLine1), getFontHeight(metrics));
-			Area area1 = new Area(bounds1);
+			var area1 = new Area(bounds1);
 			if (enableBoundsChecking && overlapsExistingTextOrCityOrIsOffMap(area1))
 			{
 				return false;
 			}
 			// Check line 2.
-			java.awt.Rectangle bounds2 = new java.awt.Rectangle((int)ulCorner2.x,
+			var bounds2 = new java.awt.Rectangle((int)ulCorner2.x,
 					(int)ulCorner2.y, metrics.stringWidth(nameLine2), getFontHeight(metrics));
-			Area area2 = new Area(bounds2);
+			var area2 = new Area(bounds2);
 			if (enableBoundsChecking && overlapsExistingTextOrCityOrIsOffMap(area2))
 			{
 				return false;
 			}
 			text.areas = asList(area1, area2);
 
-			Point textStartLine1 = new Point(ulCorner1.x, ulCorner1.y + metrics.getAscent());
+			var textStartLine1 = new Point(ulCorner1.x, ulCorner1.y + metrics.getAscent());
 			//drawBackgroundBlending(map, g, (int)bounds1.getWidth(), (int)bounds1.getHeight(), ulCorner1, 0);
 			drawBackgroundBlendingForText(map, g, textStartLine1, 0, metrics, nameLine1);
 			drawNameHorizontalAtPoint(g, nameLine1, textStartLine1, boldBackground);
 
-			Point textStartLine2 = new Point(ulCorner2.x, ulCorner2.y + metrics.getAscent());
+			var textStartLine2 = new Point(ulCorner2.x, ulCorner2.y + metrics.getAscent());
 			//drawBackgroundBlending(map, g, (int)bounds2.getWidth(), (int)bounds2.getHeight(), ulCorner2, 0);
 			drawBackgroundBlendingForText(map, g, textStartLine2, 0, metrics, nameLine2);
 			drawNameHorizontalAtPoint(g, nameLine2, textStartLine2, boldBackground);
@@ -1002,10 +1005,10 @@ public class TextDrawer
 		else
 		{
 			// Make sure we don't draw on top of existing text.
-			java.awt.Rectangle bounds = new java.awt.Rectangle((int)(textLocation.x - width/2),
-					(int)(textLocation.y - height/2), metrics.stringWidth(text.value), (int)height);
+			var bounds = new java.awt.Rectangle((int)(textLocation.x - width/2),
+					(int)(textLocation.y - height/2), metrics.stringWidth(text.value), height);
 			//g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-			Area area = new Area(bounds);
+			var area = new Area(bounds);
 			if (enableBoundsChecking && overlapsExistingTextOrCityOrIsOffMap(area))
 			{
 				return false;
@@ -1013,9 +1016,9 @@ public class TextDrawer
 
 			text.areas = singletonList(area);
 
-			Point boundsLocation = new Point(bounds.getLocation().x, bounds.getLocation().y);
+			var boundsLocation = new Point(bounds.getLocation().x, bounds.getLocation().y);
 
-			Point textStart = new Point(boundsLocation.x, boundsLocation.y + metrics.getAscent());
+			var textStart = new Point(boundsLocation.x, boundsLocation.y + metrics.getAscent());
 			//drawBackgroundBlending(map, g, width, height, boundsLocation, 0);
 			drawBackgroundBlendingForText(map, g, textStart, 0, metrics, text.value);
 			drawNameHorizontalAtPoint(g, text.value, textStart, boldBackground);
@@ -1025,9 +1028,8 @@ public class TextDrawer
 
 	public static java.awt.Point getTextBounds(String text, Font font)
 	{
-		FontMetrics metrics = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(font);
-		return new java.awt.Point(metrics.stringWidth(text),
-				metrics.getHeight());
+		var metrics = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(font);
+		return new java.awt.Point(metrics.stringWidth(text), metrics.getHeight());
 	}
 
 	private static int getFontHeight(FontMetrics metrics)
@@ -1059,10 +1061,10 @@ public class TextDrawer
 			return;
 
 
-		Point centroid = findCentroid(locations);
+		var centroid = findCentroid(locations);
 
-		SimpleRegression regression = new SimpleRegression();
-		for (Point p : locations)
+		var regression = new SimpleRegression();
+		for (var p : locations)
 		{
 			regression.addObservation(new double[]{p.x}, p.y);
 		}
@@ -1072,8 +1074,8 @@ public class TextDrawer
 			regression.regress();
 
 			// Find the angle to rotate the text to.
-			double y0 = regression.predict(0);
-			double y1 = regression.predict(1);
+			var y0 = regression.predict(0);
+			var y1 = regression.predict(1);
 			// Move the intercept to the origin.
 			y1 -= y0;
 			angle = Math.atan(y1);
@@ -1084,7 +1086,7 @@ public class TextDrawer
 			angle = 0;
 		}
 
-		MapText text = createMapText(name, centroid, angle, type);
+		var text = createMapText(name, centroid, angle, type);
 		if (drawNameRotated(map, g, riseOffset, enableBoundsChecking, text))
 		{
 			mapTexts.add(text);
@@ -1103,9 +1105,9 @@ public class TextDrawer
 	public boolean drawNameRotated(BufferedImage map, Graphics2D g,
 			double riseOffset, boolean enableBoundsChecking, MapText text)
 	{
-		FontMetrics metrics = g.getFontMetrics(g.getFont());
-		int width = metrics.stringWidth(text.value);
-		int height = getFontHeight(metrics);
+		var metrics = g.getFontMetrics(g.getFont());
+		var width = metrics.stringWidth(text.value);
+		var height = getFontHeight(metrics);
 
 		if (width == 0 || height == 0)
 		{
@@ -1113,19 +1115,18 @@ public class TextDrawer
 			return false;
 		}
 
-		Point textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
+		var textLocation = new Point(text.location.x * settings.resolution, text.location.y * settings.resolution);
 
-		Point offset = new Point(riseOffset * Math.sin(text.angle), -riseOffset * Math.cos(text.angle));
-		Point pivot = new Point(textLocation.x - offset.x, textLocation.y - offset.y);
+		var offset = new Point(riseOffset * Math.sin(text.angle), -riseOffset * Math.cos(text.angle));
+		var pivot = new Point(textLocation.x - offset.x, textLocation.y - offset.y);
 
-		AffineTransform orig = g.getTransform();
+		var orig = g.getTransform();
 		g.rotate(text.angle, pivot.x, pivot.y);
 
 		// Make sure we don't draw on top of existing text.
-		java.awt.Rectangle bounds = new java.awt.Rectangle((int)(pivot.x - width/2),
+		var bounds = new java.awt.Rectangle((int)(pivot.x - width/2),
 				(int)(pivot.y - height/2), width, height);
-		Area area = new Area(bounds);
-		area = area.createTransformedArea(g.getTransform());
+		var area = new Area(bounds).createTransformedArea(g.getTransform());
 		if (enableBoundsChecking && overlapsExistingTextOrCityOrIsOffMap(area))
 		{
 			// If there is a riseOffset, try negating it to put the name below the object instead of above.
@@ -1151,7 +1152,7 @@ public class TextDrawer
 		// Update the text location with the offset.
 		text.location = new Point(pivot.x / settings.resolution, pivot.y / settings.resolution);
 
-		Point textStart = new Point(bounds.getLocation().x, bounds.getLocation().y + metrics.getAscent());
+		var textStart = new Point(bounds.getLocation().x, bounds.getLocation().y + metrics.getAscent());
 		drawBackgroundBlendingForText(map, g, textStart, text.angle, metrics, text.value);
 
 		//g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -1169,8 +1170,8 @@ public class TextDrawer
 
 	public Point findCentroid(Collection<Point> plateCenters)
 	{
-		Point centroid = new Point(0, 0);
-		for (Point p : plateCenters)
+		var centroid = new Point(0, 0);
+		for (var p : plateCenters)
 		{
 			centroid.x += p.x;
 			centroid.y += p.y;
@@ -1183,14 +1184,14 @@ public class TextDrawer
 
 	private boolean overlapsExistingTextOrCityOrIsOffMap(Area bounds)
 	{
-		for (MapText mp : mapTexts)
+		for (var mp : mapTexts)
 		{
 			// Ignore empty text and ignore edited text.
 			if (mp.value.length() > 0)
 			{
-				for (Area a : mp.areas)
+				for (var a : mp.areas)
 				{
-					Area aCopy = new Area(a);
+					var aCopy = new Area(a);
 					aCopy.intersect(bounds);
 					if (!aCopy.isEmpty())
 						return true;
@@ -1198,9 +1199,9 @@ public class TextDrawer
 			}
 		}
 
-		for (Area a : cityAreas)
+		for (var a : cityAreas)
 		{
-			Area aCopy = new Area(a);
+			var aCopy = new Area(a);
 			aCopy.intersect(bounds);
 			if (!aCopy.isEmpty())
 				return true;
@@ -1231,10 +1232,10 @@ public class TextDrawer
 	 */
 	public MapText findTextPicked(java.awt.Point point)
 	{
-		for (MapText mp : mapTexts)
+		for (var mp : mapTexts)
 		{
 			if (mp.value.length() > 0)
-				for (Area a : mp.areas)
+				for (var a : mp.areas)
 				{
 					if (a.contains(point))
 						return mp;
@@ -1253,7 +1254,7 @@ public class TextDrawer
 	 */
 	public MapText createUserAddedText(TextType type, Point location)
 	{
-		String name = generateNameOfTypeForTextEditor(type);
+		var name = generateNameOfTypeForTextEditor(type);
 		// Getting the id must be done after calling generateNameOfType because said method increments textCounter
 		// before generating the name.
 		return createMapText(name, location, 0.0, type, new ArrayList<>(0));

@@ -2,7 +2,7 @@ package nortantis;
 
 import nortantis.util.AssetsPath;
 import nortantis.util.Counter;
-import nortantis.util.Pair;
+import nortantis.util.Tuple2;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -20,8 +20,8 @@ import static org.apache.commons.text.WordUtils.capitalize;
 public class NameCompiler
 {
 	// The first part of each pair is the noun.
-	private final List<Pair<String, String>> nounAdjectivePairs;
-	private List<Pair<String, String>> nounVerbPairs;
+	private final List<Tuple2<String, String>> nounAdjectiveTuples;
+	private List<Tuple2<String, String>> nounVerbTuples;
 	// Used to decide whether to return a result from nounAdjectivePairs or nounVerbPairs.
 	private final Counter<String> counter;
 	private final Random r;
@@ -31,8 +31,8 @@ public class NameCompiler
 	}
 	private final Set<String> dict;
 
-	public NameCompiler(Random r, List<Pair<String, String>> nounAdjectivePairs,
-			List<Pair<String, String>> nounVerbPairs)
+	public NameCompiler(Random r, List<Tuple2<String, String>> nounAdjectiveTuples,
+			List<Tuple2<String, String>> nounVerbTuples)
 	{
 		// Load the word dictionary.
 		List<String> lines;
@@ -44,40 +44,39 @@ public class NameCompiler
 			throw new RuntimeException("Unable to read word dictionary file.", e);
 		}
 		dict = new TreeSet<>();
-		for (String line : lines)
+		for (var line : lines)
 		{
-			String[] parts = line.split("[\\s0-9/]");
-			if (parts.length == 0)
-				continue;
-			String word = parts[0];
+			var parts = line.split("[\\s0-9/]");
+			if (parts.length == 0) continue;
+			var word = parts[0];
 			word = word.trim();
 			dict.add(word);
 		}
 
-		this.nounVerbPairs = convertToPresentTense(nounVerbPairs);
+		this.nounVerbTuples = convertToPresentTense(nounVerbTuples);
 
 		// Make all first letters capital.
-		this.nounAdjectivePairs = capitalizeFirstLetters(nounAdjectivePairs);
-		this.nounVerbPairs = capitalizeFirstLetters(this.nounVerbPairs);
+		this.nounAdjectiveTuples = capitalizeFirstLetters(nounAdjectiveTuples);
+		this.nounVerbTuples = capitalizeFirstLetters(this.nounVerbTuples);
 
 
 		this.r = r;
 		counter = new Counter<>();
-		counter.add("adjectives", this.nounAdjectivePairs.size());
-		counter.add("verbs", this.nounVerbPairs.size());
+		counter.add("adjectives", this.nounAdjectiveTuples.size());
+		counter.add("verbs", this.nounVerbTuples.size());
 	}
 
-	private List<Pair<String, String>> convertToPresentTense(List<Pair<String, String>> verbPairs)
+	private List<Tuple2<String, String>> convertToPresentTense(List<Tuple2<String, String>> tuples)
 	{
-		return verbPairs.stream()
-				.map(x -> new Pair<>(x.first(), convertVerbToPresentTense(x.second())))
+		return tuples.stream()
+				.map(x -> new Tuple2<>(x.first(), convertVerbToPresentTense(x.second())))
 				.collect(toList());
 	}
 
-	private List<Pair<String, String>> capitalizeFirstLetters(List<Pair<String, String>> pairs)
+	private List<Tuple2<String, String>> capitalizeFirstLetters(List<Tuple2<String, String>> tuples)
 	{
-		return pairs.stream()
-				.map(x -> new Pair<>(capitalize(x.first()), capitalize(x.second())))
+		return tuples.stream()
+				.map(x -> new Tuple2<>(capitalize(x.first()), capitalize(x.second())))
 				.collect(toList());
 	}
 
@@ -85,51 +84,46 @@ public class NameCompiler
 	{
 		if (counter.random(r).equals("adjectives"))
 		{
-			if (nounAdjectivePairs.size() == 0)
+			if (nounAdjectiveTuples.size() == 0)
 			{
 				return "";
 			}
-			var pair = nounAdjectivePairs.get(r.nextInt(nounAdjectivePairs.size()));
-			double d = r.nextDouble();
-			String result;
+			var pair = nounAdjectiveTuples.get(r.nextInt(nounAdjectiveTuples.size()));
+			var d = r.nextDouble();
 			if (d < 1.0/3.0)
 			{
 				// Just return the noun.
-				result = pair.first();
+				return pair.first();
 			}
 			else if (d < 2.0/3.0)
 			{
 				// Just return the adjective.
-				result = pair.second();
+				return pair.second();
 			}
 			else
 			{
 				// Return both.
-				result = pair.second() + " " + pair.first();
+				return pair.second() + " " + pair.first();
 			}
-			return result;
 		}
 		else
 		{
-			if (nounVerbPairs.size() == 0)
+			if (nounVerbTuples.size() == 0)
 			{
 				return "";
 			}
-			var pair = nounVerbPairs.get(r.nextInt(nounVerbPairs.size()));
-			double d = r.nextDouble();
-			String result;
+			var pair = nounVerbTuples.get(r.nextInt(nounVerbTuples.size()));
+			var d = r.nextDouble();
 			if (d < 0.5)
 			{
 				// Just return the noun.
-				result = pair.first();
+				return pair.first();
 			}
 			else
 			{
 				// Return both.
-				result = pair.second() + " " + pair.first();
+				return pair.second() + " " + pair.first();
 			}
-
-			return result;
 		}
 	}
 
@@ -141,7 +135,7 @@ public class NameCompiler
 	 */
 	String convertVerbToPresentTense(String verb)
 	{
-		List<Character> vowels = Arrays.asList('a', 'e', 'i', 'o', 'u');
+		var vowels = Arrays.asList('a', 'e', 'i', 'o', 'u');
 
 		if (verb.endsWith("ing"))
 			return verb;
@@ -156,7 +150,6 @@ public class NameCompiler
 		{
 			return verb.substring(0, verb.length() - 2) + "ing";
 		}
-
 
 		if (verb.endsWith("aid"))
 		{

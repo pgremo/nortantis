@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +26,7 @@ public class SettingsGenerator
 	public static int minWorldSize = 2000;
 	public static int maxWorldSize = 30000;
 	public static int worldSizePrecision = 1000;
-	public static double maxCityProbabillity = 1.0/40.0;
+	public static double maxCityProbability = 1.0/40.0;
 
 	public static MapSettings generate(ObjectMapper mapper)
 	{
@@ -35,8 +34,8 @@ public class SettingsGenerator
 		{
 			throw new IllegalArgumentException("The default settings files " + defaultSettingsFile + " does not exist");
 		}
-		
-		Random rand = new Random();
+
+		var rand = new Random();
 		// Prime the random number generator
 		for (int i = 0; i < 100; i++)
 		{
@@ -55,12 +54,12 @@ public class SettingsGenerator
 		settings.pointPrecision = MapSettings.defaultPointPrecision;
 		
 		setRandomSeeds(settings, rand);
-		
-		int hueRange = 16;
-		int saturationRange = 25;
-		int brightnessRange = 25;
-		
-		Color landColor = rand.nextInt(2) == 1 ? settings.landColor : settings.oceanColor;
+
+		var hueRange = 16;
+		var saturationRange = 25;
+		var brightnessRange = 25;
+
+		var landColor = rand.nextInt(2) == 1 ? settings.landColor : settings.oceanColor;
 		Color oceanColor;
 		if (landColor == settings.landColor)
 		{
@@ -77,8 +76,8 @@ public class SettingsGenerator
 		settings.landColor = MapCreator.generateColorFromBaseColor(rand, landColor, hueRange, saturationRange, brightnessRange);
 		
 		settings.oceanColor = MapCreator.generateColorFromBaseColor(rand, oceanColor, hueRange, saturationRange, brightnessRange);
-		
-		double landBlurColorScale = 0.5;
+
+		var landBlurColorScale = 0.5;
 		settings.landBlurColor = new Color((int)(settings.landColor.getRed() * landBlurColorScale), (int)(settings.landColor.getGreen() * landBlurColorScale), (int)(settings.landColor.getBlue() * landBlurColorScale));
 		if (settings.oceanEffect == OceanEffect.Ripples)
 		{
@@ -86,14 +85,14 @@ public class SettingsGenerator
 		}
 		else if (settings.oceanEffect == OceanEffect.Blur)
 		{
-			double oceanEffectsColorScale = 0.3;
+			var oceanEffectsColorScale = 0.3;
 			settings.oceanEffectsColor = new Color((int)(settings.oceanColor.getRed() * oceanEffectsColorScale), (int)(settings.oceanColor.getGreen() * oceanEffectsColorScale), (int)(settings.oceanColor.getBlue() * oceanEffectsColorScale));
 		}
 		else
 		{
 			// Concentric waves
-			double oceanEffectsColorScale = 0.5;
-			int alpha = 255;
+			var oceanEffectsColorScale = 0.5;
+			var alpha = 255;
 			settings.oceanEffectsColor = new Color((int)(settings.oceanColor.getRed() * oceanEffectsColorScale), (int)(settings.oceanColor.getGreen() * oceanEffectsColorScale), (int)(settings.oceanColor.getBlue() * oceanEffectsColorScale), alpha);
 			
 		}
@@ -107,14 +106,14 @@ public class SettingsGenerator
 		settings.frayedBorderSize = 100 + Math.abs(rand.nextInt(20000));
 		
 		settings.grungeWidth = 100 + rand.nextInt(1400);
-		
-		final double drawBorderProbability = 0.25;
+
+		var drawBorderProbability = 0.25;
 		settings.drawBorder = rand.nextDouble() > drawBorderProbability;
-		Set<String> borderTypes = MapCreator.getAvailableBorderTypes();
+		var borderTypes = MapCreator.getAvailableBorderTypes();
 		if (!borderTypes.isEmpty())
 		{
 			// Random border type.
-			int index = Math.abs(rand.nextInt()) % borderTypes.size();
+			var index = Math.abs(rand.nextInt()) % borderTypes.size();
 			settings.borderType = borderTypes.toArray(new String[0])[index];
 			if (settings.borderType.equals("dashes"))
 			{
@@ -129,13 +128,13 @@ public class SettingsGenerator
 		
 		if (rand.nextDouble() > 0.25)
 		{
-			settings.cityProbability =  0.25 * maxCityProbabillity;
+			settings.cityProbability =  0.25 * maxCityProbability;
 		}
 		else
 		{
 			settings.cityProbability = 0.0;
 		}
-		Set<String> cityIconSets = IconDrawer.getIconSets(IconDrawer.citiesName);
+		var cityIconSets = IconDrawer.getIconSets(IconType.cities);
 		if (cityIconSets.size() > 0)
 		{
 			settings.cityIconSetName = new ArrayList<>(cityIconSets).get(rand.nextInt(cityIconSets.size()));
@@ -174,10 +173,10 @@ public class SettingsGenerator
 		settings.boldBackgroundColor = MapCreator.generateColorFromBaseColor(rand, settings.boldBackgroundColor, hueRange, saturationRange, brightnessRange);
 		
 		// This threshold prevents large maps from having land on the edge, because such maps should be the entire world/continent.
-		int noOceanOnEdgeThreshold = 15000;
+		var noOceanOnEdgeThreshold = 15000.0;
 		if (settings.worldSize < noOceanOnEdgeThreshold)
 		{
-			settings.edgeLandToWaterProbability = settings.worldSize / (double) noOceanOnEdgeThreshold;
+			settings.edgeLandToWaterProbability = settings.worldSize / noOceanOnEdgeThreshold;
 			// Make the edge and center land water probability add up to 1 so there is usually both land and ocean.
 			settings.centerLandToWaterProbability = 1.0 - settings.edgeLandToWaterProbability;
 		}
@@ -189,24 +188,24 @@ public class SettingsGenerator
 		
 		settings.edgeLandToWaterProbability = Math.round(settings.edgeLandToWaterProbability * 100.0) / 100.0;
 		settings.centerLandToWaterProbability = Math.round(settings.centerLandToWaterProbability * 100.0) / 100.0;
-		
-		Dimension dimension = RunSwing.parseGenerateBackgroundDimensionsFromDropdown(RunSwing.getAllowedDimmensions().get(rand.nextInt(RunSwing.getAllowedDimmensions().size())));
+
+		var dimension = RunSwing.parseGenerateBackgroundDimensionsFromDropdown(RunSwing.getAllowedDimmensions().get(rand.nextInt(RunSwing.getAllowedDimmensions().size())));
 		settings.generatedWidth = dimension.width;
 		settings.generatedHeight = dimension.height;
 		
 		settings.books.clear();
-		List<String> allBooks = RunSwing.getAllBooks();
+		var allBooks = RunSwing.getAllBooks();
 		if (allBooks.size() < 3)
 		{
 			settings.books.addAll(allBooks);
 		}
 		else
 		{
-			int numBooks = 2 + Math.abs(rand.nextInt(allBooks.size() - 1));
-			List<String> booksRemaining = new ArrayList<>(allBooks);
-			for (@SuppressWarnings("unused") int ignored : new Range(numBooks))
+			var numBooks = 2 + Math.abs(rand.nextInt(allBooks.size() - 1));
+			var booksRemaining = new ArrayList<>(allBooks);
+			for (@SuppressWarnings("unused") var ignored : new Range(numBooks))
 			{
-				int index = rand.nextInt(booksRemaining.size());
+				var index = rand.nextInt(booksRemaining.size());
 				settings.books.add(booksRemaining.get(index));
 				booksRemaining.remove(index);
 			}
@@ -219,7 +218,7 @@ public class SettingsGenerator
 	
 	private static void setRandomSeeds(MapSettings settings, Random rand)
 	{
-		long seed = Math.abs(rand.nextInt());
+		var seed = Math.abs(rand.nextInt());
 		settings.randomSeed = seed;
 		settings.regionsRandomSeed = seed;
 		settings.backgroundRandomSeed = seed;
