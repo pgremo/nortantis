@@ -1174,8 +1174,8 @@ operations	called
 others	know
 others	let
 pair	make
-tuples	chosen
-tuples	confirmed
+pairs	chosen
+pairs	confirmed
 people	pay
 personnel	cause
 personnel	discussing
@@ -4699,7 +4699,7 @@ object	being
 object	deny
 originals	put
 outsiders	forcing
-tuples	working
+pairs	working
 pen	approaching
 pen	face
 pen	holding
